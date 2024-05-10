@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "558598960392",
+    "project_id": "memorial-book-76916",
+    "storage_bucket": "memorial-book-76916.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558598960392:android:cd61fc573ef425b61ba8bd",
+        "android_client_info": {
+          "package_name": "com.example.memorial_book"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjFNS1yAXIr4Ss7uyya0kki1gpHI7sysQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
