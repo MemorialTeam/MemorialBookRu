@@ -21,16 +21,16 @@ class GetMapOfPeopleResponseModel {
   }
 }
 
-class BurialCordResponseModel {
+class CoordsResponseModel {
   dynamic lat;
   dynamic lng;
 
-  BurialCordResponseModel({
+  CoordsResponseModel({
     required this.lat,
     required this.lng,
   });
 
-  BurialCordResponseModel.fromJson(Map<String, dynamic> json) {
+  CoordsResponseModel.fromJson(Map<String, dynamic> json) {
     json['lat'] != null ?
     lat = json['lat'] :
     null;

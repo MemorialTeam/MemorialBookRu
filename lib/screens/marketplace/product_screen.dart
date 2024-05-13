@@ -1,21 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:memorial_book/provider/marketplace_provider.dart';
 import 'package:memorial_book/screens/marketplace/product_card_screen.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/marketplace_app_bar.dart';
 import 'package:memorial_book/widgets/marketplace_widgets/max_vertical_product_card.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
 import '../../helpers/enums.dart';
+import '../../models/market/item_model.dart';
 import '../../widgets/search_engine.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({
     super.key,
-    required this.state,
   });
-
-  final MarketplaceState state;
 
   @override
   State<ProductScreen> createState() => _ProductScreenState();
@@ -23,35 +23,9 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
 
-  String title() {
-    switch(widget.state) {
-      case MarketplaceState.services:
-        return 'Услуги';
-      case MarketplaceState.products:
-        return 'Товары';
-    }
-  }
-
-  String image() {
-    switch(widget.state) {
-      case MarketplaceState.services:
-        return ConstantsAssets.testServicesImage;
-      case MarketplaceState.products:
-        return ConstantsAssets.testProductImage;
-    }
-  }
-
-  int count() {
-    switch(widget.state) {
-      case MarketplaceState.services:
-        return 5;
-      case MarketplaceState.products:
-        return 20;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final marketplaceProvider = Provider.of<MarketplaceProvider>(context);
     return MarketplaceAppBar(
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
@@ -63,10 +37,10 @@ class _ProductScreenState extends State<ProductScreen> {
             physics: const BouncingScrollPhysics(),
             children: [
               SizedBox(
-                height: 2.h,
+                height: 2.2.h,
               ),
               Text(
-                title(),
+                'Товары',
                 style: TextStyle(
                   fontFamily: ConstantsFonts.latoSemiBold,
                   fontSize: 18.5.sp,
@@ -74,10 +48,8 @@ class _ProductScreenState extends State<ProductScreen> {
                 ),
               ),
               SizedBox(
-                height: 3.h,
+                height: 2.2.h,
               ),
-
-              widget.state == MarketplaceState.products ?
               Column(
                 children: [
                   Padding(
@@ -135,8 +107,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     height: 3.h,
                   ),
                 ],
-              ) :
-              const SizedBox(),
+              ),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -146,19 +117,23 @@ class _ProductScreenState extends State<ProductScreen> {
                   crossAxisSpacing: 1.6.w,
                   mainAxisExtent: 30.2.h
                 ),
-                itemCount: count(),
+                itemCount: marketplaceProvider.products.length,
                 itemBuilder: (context, index) {
+                  final ItemModel model = marketplaceProvider.products[index];
                   return PunchingAnimation(
                     child: GestureDetector(
                       onTap: () => Navigator.push(
                         context,
                         CupertinoPageRoute(
-                          builder: (context) => const ProductCardScreen(),
+                          builder: (context) => ProductCardScreen(
+                            model: model,
+                            state: MarketplaceState.products,
+                          ),
                         ),
                       ),
                       child: MaxVerticalProductCard(
-                        image: image(),
                         symbol: ConstantsAssets.symbolProductImage,
+                        model: model,
                       ),
                     ),
                   );

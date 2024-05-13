@@ -1,16 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
+import 'package:memorial_book/models/market/item_model.dart';
 import 'package:sizer/sizer.dart';
+
+import '../skeleton_loader_widget.dart';
 
 class VerticalProductCard extends StatelessWidget {
   const VerticalProductCard({
     super.key,
-    required this.image,
+    required this.model,
     this.symbol,
     this.width,
   });
 
-  final String image;
+  final ItemModel model;
   final String? symbol;
 
   final double? width;
@@ -23,24 +27,52 @@ class VerticalProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: EdgeInsets.all(1.h),
-            alignment: Alignment.bottomRight,
+          CachedNetworkImage(
             height: 20.h,
-            // width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              image: DecorationImage(
-                image: AssetImage(image),
-                fit: BoxFit.fill,
-              ),
-            ),
-            child: symbol != null ?
-            Image.asset(
-              symbol!,
-              height: 4.h,
-            ) :
-            null,
+            width: double.infinity,
+            imageUrl: model.avatar,
+            imageBuilder: (context, image) {
+              return Container(
+                padding: EdgeInsets.all(1.h),
+                alignment: Alignment.bottomRight,
+                height: 20.h,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  image: DecorationImage(
+                    image: image,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: symbol != null ?
+                Image.asset(
+                  symbol!,
+                  height: 4.h,
+                ) :
+                null,
+              );
+            },
+            errorWidget: (context, indicator, error) {
+              return Container(
+                height: 20.h,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  image: DecorationImage(
+                    image: AssetImage(
+                      ConstantsAssets.memorialBookLogoImage,
+                    ),
+                  ),
+                ),
+              );
+            },
+            placeholder: (context, indicator) {
+              return SkeletonLoaderWidget(
+                height: 20.h,
+                width: double.infinity,
+                borderRadius: 5,
+              );
+            },
           ),
           SizedBox(
             height: 1.h,
@@ -53,7 +85,7 @@ class VerticalProductCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Товар',
+                  model.productName,
                   style: TextStyle(
                     fontFamily: ConstantsFonts.latoBold,
                     fontSize: 11.5.sp,
@@ -64,7 +96,7 @@ class VerticalProductCard extends StatelessWidget {
                   height: 0.6.h,
                 ),
                 Text(
-                  'US \$29,99',
+                  'US \$${model.price}',
                   style: TextStyle(
                     fontFamily: ConstantsFonts.latoRegular,
                     fontSize: 9.5.sp,

@@ -228,6 +228,62 @@ class Service {
     );
   }
 
+  Future getShopRequest(
+      int cemeteryId,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'shop/$cemeteryId';
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future getProductsOnMainRequest(
+      int shopId,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'shop/$shopId/products';
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
   Future gettingCreatedPetsProfilesRequest(
       int page,
       ValueSetter<Response?> completion,
@@ -752,6 +808,8 @@ class Service {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     };
+
+    print(token);
 
     String endpoint = ConstEndpoints.getUserInfo;
 

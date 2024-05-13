@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/helpers/enums.dart';
 import 'package:memorial_book/provider/marketplace_provider.dart';
+import 'package:memorial_book/screens/marketplace/product_card_screen.dart';
 import 'package:memorial_book/screens/marketplace/product_screen.dart';
+import 'package:memorial_book/screens/marketplace/services_screen.dart';
 import 'package:memorial_book/widgets/marketplace_app_bar.dart';
 import 'package:memorial_book/widgets/marketplace_widgets/banner_card.dart';
 import 'package:memorial_book/widgets/marketplace_widgets/category_card.dart';
@@ -12,6 +14,7 @@ import 'package:memorial_book/widgets/marketplace_widgets/vertical_product_card.
 import 'package:memorial_book/widgets/search_engine.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import '../../models/market/item_model.dart';
 import '../../widgets/animation/punching_animation.dart';
 
 class HomeMarketplaceScreen extends StatefulWidget {
@@ -28,10 +31,9 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
   @override
   Widget build(BuildContext context) {
     final marketplaceProvider = Provider.of<MarketplaceProvider>(context);
-    return MarketplaceAppBar(
-      child: Scaffold(
-        backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
-        body: ListView(
+    if(marketplaceProvider.shopModel != null) {
+      return MarketplaceAppBar(
+        child: ListView(
           physics: const BouncingScrollPhysics(),
           children: [
             Container(
@@ -121,9 +123,7 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                                 onTap: () => Navigator.push(
                                   context,
                                   CupertinoPageRoute(
-                                    builder: (context) => const ProductScreen(
-                                      state: MarketplaceState.products,
-                                    ),
+                                    builder: (context) => const ProductScreen(),
                                   ),
                                 ),
                               ),
@@ -139,9 +139,7 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                                 onTap: () => Navigator.push(
                                   context,
                                   CupertinoPageRoute(
-                                    builder: (context) => const ProductScreen(
-                                      state: MarketplaceState.services,
-                                    ),
+                                    builder: (context) => const ServicesScreen(),
                                   ),
                                 ),
                               ),
@@ -206,18 +204,32 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                       physics: const BouncingScrollPhysics(),
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 1.w,
-                          ),
-                          child: VerticalProductCard(
-                            image: ConstantsAssets.testProductImage,
-                            symbol: ConstantsAssets.symbolProductImage,
-                            width: 38.w,
+                        final ItemModel model = marketplaceProvider.products[index];
+                        return PunchingAnimation(
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => ProductCardScreen(
+                                  model: model,
+                                  state: MarketplaceState.products,
+                                ),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 1.w,
+                              ),
+                              child: VerticalProductCard(
+                                symbol: ConstantsAssets.symbolProductImage,
+                                width: 38.w,
+                                model: model,
+                              ),
+                            ),
                           ),
                         );
                       },
-                      itemCount: 5,
+                      itemCount: marketplaceProvider.products.length,
                     ),
                   ),
                   SizedBox(
@@ -251,22 +263,41 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 1.w,
-                    ),
-                    child: VerticalProductCard(
-                      image: ConstantsAssets.testServicesImage,
-                      width: 38.w,
+                  final ItemModel model = marketplaceProvider.services[index];
+                  return PunchingAnimation(
+                    child: GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => ProductCardScreen(
+                            model: model,
+                            state: MarketplaceState.services,
+                          ),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 1.w,
+                        ),
+                        child: VerticalProductCard(
+                          width: 38.w,
+                          model: model,
+                        ),
+                      ),
                     ),
                   );
                 },
-                itemCount: 5,
+                itemCount: marketplaceProvider.services.length,
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
+    }
+    else {
+      return Scaffold(
+        body: SizedBox(),
+      );
+    }
   }
 }

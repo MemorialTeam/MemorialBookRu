@@ -12,6 +12,7 @@ class MainButton extends StatelessWidget {
     this.inactiveColor = const Color.fromRGBO(23, 94, 217, 0.5),
     required this.onTap,
     this.margin,
+    this.padding,
     this.border,
     this.textStyle,
   });
@@ -26,7 +27,7 @@ class MainButton extends StatelessWidget {
   final void Function() onTap;
 
   final EdgeInsetsGeometry? margin;
-
+  final EdgeInsetsGeometry? padding;
   final BoxBorder? border;
 
   final TextStyle? textStyle;
@@ -60,7 +61,10 @@ class MainButton extends StatelessWidget {
     return PunchingAnimation(
       child: Container(
         height: 7.h,
-        width: double.infinity,
+        width: padding == null ?
+        double.infinity :
+        null,
+        padding: padding,
         margin: margin,
         decoration: BoxDecoration(
           color: buttonColor(),

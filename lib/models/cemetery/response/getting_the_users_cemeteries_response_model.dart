@@ -39,7 +39,7 @@ class CemeteriesResponseModel {
   String? subtitle;
   String? avatar;
   String? banner;
-  BurialCordResponseModel? addressCoords;
+  CoordsResponseModel? addressCoords;
 
   CemeteriesResponseModel({
     this.id,
@@ -56,6 +56,6 @@ class CemeteriesResponseModel {
     subtitle = json['subtitle'];
     avatar = json['avatar'];
     banner = json['banner'];
-    addressCoords = BurialCordResponseModel.fromJson(json['address_coords']);
+    addressCoords = CoordsResponseModel.fromJson(json['address_coords']);
   }
 }

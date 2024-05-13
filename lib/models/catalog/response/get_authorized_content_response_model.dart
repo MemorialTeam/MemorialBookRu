@@ -63,7 +63,7 @@ class HumanDataResponseModel {
   String? yearBirth;
   String? yearDeath;
   String? avatar;
-  BurialCordResponseModel? burialCord;
+  CoordsResponseModel? burialCord;
   String? createdAt;
 
   HumanDataResponseModel({
@@ -107,7 +107,7 @@ class HumanDataResponseModel {
     }
     avatar = json['avatar'];
     if(json['coords'] != null) {
-      burialCord = BurialCordResponseModel.fromJson(json['coords']);
+      burialCord = CoordsResponseModel.fromJson(json['coords']);
     }
     if(json['created_at'] != null) {
       createdAt = json['created_at'];

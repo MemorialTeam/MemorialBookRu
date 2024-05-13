@@ -22,6 +22,7 @@ import '../models/communitites/response/getting_posts_of_community_response_mode
 import '../models/communitites/response/search_community_info_response_model.dart';
 import '../models/create_profile/response/get_hobbies_response_model.dart';
 import '../models/create_profile/response/get_religions_response_model.dart';
+import '../models/market/response/get_shop_response_model.dart';
 import '../models/people/response/get_map_of_people_response_model.dart';
 import '../models/people/response/get_people_info_response_model.dart';
 import '../models/people/response/getting_created_humans_profiles_response_model.dart';
@@ -101,6 +102,32 @@ class Mapper {
     if (response != null) {
       Map<String, dynamic> body = json.decode(response.body);
       GettingMemorialsOfCommunityResponseModel model = GettingMemorialsOfCommunityResponseModel.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getShopResponse(
+      Response? response,
+      ValueSetter<GetShopResponseModel?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      GetShopResponseModel model = GetShopResponseModel.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getProductsOnMainResponse(
+      Response? response,
+      ValueSetter<GetShopResponseModel?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      GetShopResponseModel model = GetShopResponseModel.fromJson(body);
       completion(model);
     } else {
       completion(null);

@@ -102,6 +102,9 @@ class ConstantsAssets {
   static String orderHistoryImage = 'assets/images/orderHistoryImage.png';
   static String basketImage = 'assets/images/basketImage.png';
   static String productAddImage = 'assets/images/productAddImage.png';
+  static String blankImage = 'assets/images/blankImage.png';
+  static String addToCardImage = 'assets/images/addToCardImage.png';
+  static String removeFromCardImage = 'assets/images/removeFromCardImage.png';
   ///
   static String buddhismImage = 'assets/images/buddhismImage.png';
   static String christianityImage = 'assets/images/christianityImage.png';

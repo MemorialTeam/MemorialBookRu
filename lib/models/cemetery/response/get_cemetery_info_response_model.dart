@@ -33,7 +33,7 @@ class CemeteryResponseModel {
   String? description;
   String? avatar;
   String? banner;
-  BurialCordResponseModel? addressCoords;
+  CoordsResponseModel? addressCoords;
   List? gallery;
   List<FamousPersonalitiesResponseModel>? memorials;
   List<FamousPersonalitiesResponseModel>? famousPersonalities;
@@ -61,7 +61,7 @@ class CemeteryResponseModel {
       avatar = json['avatar'];
       banner = json['banner'];
       json['address_coords'] != null ?
-      addressCoords = BurialCordResponseModel.fromJson(json['address_coords']) :
+      addressCoords = CoordsResponseModel.fromJson(json['address_coords']) :
       null;
       gallery = json['gallery'];
       memorials = List.of(json['memorials']).map(
@@ -81,7 +81,7 @@ class FamousPersonalitiesResponseModel {
   String? fullName;
   dynamic dateBirth;
   dynamic dateDeath;
-  BurialCordResponseModel? burialCord;
+  CoordsResponseModel? burialCord;
   bool? isCelebrity;
   String? avatar;
 
@@ -101,7 +101,7 @@ class FamousPersonalitiesResponseModel {
     dateBirth = json['date_birth'];
     dateDeath = json['date_death'];
     json['burial_cord'] != null ?
-    burialCord = BurialCordResponseModel.fromJson(json['burial_cord']) :
+    burialCord = CoordsResponseModel.fromJson(json['burial_cord']) :
     null;
     isCelebrity = json['is_celebrity'];
     avatar = json['avatar'];

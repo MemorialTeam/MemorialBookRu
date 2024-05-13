@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:memorial_book/helpers/constants.dart';
+import 'package:memorial_book/provider/marketplace_provider.dart';
 import 'package:memorial_book/provider/tab_bar_provider.dart';
 import 'package:memorial_book/screens/main_flow/some_selected_screens/selected_community_screen.dart';
 import 'package:memorial_book/screens/marketplace/home_marketplace_screen.dart';
@@ -29,6 +30,7 @@ class SelectedPeopleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final accountProvider = Provider.of<AccountProvider>(context);
     final tabBarProvider = Provider.of<TabBarProvider>(context);
+    final marketplaceProvider = Provider.of<MarketplaceProvider>(context);
     GetPeopleInfoResponseModel modelData = model;
     return MemorialAppBar(
       automaticallyImplyBackLeading: true,
@@ -142,12 +144,18 @@ class SelectedPeopleScreen extends StatelessWidget {
                         ),
                         MainButton(
                           text: 'BUY FLOWERS OR SERVICE',
-                          onTap: () => Navigator.push(
-                            tabBarProvider.mainContext,
-                            CupertinoPageRoute(
-                              builder: (context) => const HomeMarketplaceScreen(),
-                            ),
-                          ),
+                          onTap: () async => await marketplaceProvider.getShop(1, (model) {
+                            if(model != null) {
+                              if(model.status == true) {
+                                Navigator.push(
+                                  tabBarProvider.mainContext,
+                                  CupertinoPageRoute(
+                                    builder: (context) => const HomeMarketplaceScreen(),
+                                  ),
+                                );
+                              }
+                            }
+                          }),
                         ),
                       ],
                     ),

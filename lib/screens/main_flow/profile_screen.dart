@@ -47,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         timer = Timer.periodic(
           const Duration(
-            seconds: 30,
+            seconds: 10,
           ),
           ((timer) => _accountProvider.getUserInfo(context)),
         );
