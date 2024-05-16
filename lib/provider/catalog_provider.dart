@@ -183,6 +183,14 @@ class CatalogProvider extends ChangeNotifier {
     }
   }
 
+  // void clearMainContent() {
+  //   humans.clear();
+  //   cemeteries.clear();
+  //   pets.clear();
+  //   communities.clear();
+  //   notifyListeners();
+  // }
+
   Future gettingAuthorizedMainContent(
       BuildContext context,
       ValueSetter<GetAuthorizedContentResponseModel?> completion,
@@ -209,19 +217,21 @@ class CatalogProvider extends ChangeNotifier {
 
   Future gettingGuestMainContent(
       BuildContext context,
-      ValueSetter<GetGuestContentResponseModel?> completion,
+      ValueSetter<GetAuthorizedContentResponseModel?> completion,
       ) async {
     SVProgressHUD.show();
     service.gettingGuestMainContentRequest((response) {
       SVProgressHUD.dismiss();
       mapper.gettingGuestMainContentResponse(response, (model) async {
         if (model != null) {
-          humans = model.data?.celebrityHumans ?? [];
-          cemeteries = model.data?.cemeteries ?? [];
-          pets = model.data?.celebrityPets ?? [];
-          communities = model.data?.communities ?? [];
+          if(model.status == true) {
+            humans = model.feed?.humans ?? [];
+            cemeteries = model.feed?.cemeteries ?? [];
+            pets = model.feed?.pets ?? [];
+            communities = model.feed?.communities ?? [];
+            notifyListeners();
+          }
           completion(model);
-          notifyListeners();
         } else {
           completion(null);
         }

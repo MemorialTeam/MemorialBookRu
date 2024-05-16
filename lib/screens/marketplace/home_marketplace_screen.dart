@@ -2,19 +2,19 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
-import 'package:memorial_book/helpers/enums.dart';
 import 'package:memorial_book/provider/marketplace_provider.dart';
-import 'package:memorial_book/screens/marketplace/product_card_screen.dart';
 import 'package:memorial_book/screens/marketplace/product_screen.dart';
 import 'package:memorial_book/screens/marketplace/services_screen.dart';
 import 'package:memorial_book/widgets/marketplace_app_bar.dart';
 import 'package:memorial_book/widgets/marketplace_widgets/banner_card.dart';
 import 'package:memorial_book/widgets/marketplace_widgets/category_card.dart';
 import 'package:memorial_book/widgets/marketplace_widgets/vertical_product_card.dart';
+import 'package:memorial_book/widgets/memorial_book_icon_widget.dart';
 import 'package:memorial_book/widgets/search_engine.dart';
+import 'package:memorial_book/widgets/skeleton_loader_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../../models/market/item_model.dart';
+import '../../models/market/response/products_response_models/product_data_response_model.dart';
 import '../../widgets/animation/punching_animation.dart';
 
 class HomeMarketplaceScreen extends StatefulWidget {
@@ -27,6 +27,19 @@ class HomeMarketplaceScreen extends StatefulWidget {
 class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
 
   CarouselController controller = CarouselController();
+
+  @override
+  void initState() {
+    final marketplaceProvider = Provider.of<MarketplaceProvider>(
+      context,
+      listen: false,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await marketplaceProvider.getProductsMain();
+      await marketplaceProvider.getServicesMain();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,12 +128,13 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                         ),
                         Row(
                           children: [
+                            if(marketplaceProvider.productsMainModel?.productsData != null && marketplaceProvider.productsMainModel!.productsData!.isNotEmpty)
                             Expanded(
                               child: CategoryCard(
                                 height: 24.h,
                                 image: ConstantsAssets.productsImage,
                                 title: 'Товары',
-                                onTap: () => Navigator.push(
+                                onTap: () async => await Navigator.push(
                                   context,
                                   CupertinoPageRoute(
                                     builder: (context) => const ProductScreen(),
@@ -128,9 +142,11 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                                 ),
                               ),
                             ),
+                            if(marketplaceProvider.productsMainModel?.productsData != null && marketplaceProvider.productsMainModel!.productsData!.isNotEmpty && marketplaceProvider.servicesMainModel?.productsData != null && marketplaceProvider.servicesMainModel!.productsData!.isNotEmpty)
                             SizedBox(
                               width: 1.4.w,
                             ),
+                            if(marketplaceProvider.servicesMainModel?.productsData != null && marketplaceProvider.servicesMainModel!.productsData!.isNotEmpty)
                             Expanded(
                               child: CategoryCard(
                                 height: 24.h,
@@ -200,22 +216,24 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                   ),
                   SizedBox(
                     height: 30.h,
-                    child: ListView.builder(
+                    child: marketplaceProvider.productsMainLoading == false ?
+                    marketplaceProvider.productsMainModel?.productsData != null && marketplaceProvider.productsMainModel!.productsData!.isNotEmpty ?
+                    ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
-                        final ItemModel model = marketplaceProvider.products[index];
+                        final ProductDataResponseModel model = marketplaceProvider.productsMainModel!.productsData![index];
                         return PunchingAnimation(
                           child: GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => ProductCardScreen(
-                                  model: model,
-                                  state: MarketplaceState.products,
-                                ),
-                              ),
-                            ),
+                            // onTap: () => Navigator.push(
+                            //   context,
+                            //   CupertinoPageRoute(
+                            //     builder: (context) => ProductCardScreen(
+                            //       model: model,
+                            //       state: MarketplaceState.products,
+                            //     ),
+                            //   ),
+                            // ),
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 1.w,
@@ -229,7 +247,32 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                           ),
                         );
                       },
-                      itemCount: marketplaceProvider.products.length,
+                      separatorBuilder: (context, index) {
+                        return SizedBox(
+                          width: 1.6.w,
+                        );
+                      },
+                      itemCount: marketplaceProvider.productsMainModel?.productsData?.length ?? 0,
+                    ) :
+                    const MemorialBookIconWidget(
+                      title: 'В магазине нет товаров',
+                    ) :
+                    ListView.separated(
+                      physics: const NeverScrollableScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return SkeletonLoaderWidget(
+                          height: double.infinity,
+                          width: 38.w,
+                          borderRadius: 7,
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(
+                          width: 1.6.w,
+                        );
+                      },
+                      itemCount: 4,
                     ),
                   ),
                   SizedBox(
@@ -259,22 +302,24 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
             ),
             SizedBox(
               height: 30.h,
-              child: ListView.builder(
+              child: marketplaceProvider.servicesMainLoading == false ?
+              marketplaceProvider.servicesMainModel?.productsData != null && marketplaceProvider.servicesMainModel!.productsData!.isNotEmpty ?
+              ListView.separated(
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  final ItemModel model = marketplaceProvider.services[index];
+                  final ProductDataResponseModel model = marketplaceProvider.servicesMainModel!.productsData![index];
                   return PunchingAnimation(
                     child: GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => ProductCardScreen(
-                            model: model,
-                            state: MarketplaceState.services,
-                          ),
-                        ),
-                      ),
+                      // onTap: () => Navigator.push(
+                      //   context,
+                      //   CupertinoPageRoute(
+                      //     builder: (context) => ProductCardScreen(
+                      //       model: model,
+                      //       state: MarketplaceState.services,
+                      //     ),
+                      //   ),
+                      // ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: 1.w,
@@ -287,7 +332,32 @@ class _HomeMarketplaceScreenState extends State<HomeMarketplaceScreen> {
                     ),
                   );
                 },
-                itemCount: marketplaceProvider.services.length,
+                separatorBuilder: (context, index) {
+                  return SizedBox(
+                    width: 1.6.w,
+                  );
+                },
+                itemCount: marketplaceProvider.servicesMainModel?.productsData?.length ?? 0,
+              ) :
+              const MemorialBookIconWidget(
+                title: 'В магазине нет услуг',
+              ) :
+              ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  return SkeletonLoaderWidget(
+                    height: double.infinity,
+                    width: 38.w,
+                    borderRadius: 7,
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return SizedBox(
+                    width: 1.6.w,
+                  );
+                },
+                itemCount: 4,
               ),
             ),
           ],

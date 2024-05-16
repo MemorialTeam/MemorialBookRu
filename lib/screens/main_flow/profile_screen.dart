@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,6 @@ import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
-import '../../helpers/enums.dart';
 import '../../provider/account_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/tab_bar_provider.dart';
@@ -29,7 +27,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
-  late Timer timer;
+  Timer? timer;
 
   @override
   void initState() {
@@ -44,21 +42,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if(_authProvider.userRules == 'authorized') {
       _accountProvider.getUserInfo(context);
 
-      setState(() {
-        timer = Timer.periodic(
-          const Duration(
-            seconds: 10,
-          ),
-          ((timer) => _accountProvider.getUserInfo(context)),
-        );
-      });
+      timer = Timer.periodic(
+        const Duration(
+          seconds: 10,
+        ),
+        ((timer) => _accountProvider.getUserInfo(context)),
+      );
     }
     super.initState();
   }
 
   @override
   void dispose() {
-    timer.cancel();
+    timer?.cancel();
     super.dispose();
   }
 

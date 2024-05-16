@@ -23,6 +23,8 @@ import '../models/communitites/response/search_community_info_response_model.dar
 import '../models/create_profile/response/get_hobbies_response_model.dart';
 import '../models/create_profile/response/get_religions_response_model.dart';
 import '../models/market/response/get_shop_response_model.dart';
+import '../models/market/response/products_response_models/get_product_by_id_reponse_model.dart';
+import '../models/market/response/products_response_models/get_products_category_response_model.dart';
 import '../models/people/response/get_map_of_people_response_model.dart';
 import '../models/people/response/get_people_info_response_model.dart';
 import '../models/people/response/getting_created_humans_profiles_response_model.dart';
@@ -71,11 +73,11 @@ class Mapper {
 
   void gettingGuestMainContentResponse(
       Response? response,
-      ValueSetter<GetGuestContentResponseModel?> completion,
+      ValueSetter<GetAuthorizedContentResponseModel?> completion,
       ) {
     if (response != null) {
       Map<String, dynamic> body = json.decode(response.body);
-      GetGuestContentResponseModel model = GetGuestContentResponseModel.fromJson(body);
+      GetAuthorizedContentResponseModel model = GetAuthorizedContentResponseModel.fromJson(body);
       completion(model);
     } else {
       completion(null);
@@ -102,6 +104,45 @@ class Mapper {
     if (response != null) {
       Map<String, dynamic> body = json.decode(response.body);
       GettingMemorialsOfCommunityResponseModel model = GettingMemorialsOfCommunityResponseModel.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getProductsCategoryResponse(
+      Response? response,
+      ValueSetter<GetProductsCategoryResponseModel?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      GetProductsCategoryResponseModel model = GetProductsCategoryResponseModel.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getServicesCategoryResponse(
+      Response? response,
+      ValueSetter<GetProductsCategoryResponseModel?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      GetProductsCategoryResponseModel model = GetProductsCategoryResponseModel.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getProductByIdResponse(
+      Response? response,
+      ValueSetter<GetProductByIdResponseModel?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      GetProductByIdResponseModel model = GetProductByIdResponseModel.fromJson(body);
       completion(model);
     } else {
       completion(null);

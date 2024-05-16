@@ -350,14 +350,14 @@ class AccountProvider extends ChangeNotifier {
     }
   }
 
-  void gettingPeopleProfile(
+  Future gettingPeopleProfile(
       BuildContext context,
       int id,
       ValueSetter<GetPeopleInfoResponseModel?> completion,
       ) async {
     try {
       SVProgressHUD.show();
-      service.gettingPeopleProfileRequest(id, (response) {
+      await service.gettingPeopleProfileRequest(id, (response) {
         mapper.gettingPeopleProfileResponse(response, (model) {
           print(response?.body);
           SVProgressHUD.dismiss();

@@ -105,6 +105,7 @@ class ConstantsAssets {
   static String blankImage = 'assets/images/blankImage.png';
   static String addToCardImage = 'assets/images/addToCardImage.png';
   static String removeFromCardImage = 'assets/images/removeFromCardImage.png';
+  static String questionMarkImage = 'assets/images/questionMarkImage.png';
   ///
   static String buddhismImage = 'assets/images/buddhismImage.png';
   static String christianityImage = 'assets/images/christianityImage.png';

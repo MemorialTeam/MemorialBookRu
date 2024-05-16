@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
-import 'package:memorial_book/models/market/item_model.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-
+import '../../models/market/response/products_response_models/product_data_response_model.dart';
 import '../../provider/marketplace_provider.dart';
 import '../skeleton_loader_widget.dart';
 
@@ -17,7 +16,7 @@ class MaxVerticalProductCard extends StatelessWidget {
     this.width,
   });
 
-  final ItemModel model;
+  final ProductDataResponseModel model;
   final String? symbol;
 
   final double? width;
@@ -25,6 +24,45 @@ class MaxVerticalProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final marketplaceProvider = Provider.of<MarketplaceProvider>(context);
+
+    Widget price() {
+      if(model.discountedPrice != null) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'US \$${model.price}',
+              style: TextStyle(
+                decoration: TextDecoration.lineThrough,
+                decorationColor: Colors.red,
+                fontFamily: ConstantsFonts.latoRegular,
+                fontSize: 7.5.sp,
+                color: const Color.fromRGBO(0, 0, 0, 1),
+              ),
+            ),
+            Text(
+              'US \$${model.discountedPrice}',
+              style: TextStyle(
+                fontFamily: ConstantsFonts.latoRegular,
+                fontSize: 9.5.sp,
+                color: const Color.fromRGBO(0, 0, 0, 1),
+              ),
+            )
+          ],
+        );
+      } else {
+        return Text(
+          'US \$${model.price}',
+          style: TextStyle(
+            fontFamily: ConstantsFonts.latoRegular,
+            fontSize: 9.5.sp,
+            color: const Color.fromRGBO(0, 0, 0, 1),
+          ),
+        );
+      }
+    }
+
     return SizedBox(
       width: width,
       child: Column(
@@ -35,7 +73,7 @@ class MaxVerticalProductCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: CachedNetworkImage(
-                imageUrl: model.avatar,
+                imageUrl: model.mainPhoto ?? '',
                 width: double.infinity,
                 imageBuilder: (context, image) {
                   return Container(
@@ -58,11 +96,11 @@ class MaxVerticalProductCard extends StatelessWidget {
                 errorWidget: (context, error, _) {
                   return Container(
                     decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(ConstantsAssets.memorialBookLogoImage),
+                        fit: BoxFit.cover,
+                      ),
                       borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      size: 7.sp,
                     ),
                   );
                 },
@@ -90,7 +128,7 @@ class MaxVerticalProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      model.productName,
+                      model.name ?? '',
                       style: TextStyle(
                         fontFamily: ConstantsFonts.latoBold,
                         fontSize: 11.5.sp,
@@ -100,14 +138,7 @@ class MaxVerticalProductCard extends StatelessWidget {
                     SizedBox(
                       height: 1.h,
                     ),
-                    Text(
-                      'US \$${model.price}',
-                      style: TextStyle(
-                        fontFamily: ConstantsFonts.latoRegular,
-                        fontSize: 9.5.sp,
-                        color: const Color.fromRGBO(0, 0, 0, 1),
-                      ),
-                    ),
+                    price(),
                   ],
                 ),
                 PunchingAnimation(

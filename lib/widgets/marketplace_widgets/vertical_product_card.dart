@@ -4,6 +4,8 @@ import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/models/market/item_model.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../models/market/response/products_response_models/get_products_category_response_model.dart';
+import '../../models/market/response/products_response_models/product_data_response_model.dart';
 import '../skeleton_loader_widget.dart';
 
 class VerticalProductCard extends StatelessWidget {
@@ -14,7 +16,7 @@ class VerticalProductCard extends StatelessWidget {
     this.width,
   });
 
-  final ItemModel model;
+  final ProductDataResponseModel? model;
   final String? symbol;
 
   final double? width;
@@ -30,7 +32,7 @@ class VerticalProductCard extends StatelessWidget {
           CachedNetworkImage(
             height: 20.h,
             width: double.infinity,
-            imageUrl: model.avatar,
+            imageUrl: model?.mainPhoto ?? '',
             imageBuilder: (context, image) {
               return Container(
                 padding: EdgeInsets.all(1.h),
@@ -85,7 +87,7 @@ class VerticalProductCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  model.productName,
+                  model?.name ?? '',
                   style: TextStyle(
                     fontFamily: ConstantsFonts.latoBold,
                     fontSize: 11.5.sp,
@@ -96,7 +98,7 @@ class VerticalProductCard extends StatelessWidget {
                   height: 0.6.h,
                 ),
                 Text(
-                  'US \$${model.price}',
+                  'US \$${model?.price.toString()}',
                   style: TextStyle(
                     fontFamily: ConstantsFonts.latoRegular,
                     fontSize: 9.5.sp,

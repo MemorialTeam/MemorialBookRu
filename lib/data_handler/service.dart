@@ -312,6 +312,92 @@ class Service {
     );
   }
 
+  Future getProductsCategoryRequest(
+      int page,
+      int shopId,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'shop/$shopId/products?page=$page';
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future getServicesCategoryRequest(
+      int page,
+      int shopId,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'shop/$shopId/services?page=$page';
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future getProductByIdRequest(
+      int id,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'shop/product/$id';
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
   Future communityMemorialsSearchRequest(
       String name,
       int communityID,
@@ -767,7 +853,7 @@ class Service {
     );
   }
 
-  void gettingPeopleProfileRequest(
+  Future gettingPeopleProfileRequest(
       int id,
       ValueSetter<Response?> completion,
       ) async {

@@ -62,23 +62,23 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 itemCount: marketplaceProvider.services.length,
                 itemBuilder: (context, index) {
                   final ItemModel model = marketplaceProvider.services[index];
-                  return PunchingAnimation(
-                    child: GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => ProductCardScreen(
-                            model: model,
-                            state: MarketplaceState.services,
-                          ),
-                        ),
-                      ),
-                      child: MaxVerticalProductCard(
-                        symbol: ConstantsAssets.symbolProductImage,
-                        model: model,
-                      ),
-                    ),
-                  );
+                  // return PunchingAnimation(
+                  //   child: GestureDetector(
+                  //     onTap: () => Navigator.push(
+                  //       context,
+                  //       CupertinoPageRoute(
+                  //         builder: (context) => ProductCardScreen(
+                  //           model: model,
+                  //           state: MarketplaceState.services,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     child: MaxVerticalProductCard(
+                  //       symbol: ConstantsAssets.symbolProductImage,
+                  //       model: model,
+                  //     ),
+                  //   ),
+                  // );
                 },
               ),
               SizedBox(

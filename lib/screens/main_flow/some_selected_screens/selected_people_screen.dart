@@ -144,18 +144,12 @@ class SelectedPeopleScreen extends StatelessWidget {
                         ),
                         MainButton(
                           text: 'BUY FLOWERS OR SERVICE',
-                          onTap: () async => await marketplaceProvider.getShop(1, (model) {
-                            if(model != null) {
-                              if(model.status == true) {
-                                Navigator.push(
-                                  tabBarProvider.mainContext,
-                                  CupertinoPageRoute(
-                                    builder: (context) => const HomeMarketplaceScreen(),
-                                  ),
-                                );
-                              }
-                            }
-                          }),
+                          onTap: () async => await Navigator.push(
+                            tabBarProvider.mainContext,
+                            CupertinoPageRoute(
+                              builder: (context) => const HomeMarketplaceScreen(),
+                            ),
+                          ),
                         ),
                       ],
                     ),

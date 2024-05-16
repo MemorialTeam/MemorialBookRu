@@ -45,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     final _catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
     final _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    // _catalogProvider.clearMainContent();
     _catalogProvider.setCustomMarker();
     if(_authProvider.userRules == 'authorized') {
       _catalogProvider.gettingAuthorizedMainContent(context, (model) {});
@@ -225,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               '' :
                               '${dataList.lastName}';
                               return VerticalCardWidget(
-                                onTap: () => accountProvider.gettingPeopleProfile(context, dataList.id ?? 0, (model) {
+                                onTap: () async => await accountProvider.gettingPeopleProfile(context, dataList.id ?? 0, (model) {
                                   if(model!.status == true) {
                                     Navigator.push(
                                       context,
@@ -580,7 +581,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             separatorBuilder: (BuildContext context, int index) {
                               return SizedBox(
-                                width: 3.w,
+                                width: 3.2.w,
                               );
                             },
                           ),
@@ -589,7 +590,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             3.2.w :
                             0,
                           ),
-
                           authProvider.userRules == 'authorized' ?
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -701,7 +701,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             3.2.w :
                             0,
                           ),
-
                           authProvider.userRules == 'authorized' ?
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,

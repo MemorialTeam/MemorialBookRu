@@ -1,6 +1,5 @@
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:memorial_book/screens/marketplace/check_out_screen.dart';
 import 'package:memorial_book/widgets/main_button.dart';
 import 'package:memorial_book/widgets/marketplace_app_bar.dart';
@@ -8,7 +7,7 @@ import 'package:memorial_book/widgets/marketplace_widgets/product_card_shopping_
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
-import '../../models/market/item_model.dart';
+import '../../models/market/response/products_response_models/product_data_response_model.dart';
 import '../../provider/marketplace_provider.dart';
 
 class ShoppingCartScreen extends StatelessWidget {
@@ -47,7 +46,7 @@ class ShoppingCartScreen extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  final ItemModel model = marketplaceProvider.basket[index];
+                  final ProductDataResponseModel model = marketplaceProvider.basket[index];
                   return Container(
                     decoration: index == marketplaceProvider.basket.length - 1 ?
                     BoxDecoration(
