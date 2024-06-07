@@ -6,12 +6,13 @@ import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../helpers/constants.dart';
-import '../models/communitites/response/get_community_info_response_model.dart';
+import '../models/catalog/response/get_authorized_content_response_model.dart';
 import '../provider/catalog_provider.dart';
 import '../provider/tab_bar_provider.dart';
 import '../widgets/memorial_app_bar.dart';
 import '../widgets/cards/horizontal_mini_card_widget.dart';
 import '../widgets/memorial_book_icon_widget.dart';
+import '../widgets/platform_scroll_physics.dart';
 import '../widgets/text_field_search_widget.dart';
 import 'main_flow/some_selected_screens/selected_cemetery_screen.dart';
 import 'main_flow/some_selected_screens/selected_community_screen.dart';
@@ -38,7 +39,7 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
         body: Stack(
           children: [
             ListView(
-              physics: const BouncingScrollPhysics(),
+              physics: platformScrollPhysics(),
               children: [
                 SizedBox(
                   height: 1.2.h,
@@ -141,8 +142,8 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
                     focusNode: catalogProvider.searchFollowNode,
                     controller: catalogProvider.searchFollowController,
                     hintText: flowIs == 'Community' ?
-                    'Find and join a community' :
-                    'Find and join a cemetery',
+                    'Найдите сообщество и присоединяйтесь к нему' :
+                    'Найдите кладбище и присоединяйтесь к нему',
                     prefixIcon: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 10,
@@ -183,8 +184,8 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
                     children: [
                       Text(
                         flowIs == 'Community' ?
-                        'All communities' :
-                        'All cemeteries',
+                        'Все сообщества' :
+                        'Все кладбища',
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontFamily: ConstantsFonts.latoBold,
@@ -209,7 +210,7 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
                               ),
                               child: Center(
                                 child: Text(
-                                  'Managed',
+                                  'Управляемые',
                                   style: TextStyle(
                                     color: const Color.fromRGBO(79, 79, 79, 1),
                                     fontSize: 9.5.sp,
@@ -244,20 +245,17 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
                     catalogProvider.cemeteryList.length,
                     itemBuilder: (context, index) {
                       if(flowIs == 'Community') {
-                        CommunitiesInfoResponseModel dataList = catalogProvider.communitiesFollowList()[index];
+                        CommunityDataResponseModel dataList = catalogProvider.communitiesFollowList()[index];
                         return HorizontalMiniCardWidget(
-                          onTap: () {
-                            catalogProvider.gettingCommunityProfile(context, dataList.id ?? 0, (model) {
-                              if(model!.status == true) {
-                                Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => const SelectedCommunityScreen(),
-                                  ),
-                                );
-                              }
-                            });
-                          },
+                          onTap: () => Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => SelectedCommunityScreen(
+                                id: dataList.id ?? 0,
+                                avatar: dataList.avatar ?? '',
+                              ),
+                            ),
+                          ),
                           avatar: dataList.avatar ?? '',
                           title: dataList.title ?? '',
                           subtitle: dataList.subtitle ?? '',
@@ -266,18 +264,15 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
                       else {
                         final dataList = catalogProvider.cemeteryList[index];
                         return HorizontalMiniCardWidget(
-                          onTap: () {
-                            catalogProvider.gettingCemeteryProfile(context, dataList.id ?? 0, (model) {
-                              if(model!.status == true) {
-                                Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => const SelectedCemeteryScreen(),
-                                  ),
-                                );
-                              }
-                            });
-                          },
+                          onTap: () => Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => SelectedCemeteryScreen(
+                                avatar: dataList.avatar ?? '',
+                                id: dataList.id ?? 0,
+                              ),
+                            ),
+                          ),
                           avatar: dataList.avatar ?? '',
                           title: dataList.title ?? '',
                           subtitle: dataList.subtitle ?? '',
@@ -286,7 +281,7 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
                     },
                   ) :
                   const MemorialBookIconWidget(
-                    title: 'Nothing found',
+                    title: 'Ничего не найдено',
                   ),
                 ),
               ],

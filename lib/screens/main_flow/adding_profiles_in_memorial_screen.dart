@@ -1,31 +1,38 @@
+import 'package:flutter/material.dart';
 import 'package:memorial_book/screens/main_flow/some_selected_screens/selected_people_screen.dart';
+import '../../models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import '../../widgets/cards/horizontal_mini_card_widget.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/widgets/search_engine.dart';
 import '../../widgets/memorial_book_icon_widget.dart';
-import '../../provider/account_provider.dart';
 import '../../provider/catalog_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-class AddingProfilesInMemorialScreen extends StatelessWidget {
+import '../../widgets/platform_scroll_physics.dart';
+
+class AddingProfilesInMemorialScreen extends StatefulWidget {
   const AddingProfilesInMemorialScreen({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<AddingProfilesInMemorialScreen> createState() => _AddingProfilesInMemorialScreenState();
+}
+
+class _AddingProfilesInMemorialScreenState extends State<AddingProfilesInMemorialScreen> {
+  @override
   Widget build(BuildContext context) {
-    final accountProvider = Provider.of<AccountProvider>(context);
     final catalogProvider = Provider.of<CatalogProvider>(context);
     return MemorialAppBar(
       automaticallyImplyBackLeading: true,
       child: UnScopeScaffold(
         backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
         body: ListView(
-          physics: const BouncingScrollPhysics(),
+          physics: platformScrollPhysics(),
           children: [
             SizedBox(
               height: 1.2.h,
@@ -40,7 +47,7 @@ class AddingProfilesInMemorialScreen extends StatelessWidget {
               child: SearchEngine(
                 focusNode: catalogProvider.addPeopleFocusNode,
                 controller: catalogProvider.addPeopleController,
-                isNotEmptyFunc: (text) => catalogProvider.addToCommunityPeopleSearch(),
+                isNotEmptyFunc: (text) async => await catalogProvider.addToCommunityPeopleSearch(),
                 isEmptyFunc: () => catalogProvider.clearAddPeopleFoundPeoples(),
               ),
             ),
@@ -55,12 +62,12 @@ class AddingProfilesInMemorialScreen extends StatelessWidget {
                     catalogProvider.addPeopleController.text.length % 3 == 0 &&
                     catalogProvider.addPeopleIsLoading == false) {
                   return const MemorialBookIconWidget(
-                    title: 'Nothing found',
+                    title: 'Ничего не найдено',
                   );
                 } else if(catalogProvider.addPeopleFoundPeoples.isEmpty &&
                     catalogProvider.addPeopleController.text.isEmpty) {
                   return const MemorialBookIconWidget(
-                    title: 'Enter to find the profile',
+                    title: 'Введите, чтобы найти профиль',
                   );
                 } else if(catalogProvider.addPeopleIsLoading == true) {
                   return SizedBox(
@@ -75,34 +82,109 @@ class AddingProfilesInMemorialScreen extends StatelessWidget {
                   );
                 } else {
                   final dataList = catalogProvider.addPeopleFoundPeoples[index];
-                  final String? firstName = dataList.firstName == '' || dataList.firstName == null ?
+                  final String firstName = dataList.firstName == '' || dataList.firstName == null ?
                   '' :
                   '${dataList.firstName} ';
-                  final String? middleName = dataList.middleName == '' || dataList.middleName == null ?
+                  final String middleName = dataList.middleName == '' || dataList.middleName == null ?
                   '' :
                   '${dataList.middleName} ';
-                  final String? lastName = dataList.lastName == '' || dataList.lastName == null ?
+                  final String lastName = dataList.lastName == '' || dataList.lastName == null ?
                   '' :
                   '${dataList.lastName}';
-                  return HorizontalMiniCardWidget(
-                    index: index,
-                    isAddingPeople: true,
-                    onTap: () => accountProvider.gettingPeopleProfile(context, dataList.id ?? 0, (model) {
-                      if(model!.status == true) {
-                        Navigator.push(
+
+                  return Stack(
+                    children: [
+                      HorizontalMiniCardWidget(
+                        index: index,
+                        isAddingPeople: true,
+                        onTap: () => Navigator.push(
                           context,
                           CupertinoPageRoute(
                             builder: (context) => SelectedPeopleScreen(
-                              model: model,
+                              avatar: dataList.avatar ?? '',
+                              id: dataList.id ?? 0,
                             ),
                           ),
-                        );
-                      }
-                    }),
-                    avatar: dataList.avatar,
-                    title: firstName! + middleName! + lastName!,
-                    subtitle: '${dataList.dateBirth.toString()} - ${dataList.dateDeath.toString()}',
-                    id: dataList.id ?? 0,
+                        ),
+                        avatar: dataList.avatar,
+                        title: firstName+ middleName+ lastName,
+                        subtitle: '${dataList.dateBirth.toString()} - ${dataList.dateDeath.toString()}',
+                        id: dataList.id ?? 0,
+                      ),
+                      Positioned(
+                        right: dataList.isLoading == false ?
+                        0 :
+                        6,
+                        top: 1.2.h,
+                        bottom: 1.2.h,
+                        child: dataList.isLoading == false ?
+                        IconButton(
+                          onPressed: catalogProvider.isAdded(index) == StateOfMemorial.added ?
+                          (() async {
+                            setState(() {
+                              dataList.isLoading = true;
+                            });
+                            await catalogProvider.removeMemorialFromTheCommunity(
+                              context,
+                              catalogProvider.communityProfileModel?.id ?? 0,
+                              AddMemorialToTheCommunityRequestModel(
+                                memorialId: dataList.id ?? 0,
+                                memorialType: 'human',
+                              ),
+                              ((model) async {
+                                if(model != null) {
+                                  if(model.status == true) {
+                                    await catalogProvider.updateMemorialsOfCommunity(catalogProvider.communityProfileModel?.id ?? 0).whenComplete(() => setState(() => dataList.isLoading = false));
+                                    await catalogProvider.updateCommunityPeopleSearch();
+                                  }
+                                }
+                              }),
+                            );
+                          }) :
+                          (() async {
+                            setState(() {
+                              dataList.isLoading = true;
+                            });
+                            await catalogProvider.addMemorialToTheCommunity(
+                              context,
+                              catalogProvider.communityProfileModel?.id ?? 0,
+                              AddMemorialToTheCommunityRequestModel(
+                                memorialId: dataList.id ?? 0,
+                                memorialType: 'human',
+                              ),
+                              ((model) async {
+                                if(model != null) {
+                                  if(model.status == true) {
+                                    await catalogProvider.updateMemorialsOfCommunity(catalogProvider.communityProfileModel?.id ?? 0).whenComplete(() => setState(() => dataList.isLoading = false));
+                                    await catalogProvider.updateCommunityPeopleSearch();
+                                  }
+                                }
+                              }),
+                            );
+                          }),
+                          icon: catalogProvider.isAdded(index) == StateOfMemorial.added ?
+                          Icon(
+                            Icons.remove_circle,
+                            size: 24.sp,
+                            color: Colors.red,
+                          ) : Icon(
+                            Icons.add_circle,
+                            color: const Color.fromRGBO(18, 175, 82, 1),
+                            size: 24.sp,
+                          ),
+                        ) :
+                        SizedBox(
+                          height: 4.h,
+                          width: 4.h,
+                          child: const LoadingIndicator(
+                            indicatorType: Indicator.ballSpinFadeLoader,
+                            colors: [
+                              Color.fromRGBO(23, 94, 217, 1),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }
               },

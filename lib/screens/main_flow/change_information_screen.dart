@@ -9,6 +9,7 @@ import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
 import '../../models/user/response/user_info_response_model.dart';
 import '../../provider/account_provider.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/skeleton_loader_widget.dart';
 import '../../widgets/text_field_profile_widget.dart';
 
@@ -33,8 +34,8 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
     return showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: 3.2.w,
           ),
           contentPadding: EdgeInsets.zero,
           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -209,10 +210,10 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
         body: Form(
           onChanged: () => authProvider.stateChange(),
           child: ListView(
-            physics: const BouncingScrollPhysics(),
+            physics: platformScrollPhysics(),
             children: [
-              const SizedBox(
-                height: 16,
+              SizedBox(
+                height: 1.7.h,
               ),
               Container(
                 width: double.infinity,
@@ -223,8 +224,8 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                 padding: EdgeInsets.all(
                   2.h,
                 ),
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16,
+                margin: EdgeInsets.symmetric(
+                  horizontal: 3.2.w,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,8 +295,8 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                             ),
                           ),
                           Positioned(
-                            bottom: 1,
-                            right: 1,
+                            bottom: 0.1.h,
+                            right: 0.2.w,
                             child: Container(
                               height: 5.2.h,
                               width: 5.2.h,
@@ -334,19 +335,21 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                       height: 3.6.h,
                     ),
                     Text(
-                      'Primary information',
+                      'Первичная информация',
                       style: TextStyle(
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 17.5.sp,
+                        fontFamily: ConstantsFonts.latoBlack,
                       ),
                     ),
                     SizedBox(
                       height: 3.6.h,
                     ),
                     Text(
-                      'Full name:',
+                      'Полное имя:',
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        fontFamily: ConstantsFonts.latoRegular,
+                        fontSize: 9.5.sp,
+                        color: const Color.fromRGBO(32, 30, 31, 0.5),
                       ),
                     ),
                     SizedBox(
@@ -362,7 +365,9 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                     Text(
                       'E-mail:',
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        fontFamily: ConstantsFonts.latoRegular,
+                        fontSize: 9.5.sp,
+                        color: const Color.fromRGBO(32, 30, 31, 0.5),
                       ),
                     ),
                     SizedBox(
@@ -376,9 +381,11 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                       height: 3.1.h,
                     ),
                     Text(
-                      'New password:',
+                      'Новый пароль:',
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        fontFamily: ConstantsFonts.latoRegular,
+                        fontSize: 9.5.sp,
+                        color: const Color.fromRGBO(32, 30, 31, 0.5),
                       ),
                     ),
                     SizedBox(
@@ -391,9 +398,11 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                       height: 3.1.h,
                     ),
                     Text(
-                      'Repeat password:',
+                      'Повторите пароль:',
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        fontFamily: ConstantsFonts.latoRegular,
+                        fontSize: 9.5.sp,
+                        color: const Color.fromRGBO(32, 30, 31, 0.5),
                       ),
                     ),
                     SizedBox(
@@ -406,7 +415,7 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                       height: 3.1.h,
                     ),
                     MainButton(
-                      text: 'SAVE CHANGES',
+                      text: 'СОХРАНИТЬ ИЗМЕНЕНИЯ',
                       onTap: () => accountProvider.updatingUserInformation(
                         context,
                         usernameController.text == '' ?
@@ -424,175 +433,16 @@ class _ChangeInformationScreenState extends State<ChangeInformationScreen> {
                   ],
                 ),
               ),
-              // SizedBox(
-              //   height: 2.4.h,
-              // ),
-              // Container(
-              //   width: double.infinity,
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(8),
-              //     color: const Color.fromRGBO(255, 255, 255, 1),
-              //   ),
-              //   padding: EdgeInsets.all(
-              //     2.h,
-              //   ),
-              //   margin: const EdgeInsets.symmetric(
-              //     horizontal: 16,
-              //   ),
-              //   child: Column(
-              //     children: [
-              //       Align(
-              //         alignment: Alignment.centerLeft,
-              //         child: Text(
-              //           'Profile access',
-              //           style: TextStyle(
-              //             fontSize: 17.sp,
-              //             fontWeight: FontWeight.w700,
-              //           ),
-              //         ),
-              //       ),
-              //       SizedBox(
-              //         height: 1.6.h,
-              //       ),
-              //       Column(
-              //         mainAxisSize: MainAxisSize.min,
-              //         children: List.generate(
-              //           2, (index) {
-              //           return Container(
-              //             width: double.infinity,
-              //             height: 5.4.h,
-              //             margin: EdgeInsets.symmetric(
-              //               vertical: 1.2.h,
-              //             ),
-              //             padding: EdgeInsets.only(
-              //               right: 4.5.w,
-              //             ),
-              //             decoration: BoxDecoration(
-              //               borderRadius: BorderRadius.circular(50),
-              //               border: Border.all(
-              //                 color: const Color.fromRGBO(229, 232, 235, 1),
-              //               ),
-              //               color: const Color.fromRGBO(245, 247, 249, 1),
-              //             ),
-              //             child: Row(
-              //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //               children: [
-              //                 Container(
-              //                   decoration: BoxDecoration(
-              //                     borderRadius: BorderRadius.circular(50),
-              //                     border: const Border(
-              //                       top: BorderSide(
-              //                         width: 0.001,
-              //                         color: Color.fromRGBO(229, 232, 235, 1),
-              //                       ),
-              //                       bottom: BorderSide(
-              //                         width: 0.001,
-              //                         color: Color.fromRGBO(229, 232, 235, 1),
-              //                       ),
-              //                       left: BorderSide(
-              //                         width: 0.001,
-              //                         color: Color.fromRGBO(229, 232, 235, 1),
-              //                       ),
-              //                       right: BorderSide(
-              //                         width: 1,
-              //                         color: Color.fromRGBO(229, 232, 235, 1),
-              //                       ),
-              //                     ),
-              //                     color: const Color.fromRGBO(255, 255, 255, 1),
-              //                   ),
-              //                   padding: EdgeInsets.only(
-              //                     left: 0.3.h,
-              //                     top: 0.3.h,
-              //                     bottom: 0.3.h,
-              //                     right: 4.5.w,
-              //                   ),
-              //                   child: Row(
-              //                     mainAxisSize: MainAxisSize.min,
-              //                     children: [
-              //                       Image.asset(
-              //                         ConstantsAssets.avatarTestImage,
-              //                         fit: BoxFit.fill,
-              //                       ),
-              //                       SizedBox(
-              //                         width: 2.w,
-              //                       ),
-              //                       Text(
-              //                         'Андрасова М.В.',
-              //                         style: TextStyle(
-              //                           fontWeight: FontWeight.w500,
-              //                           fontSize: 9.5.sp,
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   ),
-              //                 ),
-              //                 Text(
-              //                   'Full profile access',
-              //                   style: TextStyle(
-              //                     fontWeight: FontWeight.w400,
-              //                     fontSize: 10.5.sp,
-              //                     color: Colors.grey.shade500,
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           );
-              //         },
-              //         ),
-              //       ),
-              //       SizedBox(
-              //         height: 2.4.h,
-              //       ),
-              //       Container(
-              //         width: double.infinity,
-              //         decoration: BoxDecoration(
-              //           color: Colors.transparent,
-              //           borderRadius: BorderRadius.circular(8),
-              //           border: Border.all(
-              //             color: const Color.fromRGBO(23, 94, 217, 1),
-              //           ),
-              //         ),
-              //         margin: EdgeInsets.symmetric(
-              //           horizontal: 7.w,
-              //         ),
-              //         child: Material(
-              //           color: Colors.transparent,
-              //           child: InkWell(
-              //             borderRadius: BorderRadius.circular(8),
-              //             onTap: () {
-              //               invitationBox(context, true,);
-              //             },
-              //             child: Padding(
-              //               padding: EdgeInsets.symmetric(
-              //                 vertical: 2.2.h,
-              //               ),
-              //               child: Center(
-              //                 child: Text(
-              //                   'SHARE PROFILE ACCESS',
-              //                   style: TextStyle(
-              //                     color: const Color.fromRGBO(23, 94, 217, 1),
-              //                     fontSize: 10.sp,
-              //                     fontWeight: FontWeight.w600,
-              //                   ),
-              //                 ),
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
               SizedBox(
                 height: 2.4.h,
               ),
               Center(
                 child: Text(
-                  'Delete account',
+                  'Удалить учетную запись',
                   style: TextStyle(
-                    color: Colors.grey.shade400,
+                    color: const Color.fromRGBO(32, 30, 31, 0.5),
                     fontSize: 11.5.sp,
-                    fontWeight: FontWeight.w400,
+                    fontFamily: ConstantsFonts.latoRegular
                   ),
                 ),
               ),

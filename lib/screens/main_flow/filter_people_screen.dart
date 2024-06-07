@@ -1,5 +1,7 @@
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:memorial_book/helpers/constants.dart';
+import 'package:memorial_book/widgets/main_button.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/text_field_profile_widget.dart';
 import '../../provider/catalog_provider.dart';
 import '../../widgets/unscope_scaffold.dart';
@@ -29,7 +31,7 @@ class _FilterScreenState extends State<FilterScreen> {
     return UnScopeScaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       body: ListView(
-        physics: const BouncingScrollPhysics(),
+        physics: platformScrollPhysics(),
         children: [
           Padding(
             padding: EdgeInsets.symmetric(
@@ -40,7 +42,7 @@ class _FilterScreenState extends State<FilterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Search',
+                  'Поиск',
                   style: TextStyle(
                     fontFamily: ConstantsFonts.latoBlack,
                     fontSize: 32.sp,
@@ -50,7 +52,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   height: 1.h,
                 ),
                 Text(
-                  'Enter first name, middle name, last name of the profile you want to find. If you are not sure of the dates, specify approximate ones.',
+                  'Введите имя, отчество, фамилию профиля, который вы хотите найти. Если вы не уверены в датах, укажите приблизительные.',
                   style: TextStyle(
                     color: const Color.fromRGBO(32, 30, 31, 0.5),
                     fontFamily: ConstantsFonts.latoRegular,
@@ -65,7 +67,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Full name:',
+                      'Полное имя:',
                       style: TextStyle(
                         color: Colors.grey.shade500,
                         fontWeight: FontWeight.w400,
@@ -88,10 +90,10 @@ class _FilterScreenState extends State<FilterScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Birth year:',
+                                'Год рождения:',
                                 style: TextStyle(
-                                  color: Colors.grey.shade500,
-                                  fontWeight: FontWeight.w400,
+                                  color: const Color.fromRGBO(32, 30, 31, 0.5),
+                                  fontFamily: ConstantsFonts.latoRegular,
                                   fontSize: 9.5.sp,
                                 ),
                               ),
@@ -161,10 +163,10 @@ class _FilterScreenState extends State<FilterScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Death year:',
+                                'Год смерти:',
                                 style: TextStyle(
-                                  color: Colors.grey.shade500,
-                                  fontWeight: FontWeight.w400,
+                                  color: const Color.fromRGBO(32, 30, 31, 0.5),
+                                  fontFamily: ConstantsFonts.latoRegular,
                                   fontSize: 9.5.sp,
                                 ),
                               ),
@@ -228,20 +230,14 @@ class _FilterScreenState extends State<FilterScreen> {
                         ),
                       ],
                     ),
-                    AnimatedContainer(
-                      duration: const Duration(
-                        milliseconds: 700,
-                      ),
-                      curve: Curves.ease,
-                      height: catalogProvider.checkBirth == true || catalogProvider.checkDeath == true ?
-                      2.h :
-                      0,
+                    SizedBox(
+                      height: 2.0.h,
                     ),
                     Text(
-                      'Country:',
+                      'Страна:',
                       style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontWeight: FontWeight.w400,
+                        color: const Color.fromRGBO(32, 30, 31, 0.5),
+                        fontFamily: ConstantsFonts.latoRegular,
                         fontSize: 9.5.sp,
                       ),
                     ),
@@ -257,10 +253,10 @@ class _FilterScreenState extends State<FilterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Name:',
+                      'Имя:',
                       style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontWeight: FontWeight.w400,
+                        color: const Color.fromRGBO(32, 30, 31, 0.5),
+                        fontFamily: ConstantsFonts.latoRegular,
                         fontSize: 9.5.sp,
                       ),
                     ),
@@ -275,43 +271,23 @@ class _FilterScreenState extends State<FilterScreen> {
                 SizedBox(
                   height: 3.6.h,
                 ),
-                Container(
-                  height: 6.8.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    color: catalogProvider.checkBirth == true || catalogProvider.checkDeath == true ?
-                    widget.filterCheckFlow == MapFlowType.people ?
-                    const Color.fromRGBO(23, 94, 217, 0.7) :
-                    const Color.fromRGBO(18, 175, 82, 0.7) :
-                    widget.filterCheckFlow == MapFlowType.people ?
-                    const Color.fromRGBO(23, 94, 217, 1) :
-                    const Color.fromRGBO(18, 175, 82, 1),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(7),
-                      // onTap: catalogProvider.checkBirth == true || catalogProvider.checkDeath == true ?
-                      // null : () {
-                      //   catalogProvider.peopleSearch();
-                      //   Navigator.pop(context);
-                      // },
-                      onTap: () {
-                        catalogProvider.peopleSearch();
-                        Navigator.pop(context);
-                      },
-                      child: Center(
-                        child: Text(
-                          'Show',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10.5.sp,
-                          ),
-                        ),
-                      ),
-                    ),
+                MainButton(
+                  text: 'ПОКАЗАТЬ',
+                  activeColor: catalogProvider.checkBirth == true || catalogProvider.checkDeath == true ?
+                  widget.filterCheckFlow == MapFlowType.people ?
+                  const Color.fromRGBO(23, 94, 217, 0.7) :
+                  const Color.fromRGBO(18, 175, 82, 0.7) :
+                  widget.filterCheckFlow == MapFlowType.people ?
+                  const Color.fromRGBO(23, 94, 217, 1) :
+                  const Color.fromRGBO(18, 175, 82, 1),
+                  onTap: () {
+                    catalogProvider.peopleSearch();
+                    Navigator.pop(context);
+                  },
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontFamily: ConstantsFonts.latoSemiBold,
+                    fontSize: 9.5.sp,
                   ),
                 ),
                 // AnimatedCrossFade(

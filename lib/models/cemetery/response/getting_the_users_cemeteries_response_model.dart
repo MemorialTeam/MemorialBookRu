@@ -4,7 +4,7 @@ import 'get_cemetery_info_response_model.dart';
 class GettingTheUsersCemeteriesResponseModel {
   bool? status;
   List<CemeteriesResponseModel>? cemeteries;
-  List<CemeteriesResponseModel>? featuredCemeteries;
+  List<SearchCemeteriesResponseModel>? featuredCemeteries;
 
   GettingTheUsersCemeteriesResponseModel({
     required this.status,
@@ -23,7 +23,7 @@ class GettingTheUsersCemeteriesResponseModel {
       json['featured_cemeteries'] != null ?
       featuredCemeteries = List.of(json['featured_cemeteries'])
           .map(
-            (index) => CemeteriesResponseModel.fromJson(index),
+            (index) => SearchCemeteriesResponseModel.fromJson(index),
       ).toList() :
       null;
     } catch(error) {
@@ -57,5 +57,32 @@ class CemeteriesResponseModel {
     avatar = json['avatar'];
     banner = json['banner'];
     addressCoords = CoordsResponseModel.fromJson(json['address_coords']);
+  }
+}
+
+class SearchCemeteriesResponseModel {
+  int? id;
+  String? name;
+  String? address;
+  CoordsResponseModel? coords;
+  String? avatar;
+  String? banner;
+
+  SearchCemeteriesResponseModel({
+    this.id,
+    this.name,
+    this.address,
+    this.coords,
+    this.avatar,
+    this.banner,
+  });
+
+  SearchCemeteriesResponseModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    address = json['address'];
+    coords = CoordsResponseModel.fromJson(json['address_coords']);
+    avatar = json['avatar'];
+    banner = json['banner'];
   }
 }

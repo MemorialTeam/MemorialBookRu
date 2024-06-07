@@ -3,6 +3,7 @@ import 'package:memorial_book/provider/profile_creation_provider.dart';
 import 'package:memorial_book/screens/profile_creation_flow/description_screen.dart';
 import 'package:memorial_book/screens/profile_creation_flow/posting_screen.dart';
 import 'package:memorial_book/screens/profile_creation_flow/primary_inforamtion_screen.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -101,7 +102,7 @@ class _CreationFlowState extends State<CreationFlow> with SingleTickerProviderSt
             children: [
               PageView(
                 controller: profileCreationProvider.pageController,
-                physics: const BouncingScrollPhysics(),
+                physics: platformScrollPhysics(),
                 onPageChanged: (index) => profileCreationProvider.onChangePage(index),
                 children: [
                   PrimaryInformationScreen(
@@ -210,7 +211,7 @@ class _CreationFlowState extends State<CreationFlow> with SingleTickerProviderSt
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              'Primary info...',
+                              'Основная информация...',
                               style: TextStyle(
                                 color: const Color.fromRGBO(23, 94, 217, 1),
                                 fontFamily: ConstantsFonts.latoRegular,
@@ -221,7 +222,7 @@ class _CreationFlowState extends State<CreationFlow> with SingleTickerProviderSt
                           Align(
                             alignment: Alignment.center,
                             child: Text(
-                              'Description',
+                              'Описание',
                               style: TextStyle(
                                 color: profileCreationProvider.indexPage >= 1 ?
                                 const Color.fromRGBO(23, 94, 217, 1) :
@@ -234,7 +235,7 @@ class _CreationFlowState extends State<CreationFlow> with SingleTickerProviderSt
                           Align(
                             alignment: Alignment.centerRight,
                             child: Text(
-                              'Posting',
+                              'Размещение',
                               style: TextStyle(
                                 color: profileCreationProvider.indexPage >= 2 ?
                                 const Color.fromRGBO(23, 94, 217, 1) :

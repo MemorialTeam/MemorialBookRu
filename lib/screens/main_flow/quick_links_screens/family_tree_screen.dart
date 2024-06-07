@@ -5,6 +5,7 @@ import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/provider/account_provider.dart';
 import 'package:memorial_book/provider/tab_bar_provider.dart';
 import 'package:memorial_book/screens/profile_creation_flow/creation_flow.dart';
+import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/animation/vertical_soft_navigation.dart';
 import 'package:memorial_book/widgets/cards/horizontal_mini_card_widget.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
@@ -60,78 +61,87 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                   onRefresh: () async => await accountProvider.gettingCreatedHumansProfiles((value) {
                     SVProgressHUD.dismiss();
                   }),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 3.4.w,
-                          vertical: 1.2.h,
-                        ),
-                        child: SearchEngine(
-                          focusNode: profilesFocusNode,
-                          controller: profilesController,
-                          isNotEmptyFunc: (text) {},
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverAppBar(
+                        expandedHeight: 8.3.h,
+                        // elevation: 0,
+                        leading: const SizedBox(),
+                        backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
+                        surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
+                        floating: true,
+                        flexibleSpace: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 3.4.w,
+                            vertical: 1.2.h,
+                          ),
+                          child: SearchEngine(
+                            focusNode: profilesFocusNode,
+                            controller: profilesController,
+                            isNotEmptyFunc: (text) {},
+                          ),
                         ),
                       ),
-                      Container(
-                        height: 0.4.h,
-                        color: const Color.fromRGBO(245, 247, 249, 1),
-                      ),
-                      accountProvider.createdHumanModel?.data != null && accountProvider.createdHumanModel!.data!.isNotEmpty ?
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (context, index) {
-                            final dataList = accountProvider.createdHumanModel!.data![index];
-                            final String? firstName = dataList.firstName == '' || dataList.firstName == null ?
-                            '' :
-                            '${dataList.firstName} ';
-                            final String? middleName = dataList.middleName == '' || dataList.middleName == null ?
-                            '' :
-                            '${dataList.middleName} ';
-                            final String? lastName = dataList.lastName == '' || dataList.lastName == null ?
-                            '' :
-                            '${dataList.lastName}';
-                            WidgetsBinding.instance.addPostFrameCallback((_){
-                              if(accountProvider.createdHumanPageNumber != accountProvider.createdHumanLastPageNumber &&
-                                  index == accountProvider.createdHumanModel!.data!.length - 1 &&
-                                  accountProvider.createdHumanPaginationLoading == false) {
-                                accountProvider.paginationCreatedHumans();
-                              }
-                            });
+                      SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 0.4.h,
+                              color: const Color.fromRGBO(245, 247, 249, 1),
+                            ),
+                            accountProvider.createdHumanModel?.data != null && accountProvider.createdHumanModel!.data!.isNotEmpty ?
+                            ListView.separated(
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final dataList = accountProvider.createdHumanModel!.data![index];
+                                final String? firstName = dataList.firstName == '' || dataList.firstName == null ?
+                                '' :
+                                '${dataList.firstName} ';
+                                final String? middleName = dataList.middleName == '' || dataList.middleName == null ?
+                                '' :
+                                '${dataList.middleName} ';
+                                final String? lastName = dataList.lastName == '' || dataList.lastName == null ?
+                                '' :
+                                '${dataList.lastName}';
+                                WidgetsBinding.instance.addPostFrameCallback((_){
+                                  if(accountProvider.createdHumanPageNumber != accountProvider.createdHumanLastPageNumber &&
+                                      index == accountProvider.createdHumanModel!.data!.length - 1 &&
+                                      accountProvider.createdHumanPaginationLoading == false) {
+                                    accountProvider.paginationCreatedHumans();
+                                  }
+                                });
 
-                            return HorizontalMiniCardWidget(
-                              onTap: () => accountProvider.gettingPeopleProfile(
-                                context,
-                                dataList.id ?? 0,
-                                ((model) {
-                                  Navigator.push(
+                                return HorizontalMiniCardWidget(
+                                  onTap: () => Navigator.push(
                                     context,
                                     CupertinoPageRoute(
                                       builder: (context) => SelectedPeopleScreen(
-                                        model: model!,
+                                        avatar: dataList.avatar ?? '',
+                                        id: dataList.id ?? 0,
                                       ),
                                     ),
-                                  );
-                                }),
-                              ),
-                              avatar: dataList.avatar,
-                              title: firstName! + middleName! + lastName!,
-                              subtitle: '${dataList.dateBirth} - ${dataList.dateDeath}',
-                            );
-                          },
-                          separatorBuilder: (context, index) {
-                            return Container(
-                              height: 0.4.h,
-                              color: const Color.fromRGBO(245, 247, 249, 1),
-                            );
-                          },
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: accountProvider.createdHumanModel!.data!.length,
+                                  ),
+                                  avatar: dataList.avatar,
+                                  title: firstName! + middleName! + lastName!,
+                                  subtitle: '${dataList.dateBirth} - ${dataList.dateDeath}',
+                                );
+                              },
+                              separatorBuilder: (context, index) {
+                                return Container(
+                                  height: 0.4.h,
+                                  color: const Color.fromRGBO(245, 247, 249, 1),
+                                );
+                              },
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: accountProvider.createdHumanModel!.data!.length,
+                            ) :
+                            const MemorialBookIconWidget(
+                              title: 'Oops...\nWe didn\'t find anything',
+                            )
+                          ],
                         ),
-                      ) :
-                      const MemorialBookIconWidget(
-                        title: 'Oops...\nWe didn\'t find anything',
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -150,70 +160,77 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                   onRefresh: () async => await accountProvider.gettingCreatedPetsProfiles((value) {
                     SVProgressHUD.dismiss();
                   }),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 3.4.w,
-                          vertical: 1.2.h,
-                        ),
-                        child: SearchEngine(
-                          focusNode: petsFocusNode,
-                          controller: petsController,
-                          isNotEmptyFunc: (text) {},
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverAppBar(
+                        expandedHeight: 8.3.h,
+                        // elevation: 0,
+                        leading: const SizedBox(),
+                        backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
+                        surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
+                        floating: true,
+                        flexibleSpace: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 3.4.w,
+                            vertical: 1.2.h,
+                          ),
+                          child: SearchEngine(
+                            focusNode: petsFocusNode,
+                            controller: petsController,
+                            isNotEmptyFunc: (text) {},
+                          ),
                         ),
                       ),
-                      Container(
-                        height: 0.4.h,
-                        color: const Color.fromRGBO(245, 247, 249, 1),
-                      ),
-                      accountProvider.createdPetsModel?.data != null && accountProvider.createdPetsModel!.data!.isNotEmpty ?
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (context, index) {
-                            final dataList = accountProvider.createdPetsModel!.data![index];
-                            WidgetsBinding.instance.addPostFrameCallback((_){
-                              if(accountProvider.createdPetPageNumber != accountProvider.createdPetLastPageNumber &&
-                                  index == accountProvider.createdPetsModel!.data!.length - 1 &&
-                                  accountProvider.createdPetPaginationLoading == false) {
-                                accountProvider.paginationCreatedHumans();
-                              }
-                            });
-                            return HorizontalMiniCardWidget(
-                              onTap: () => accountProvider.gettingPetProfile(
-                                context,
-                                dataList.id ?? 0,
-                                ((model) {
-                                  if(model!.status == true) {
-                                    Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                        builder: (context) => SelectedPetScreen(
-                                          model: model,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                }),
-                              ),
-                              avatar: dataList.avatar,
-                              title: dataList.name ?? '',
-                              subtitle: '${dataList.yearBirth} - ${dataList.yearDeath}',
-                            );
-                          },
-                          separatorBuilder: (context, index) {
-                            return Container(
+                      SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
                               height: 0.4.h,
                               color: const Color.fromRGBO(245, 247, 249, 1),
-                            );
-                          },
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: accountProvider.createdPetsModel!.data!.length,
+                            ),
+                            accountProvider.createdPetsModel?.data != null && accountProvider.createdPetsModel!.data!.isNotEmpty ?
+                            ListView.separated(
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final dataList = accountProvider.createdPetsModel!.data![index];
+                                WidgetsBinding.instance.addPostFrameCallback((_){
+                                  if(accountProvider.createdPetPageNumber != accountProvider.createdPetLastPageNumber &&
+                                      index == accountProvider.createdPetsModel!.data!.length - 1 &&
+                                      accountProvider.createdPetPaginationLoading == false) {
+                                    accountProvider.paginationCreatedHumans();
+                                  }
+                                });
+                                return HorizontalMiniCardWidget(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => SelectedPetScreen(
+                                        id: dataList.id ?? 0,
+                                        avatar: dataList.avatar ?? '',
+                                      ),
+                                    ),
+                                  ),
+                                  avatar: dataList.avatar,
+                                  title: dataList.name ?? '',
+                                  subtitle: '${dataList.yearBirth} - ${dataList.yearDeath}',
+                                );
+                              },
+                              separatorBuilder: (context, index) {
+                                return Container(
+                                  height: 0.4.h,
+                                  color: const Color.fromRGBO(245, 247, 249, 1),
+                                );
+                              },
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: accountProvider.createdPetsModel!.data!.length,
+                            ) :
+                            const MemorialBookIconWidget(
+                              title: 'Oops...\nWe didn\'t find anything',
+                            ),
+                          ],
                         ),
-                      ) :
-                      const MemorialBookIconWidget(
-                        title: 'Oops...\nWe didn\'t find anything',
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -226,35 +243,34 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        width: double.infinity,
-                        height: 6.2.h,
-                        decoration: BoxDecoration(
-                          color: accountProvider.usersProfileButtonState == true ?
-                          const Color.fromRGBO(255, 255, 255, 1) :
-                          const Color.fromRGBO(245, 247, 249, 1),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 30,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 0),
+                      child: PunchingAnimation(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: accountProvider.usersProfileButtonState == false ?
+                          (() => accountProvider.switchProfileButtonButtonState()) :
+                          null,
+                          child: Container(
+                            width: double.infinity,
+                            height: 6.2.h,
+                            decoration: BoxDecoration(
                               color: accountProvider.usersProfileButtonState == true ?
-                              const Color.fromRGBO(15, 20, 37, 0.1) :
-                              const Color.fromRGBO(15, 20, 37, 0.05),
-                            )
-                          ],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: accountProvider.usersProfileButtonState == false ?
-                            (() => accountProvider.switchProfileButtonButtonState()) :
-                            null,
-                            borderRadius: BorderRadius.circular(8),
+                              const Color.fromRGBO(255, 255, 255, 1) :
+                              const Color.fromRGBO(245, 247, 249, 1),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 30,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 0),
+                                  color: accountProvider.usersProfileButtonState == true ?
+                                  const Color.fromRGBO(15, 20, 37, 0.1) :
+                                  const Color.fromRGBO(15, 20, 37, 0.05),
+                                )
+                              ],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             child: Center(
                               child: Text(
-                                'Profile list',
+                                'Список профилей',
                                 style: TextStyle(
                                   color: accountProvider.usersProfileButtonState == true ?
                                   const Color.fromRGBO(32, 30, 31, 1) :
@@ -272,35 +288,34 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                       width: 2.2.w,
                     ),
                     Expanded(
-                      child: Container(
-                        width: double.infinity,
-                        height: 6.2.h,
-                        decoration: BoxDecoration(
-                          color: accountProvider.usersProfileButtonState == false ?
-                          const Color.fromRGBO(255, 255, 255, 1) :
-                          const Color.fromRGBO(245, 247, 249, 1),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 30,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 0),
+                      child: PunchingAnimation(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: accountProvider.usersProfileButtonState == true ?
+                          (() => accountProvider.switchProfileButtonButtonState()) :
+                          null,
+                          child: Container(
+                            width: double.infinity,
+                            height: 6.2.h,
+                            decoration: BoxDecoration(
                               color: accountProvider.usersProfileButtonState == false ?
-                              const Color.fromRGBO(15, 20, 37, 0.1) :
-                              const Color.fromRGBO(15, 20, 37, 0.05),
-                            )
-                          ],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: accountProvider.usersProfileButtonState == true ?
-                            (() => accountProvider.switchProfileButtonButtonState()) :
-                            null,
-                            borderRadius: BorderRadius.circular(8),
+                              const Color.fromRGBO(255, 255, 255, 1) :
+                              const Color.fromRGBO(245, 247, 249, 1),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 30,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 0),
+                                  color: accountProvider.usersProfileButtonState == false ?
+                                  const Color.fromRGBO(15, 20, 37, 0.1) :
+                                  const Color.fromRGBO(15, 20, 37, 0.05),
+                                )
+                              ],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             child: Center(
                               child: Text(
-                                'Pets list',
+                                'Список дом. животных',
                                 style: TextStyle(
                                   color: accountProvider.usersProfileButtonState == false ?
                                   const Color.fromRGBO(32, 30, 31, 1) :

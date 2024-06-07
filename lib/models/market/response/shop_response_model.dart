@@ -13,7 +13,6 @@ class ShopResponseModel {
   String? status;
   bool? hasPickup;
   String? createdAt;
-  ShopRequisiteResponseModel? shopRequisite;
 
   ShopResponseModel({
     required this.id,
@@ -27,7 +26,6 @@ class ShopResponseModel {
     required this.status,
     required this.hasPickup,
     required this.createdAt,
-    required this.shopRequisite,
   });
 
   ShopResponseModel.fromJson(Map<String, dynamic> json) {
@@ -42,6 +40,5 @@ class ShopResponseModel {
     status = json['status'];
     hasPickup = json['has_pickup'];
     createdAt = json['created_at'];
-    shopRequisite = ShopRequisiteResponseModel.fromJson(json['shop_requisite']);
   }
 }

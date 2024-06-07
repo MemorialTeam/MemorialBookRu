@@ -4,13 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:memorial_book/models/cemetery/response/getting_the_users_cemeteries_response_model.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/skeleton_loader_widget.dart';
-import 'package:provider/provider.dart';
 import '../helpers/constants.dart';
 import 'package:sizer/sizer.dart';
-
-import '../models/cemetery/response/get_cemetery_info_response_model.dart';
-import '../provider/account_provider.dart';
-import '../provider/catalog_provider.dart';
 import '../screens/main_flow/some_selected_screens/selected_cemetery_screen.dart';
 
 class MapsPlacesCardWidget extends StatelessWidget {
@@ -19,28 +14,23 @@ class MapsPlacesCardWidget extends StatelessWidget {
     required this.model,
   }) : super(key: key);
 
-  final CemeteriesResponseModel model;
+  final SearchCemeteriesResponseModel model;
 
   @override
   Widget build(BuildContext context) {
-    final catalogProvider = Provider.of<CatalogProvider>(context);
     return PunchingAnimation(
       child: GestureDetector(
-        onTap: () {
-          catalogProvider.gettingCemeteryProfile(context, model.id ?? 0, (model) {
-            if(model!.status == true) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => const SelectedCemeteryScreen(
-                  ),
-                ),
-              );
-            }
-          });
-        },
+        onTap: () => Navigator.push(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => SelectedCemeteryScreen(
+              avatar: model.avatar ?? '',
+              id: model.id ?? 0,
+            ),
+          ),
+        ),
         child: SizedBox(
-          height: 22.h,
+          height: 26.h,
           child: Stack(
             children: [
               CachedNetworkImage(
@@ -85,7 +75,7 @@ class MapsPlacesCardWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      model.title ?? 'Cemetery',
+                      model.name ?? 'Cemetery',
                       style: TextStyle(
                         fontSize: 10.5.sp,
                         fontFamily: ConstantsFonts.latoBold,
@@ -96,7 +86,7 @@ class MapsPlacesCardWidget extends StatelessWidget {
                       height: 0.3.h,
                     ),
                     Text(
-                      model.subtitle ?? 'Cemetery',
+                      model.address ?? 'Cemetery',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 9.5.sp,

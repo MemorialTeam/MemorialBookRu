@@ -19,6 +19,18 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    final authProvider = Provider.of<AuthProvider>(
+      context,
+      listen: false,
+    );
+    authProvider.clearRegControllers();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -45,11 +57,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         ),
       ),
       body: Form(
-        onChanged: () {
-          setState(() {
-            authProvider.checkRegistration();
-          });
-        },
+        key: _formKey,
         child: AuthRegFrame(
           title: 'Регистрация',
           body: Column(
@@ -62,6 +70,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 keyboardType: TextInputType.text,
                 hintText: 'Введите имя пользователя',
                 obscureText: false,
+                validate: (value) {
+                  if(value == null || value.isEmpty) {
+                    return 'Имя не может быть пустым';
+                  } else if(value.length < 3) {
+                    return 'Имя должно содержать более 3 символов';
+                  }
+                  return null;
+                },
                 controller: authProvider.regUsernameController,
               ),
               SizedBox(
@@ -71,6 +87,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 keyboardType: TextInputType.text,
                 hintText: 'Введите email',
                 obscureText: false,
+                validate: (value) {
+                  if(value == null || value.isEmpty) {
+                    return 'Почта не может быть пустой';
+                  } else if(!value.contains('@')) {
+                    return 'Не правильный формат почты';
+                  }
+                  return null;
+                },
                 controller: authProvider.regEmailController,
               ),
               SizedBox(
@@ -80,6 +104,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 keyboardType: TextInputType.text,
                 hintText: 'Введите пароль',
                 obscureText: false,
+                validate: (value) {
+                  if(value == null || value.isEmpty) {
+                    return 'Введите какой-нибудь пароль';
+                  } else if(value.length < 6) {
+                    return 'Пароль должен содержать не менее 6 символов';
+                  }
+                  return null;
+                },
                 controller: authProvider.regPasswordController,
               ),
               SizedBox(
@@ -89,6 +121,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 keyboardType: TextInputType.text,
                 hintText: 'Повторите пароль',
                 obscureText: false,
+                validate: (value) {
+                  if(value == null || value.isEmpty) {
+                    return 'Повторите пароль';
+                  } else if(value != authProvider.regPasswordController.text) {
+                    return 'Пароли не совпадают';
+                  }
+                  return null;
+                },
                 controller: authProvider.regRepeatPasswordController,
               ),
               SizedBox(
@@ -96,26 +136,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               ),
               MainButton(
                 text: 'Продолжить',
-                condition: authProvider.checkRegistration() == true,
-                onTap: () => authProvider.signUp(context, authProvider.regUsernameController.text, authProvider.regEmailController.text, authProvider.regRepeatPasswordController.text, (model) async {
-                  if(model != null) {
-                    if(model.status == true) {
-                      return accountProvider.setLoading();
-                    } else {
-                      return messageDialogsProvider.informationWindow(
-                        context: context,
-                        title: model.message ?? 'Something went wrong...\Try again later',
-                        textButton: 'OK',
-                      );
-                    }
-                  } else {
-                    return messageDialogsProvider.informationWindow(
-                      context: context,
-                      title: 'Something went wrong...\Try again later',
-                      textButton: 'OK',
-                    );
+                // condition: authProvider.checkRegistration() == true,
+                onTap: () {
+                  if (_formKey.currentState!.validate()) {
+                    authProvider.signUp(context, authProvider.regUsernameController.text, authProvider.regEmailController.text, authProvider.regRepeatPasswordController.text, (model) async {
+                      if(model != null) {
+                        if(model.status == true) {
+                          return accountProvider.setLoading();
+                        } else {
+                          return messageDialogsProvider.informationWindow(
+                            context: context,
+                            title: model.message ?? 'Something went wrong...\Try again later',
+                            textButton: 'OK',
+                          );
+                        }
+                      }
+                      else {
+                        return messageDialogsProvider.informationWindow(
+                          context: context,
+                          title: 'Something went wrong...\Try again later',
+                          textButton: 'OK',
+                        );
+                      }
+                    });
                   }
-                }),
+                },
               ),
               SizedBox(
                 height: 2.h,

@@ -12,7 +12,9 @@ class TextFieldSearchWidget extends StatelessWidget {
     required this.controller,
     this.textStyle,
     this.enabledBorder,
+    this.focusedBorder,
     this.backgroundColor,
+    this.cursorColor,
     required this.hintText,
   }) : super(key: key);
 
@@ -27,16 +29,19 @@ class TextFieldSearchWidget extends StatelessWidget {
   final TextStyle? textStyle;
 
   final Color? backgroundColor;
+  final Color? cursorColor;
 
   final bool autofocus;
 
   final InputBorder? enabledBorder;
+  final InputBorder? focusedBorder;
 
   final String hintText;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      // cursorColor: cursorColor ?? const Color.fromRGBO(23, 94, 217, 1),
       autofocus: autofocus,
       controller: controller,
       focusNode: focusNode,
@@ -59,7 +64,7 @@ class TextFieldSearchWidget extends StatelessWidget {
             Radius.circular(7.0),
           ),
         ),
-        focusedBorder: const OutlineInputBorder(
+        focusedBorder: focusedBorder ?? const OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.black,
           ),
@@ -74,6 +79,9 @@ class TextFieldSearchWidget extends StatelessWidget {
           borderRadius: BorderRadius.all(
             Radius.circular(7.0),
           ),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 1.6.h,
         ),
       ),
     );

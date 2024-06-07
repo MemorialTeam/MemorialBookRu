@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
+import '../../widgets/platform_scroll_physics.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class NotificationScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
         body: ListView(
-          physics: const BouncingScrollPhysics(),
+          physics: platformScrollPhysics(),
           children: [
             Padding(
               padding: EdgeInsets.symmetric(

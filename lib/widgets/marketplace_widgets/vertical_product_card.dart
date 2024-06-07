@@ -8,7 +8,7 @@ import '../../models/market/response/products_response_models/get_products_categ
 import '../../models/market/response/products_response_models/product_data_response_model.dart';
 import '../skeleton_loader_widget.dart';
 
-class VerticalProductCard extends StatelessWidget {
+class VerticalProductCard extends StatefulWidget {
   const VerticalProductCard({
     super.key,
     required this.model,
@@ -22,9 +22,53 @@ class VerticalProductCard extends StatelessWidget {
   final double? width;
 
   @override
+  State<VerticalProductCard> createState() => _VerticalProductCardState();
+}
+
+class _VerticalProductCardState extends State<VerticalProductCard> {
+
+  Widget price() {
+    if(widget.model?.discountedPrice != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'US \$${widget.model?.price ?? 0}',
+            style: TextStyle(
+              decoration: TextDecoration.lineThrough,
+              decorationColor: Colors.red,
+              fontFamily: ConstantsFonts.latoRegular,
+              fontSize: 7.5.sp,
+              color: const Color.fromRGBO(0, 0, 0, 1),
+            ),
+          ),
+          Text(
+            'US \$${widget.model?.discountedPrice ?? 0}',
+            style: TextStyle(
+              fontFamily: ConstantsFonts.latoRegular,
+              fontSize: 9.5.sp,
+              color: const Color.fromRGBO(0, 0, 0, 1),
+            ),
+          )
+        ],
+      );
+    } else {
+      return Text(
+        'US \$${widget.model?.price ?? 0}',
+        style: TextStyle(
+          fontFamily: ConstantsFonts.latoRegular,
+          fontSize: 9.5.sp,
+          color: const Color.fromRGBO(0, 0, 0, 1),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: width,
+      width: widget.width,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -32,7 +76,7 @@ class VerticalProductCard extends StatelessWidget {
           CachedNetworkImage(
             height: 20.h,
             width: double.infinity,
-            imageUrl: model?.mainPhoto ?? '',
+            imageUrl: widget.model?.mainPhoto ?? '',
             imageBuilder: (context, image) {
               return Container(
                 padding: EdgeInsets.all(1.h),
@@ -46,9 +90,9 @@ class VerticalProductCard extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                child: symbol != null ?
+                child: widget.symbol != null ?
                 Image.asset(
-                  symbol!,
+                  widget.symbol!,
                   height: 4.h,
                 ) :
                 null,
@@ -87,24 +131,18 @@ class VerticalProductCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  model?.name ?? '',
+                  widget.model?.name ?? '',
                   style: TextStyle(
                     fontFamily: ConstantsFonts.latoBold,
                     fontSize: 11.5.sp,
                     color: const Color.fromRGBO(0, 0, 0, 1),
+                    height: 0.8.sp
                   ),
                 ),
                 SizedBox(
                   height: 0.6.h,
                 ),
-                Text(
-                  'US \$${model?.price.toString()}',
-                  style: TextStyle(
-                    fontFamily: ConstantsFonts.latoRegular,
-                    fontSize: 9.5.sp,
-                    color: const Color.fromRGBO(0, 0, 0, 1),
-                  ),
-                ),
+                price(),
               ],
             ),
           ),

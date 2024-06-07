@@ -10,7 +10,8 @@ import 'package:memorial_book/screens/main_flow/add_post_screen.dart';
 import 'package:memorial_book/screens/main_flow/all_pictures_screen.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/animation/vertical_soft_navigation.dart';
-import 'package:memorial_book/widgets/open_image_core.dart';
+import 'package:memorial_book/widgets/boot_engine.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/post_card.dart';
 import 'package:memorial_book/widgets/switch_bar_widget.dart';
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
@@ -20,20 +21,39 @@ import 'package:sizer/sizer.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../provider/catalog_provider.dart';
 import '../../../provider/tab_bar_provider.dart';
+import '../../../widgets/full_screen_gallery.dart';
 import '../../../widgets/memorial_app_bar.dart';
 import '../../../widgets/skeleton_loader_widget.dart';
+import '../../../widgets/unscope_scaffold.dart';
 import '../../profile_creation_flow/creation_flow.dart';
 
 class SelectedCommunityScreen extends StatefulWidget {
   const SelectedCommunityScreen({
     Key? key,
+    required this.id,
+    required this.avatar,
   }) : super(key: key);
+
+  final String avatar;
+  final int id;
 
   @override
   State<SelectedCommunityScreen> createState() => _SelectedCommunityScreenState();
 }
 
 class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
+
+  @override
+  void initState() {
+    final catalogProvider = Provider.of<CatalogProvider>(
+      context,
+      listen: false,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_)  {
+      catalogProvider.gettingCommunityProfile(context, widget.id);
+    });
+    super.initState();
+  }
 
   bool loadingSub = false;
 
@@ -43,12 +63,12 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
     final catalogProvider = Provider.of<CatalogProvider>(context);
     final profileCreationProvider = Provider.of<ProfileCreationProvider>(context);
-    final model = catalogProvider.selectedCommunity;
+    final model = catalogProvider.communityProfileModel;
     return MemorialAppBar(
       automaticallyImplyBackLeading: true,
-      child: Scaffold(
+      child: UnScopeScaffold(
         backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
-        floatingActionButton: model.isAdmin! ?
+        floatingActionButton: model?.isAdmin == true ?
         Align(
           alignment: Alignment.bottomRight,
           child: Material(
@@ -60,7 +80,7 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
                   tabBarProvider.mainContext,
                   verticalSoftNavigation(
                     AddPostScreen(
-                      communityId: model.id ?? 0,
+                      communityId: model?.id ?? 0,
                       postType: PostType.addPost,
                     ),
                   ),
@@ -75,407 +95,465 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
           ),
         ) :
          null,
-        body: SafeArea(
-          child: Material(
-            color: const Color.fromRGBO(245, 247, 249, 1),
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverPersistentHeader(
-                  delegate: MySliverAppBar(
-                    expandedHeight: 28.8.h,
-                    image: model.avatar!,
-                    backgroundImage: model.banner!,
-                  ),
-                  floating: false,
+        body: BootEngine(
+          loadValue: catalogProvider.getCommunityProfileState,
+          activeFlow: CustomScrollView(
+            physics: platformScrollPhysics(),
+            slivers: [
+              SliverPersistentHeader(
+                delegate: MySliverAppBar(
+                  expandedHeight: 28.8.h,
+                  image: model?.avatar ?? '',
+                  backgroundImage: model?.banner ?? '',
                 ),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: 7.h,
-                        bottom: 1.6.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 2.h,
-                            ),
-                            child: Text(
-                              model.title ?? '',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 19.sp,
-                              ),
-                            ),
+                floating: false,
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: 5.h,
+                      right: 2.h,
+                      left: 2.h,
+                      bottom: 1.6.h,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          model?.title ?? '',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 19.sp,
                           ),
-                          SizedBox(
-                            height: 1.6.h,
+                        ),
+                        SizedBox(
+                          height: 1.6.h,
+                        ),
+                        Text(
+                          model?.subtitle ?? '',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 9.5.sp,
+                            fontWeight: FontWeight.w400,
                           ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 2.h,
+                        ),
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: 1.6.h,
                             ),
-                            child: Text(
-                              model.subtitle ?? '',
-                              style: TextStyle(
-                                color: Colors.grey.shade700,
-                                fontSize: 9.5.sp,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                          tabBarProvider.currentTab != TabItem.places ?
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 2.h,
-                            ),
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: 1.6.h,
-                                ),
-                                if(authProvider.userRules == 'authorized')
-                                  Column(
+                            if(authProvider.userRules == 'authorized')
+                              Column(
+                                children: [
+                                  model?.isAdmin == true ?
+                                  Row(
                                     children: [
-                                      model.isAdmin! ?
-                                      Row(
-                                        children: [
-                                          Flexible(
-                                            child: Container(
-                                              height: 6.h,
-                                              width: double.infinity,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(7),
-                                                color: const Color.fromRGBO(23, 94, 217, 1),
-                                              ),
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    profileCreationProvider.disposeAddPostScreen();
-                                                    Navigator.push(
-                                                      tabBarProvider.mainContext,
-                                                      verticalSoftNavigation(
-                                                        AddPostScreen(
-                                                          communityId: model.id ?? 0,
-                                                          postType: PostType.addPost,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  borderRadius: BorderRadius.circular(7),
-                                                  child: Center(
-                                                    child: Text(
-                                                      'ADD POST',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 10.5.sp,
-                                                      ),
+                                      Flexible(
+                                        child: Container(
+                                          height: 6.h,
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(7),
+                                            color: const Color.fromRGBO(23, 94, 217, 1),
+                                          ),
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              onTap: () {
+                                                profileCreationProvider.disposeAddPostScreen();
+                                                Navigator.push(
+                                                  tabBarProvider.mainContext,
+                                                  verticalSoftNavigation(
+                                                    AddPostScreen(
+                                                      communityId: model?.id ?? 0,
+                                                      postType: PostType.addPost,
                                                     ),
+                                                  ),
+                                                );
+                                              },
+                                              borderRadius: BorderRadius.circular(7),
+                                              child: Center(
+                                                child: Text(
+                                                  'ДОБАВИТЬ ПОСТ',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 10.5.sp,
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 3.w,
+                                      ),
+                                      PunchingAnimation(
+                                        child: PopupMenuButton(
+                                          position: PopupMenuPosition.under,
+                                          constraints: BoxConstraints(
+                                            maxWidth: 45.w,
+                                          ),
+                                          surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
+                                          color: const Color.fromRGBO(255, 255, 255, 1),
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              bottomRight: Radius.circular(20),
+                                              bottomLeft: Radius.circular(20),
+                                            ),
+                                          ),
+                                          itemBuilder: ((context) => [
+                                            BoardTypePopupMenuItem(
+                                              title: 'Изменить данные',
+                                              image: Image.asset(
+                                                ConstantsAssets.editPostImage,
+                                                height: 1.8.h,
+                                              ),
+                                              weight: 2.8.w,
+                                              onTap: () {
+                                                profileCreationProvider.setEditCommunityState(model!);
+                                                profileCreationProvider.uploadingDataToControllers(
+                                                  CommunityEditModel(
+                                                    avatar: model.avatar,
+                                                    banner: model.banner,
+                                                    title: model.title ?? '',
+                                                    subtitle: model.subtitle ?? '',
+                                                    address: model.address ?? '',
+                                                    email: model.email ?? '',
+                                                    phone: model.phone ?? '',
+                                                    website: model.website ?? '',
+                                                    description: model.description ?? '',
+                                                    id: model.id ?? 0,
+                                                  ),
+                                                );
+                                                Navigator.push(
+                                                  tabBarProvider.mainContext,
+                                                  CupertinoPageRoute(
+                                                    builder: (context) => const CreationFlow(
+                                                      checkFlow: CheckFlow.editCommunity,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            BoardTypePopupMenuItem(
+                                              title: 'Поделиться',
+                                              image: Image.asset(
+                                                ConstantsAssets.shareCommunityImage,
+                                                height: 1.65.h,
+                                              ),
+                                              weight: 3.8.w,
+                                              onTap: () async {
+                                                Navigator.pop(context);
+                                                await Share.share('Do you love your loved ones? Download the app to keep in touch with your departed loved ones - https://memorialbook.site/api/v1/feed');
+                                              },
+                                            ),
+                                          ]),
+                                          child: Container(
+                                            height: 6.h,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(7),
+                                              color: const Color.fromRGBO(229, 232, 235, 1),
+                                            ),
+                                            padding: EdgeInsets.only(
+                                              right: 4.w,
+                                              left: 4.w,
+                                            ),
+                                            child: Center(
+                                              child: Image.asset(
+                                                ConstantsAssets.threePointsImage,
+                                                width: 5.2.w,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ) :
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: PunchingAnimation(
+                                          child: Container(
+                                            height: 6.h,
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(7),
+                                              color: model?.isSubscribe == true ?
+                                              const Color.fromRGBO(250, 18, 46, 1) :
+                                              const Color.fromRGBO(23, 94, 217, 1),
+                                            ),
+                                            child: GestureDetector(
+                                              behavior: HitTestBehavior.translucent,
+                                              onTap: loadingSub == false ? () {
+                                                loadingSub = true;
+                                                setState(() {});
+                                                if(model?.isSubscribe == true) {
+                                                  catalogProvider.unsubscribeFromTheCommunity(model?.id ?? 0, context, (model) {
+                                                    loadingSub = false;
+                                                    setState(() {});
+                                                  });
+                                                } else {
+                                                  catalogProvider.subscribeToTheCommunity(model?.id ?? 0, context, (model) {
+                                                    loadingSub = false;
+                                                    setState(() {});
+                                                  });
+                                                }
+                                              } :
+                                              null,
+                                              child: Center(
+                                                child: loadingSub == false ?
+                                                Text(
+                                                  model?.isSubscribe == true ?
+                                                  'UNSUBSCRIBE' :
+                                                  'SUBSCRIBE',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 10.5.sp,
+                                                  ),
+                                                ) :
+                                                SizedBox(
+                                                  width: 4.h,
+                                                  height: 4.h,
+                                                  child: const LoadingIndicator(
+                                                    indicatorType: Indicator.ballSpinFadeLoader,
+                                                    colors: [
+                                                      Colors.white,
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      model?.isAdmin == true ?
+                                      Row(
+                                        children: [
                                           SizedBox(
                                             width: 3.w,
                                           ),
-                                          PunchingAnimation(
-                                            child: PopupMenuButton(
-                                              position: PopupMenuPosition.under,
-                                              constraints: BoxConstraints(
-                                                maxWidth: 42.w,
-                                              ),
-                                              color: const Color.fromRGBO(255, 255, 255, 1),
-                                              shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(20),
-                                                  bottomRight: Radius.circular(20),
-                                                  bottomLeft: Radius.circular(20),
-                                                ),
-                                              ),
-                                              itemBuilder: ((context) => [
-                                                BoardTypePopupMenuItem(
-                                                  title: 'Edit information',
-                                                  image: Image.asset(
-                                                    ConstantsAssets.editPostImage,
-                                                    height: 1.8.h,
-                                                  ),
-                                                  weight: 2.8.w,
-                                                  onTap: () {
-                                                    profileCreationProvider.setEditCommunityState(model);
-                                                    profileCreationProvider.uploadingDataToControllers(
-                                                      CommunityEditModel(
-                                                        avatar: model.avatar,
-                                                        banner: model.banner,
-                                                        title: model.title ?? '',
-                                                        subtitle: model.subtitle ?? '',
-                                                        address: model.address ?? '',
-                                                        email: model.email ?? '',
-                                                        phone: model.phone ?? '',
-                                                        website: model.website ?? '',
-                                                        description: model.description ?? '',
-                                                        id: model.id ?? 0,
-                                                      ),
-                                                    );
-                                                    Navigator.push(
-                                                      tabBarProvider.mainContext,
-                                                      CupertinoPageRoute(
-                                                        builder: (context) => const CreationFlow(
-                                                          checkFlow: CheckFlow.editCommunity,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                                BoardTypePopupMenuItem(
-                                                  title: 'Share',
-                                                  image: Image.asset(
-                                                    ConstantsAssets.shareCommunityImage,
-                                                    height: 1.65.h,
-                                                  ),
-                                                  weight: 3.8.w,
-                                                  onTap: () async {
-                                                    Navigator.pop(context);
-                                                    await Share.share('Do you love your loved ones? Download the app to keep in touch with your departed loved ones - https://memorialbook.site/api/v1/feed');
-                                                  },
-                                                ),
-                                              ]),
-                                              child: Container(
-                                                height: 6.h,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(7),
-                                                  color: const Color.fromRGBO(229, 232, 235, 1),
-                                                ),
-                                                padding: EdgeInsets.only(
-                                                  right: 4.w,
-                                                  left: 4.w,
-                                                ),
-                                                child: Center(
-                                                  child: Image.asset(
-                                                    ConstantsAssets.threePointsImage,
-                                                    width: 5.2.w,
-                                                  ),
-                                                ),
+                                          Container(
+                                            height: 6.h,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(7),
+                                              color: const Color.fromRGBO(229, 232, 235, 1),
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 2.h,
+                                            ),
+                                            child: Center(
+                                              child: Image.asset(
+                                                ConstantsAssets.settingsOfProfileImage,
+                                                height: 0.5.h,
                                               ),
                                             ),
                                           ),
                                         ],
                                       ) :
-                                      Row(
-                                        children: [
-                                          Flexible(
-                                            child: PunchingAnimation(
-                                              child: Container(
-                                                height: 6.h,
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(7),
-                                                  color: model.isSubscribe == true ?
-                                                  const Color.fromRGBO(250, 18, 46, 1) :
-                                                  const Color.fromRGBO(23, 94, 217, 1),
-                                                ),
-                                                child: GestureDetector(
-                                                  behavior: HitTestBehavior.translucent,
-                                                  onTap: loadingSub == false ? () {
-                                                    loadingSub = true;
-                                                    setState(() {});
-                                                    if(model.isSubscribe == true) {
-                                                      catalogProvider.unsubscribeFromTheCommunity(model.id ?? 0, context, (model) {
-                                                        loadingSub = false;
-                                                        setState(() {});
-                                                      });
-                                                    } else {
-                                                      catalogProvider.subscribeToTheCommunity(model.id ?? 0, context, (model) {
-                                                        loadingSub = false;
-                                                        setState(() {});
-                                                      });
-                                                    }
-                                                  } :
-                                                  null,
-                                                  child: Center(
-                                                    child: loadingSub == false ?
-                                                    Text(
-                                                      model.isSubscribe == true ?
-                                                      'UNSUBSCRIBE' :
-                                                      'SUBSCRIBE',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 10.5.sp,
-                                                      ),
-                                                    ) :
-                                                    SizedBox(
-                                                      width: 4.h,
-                                                      height: 4.h,
-                                                      child: const LoadingIndicator(
-                                                        indicatorType: Indicator.ballSpinFadeLoader,
-                                                        colors: [
-                                                          Colors.white,
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          model.isAdmin! ?
-                                          Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 3.w,
-                                              ),
-                                              Container(
-                                                height: 6.h,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(7),
-                                                  color: const Color.fromRGBO(229, 232, 235, 1),
-                                                ),
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 2.h,
-                                                ),
-                                                child: Center(
-                                                  child: Image.asset(
-                                                    ConstantsAssets.settingsOfProfileImage,
-                                                    height: 0.5.h,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ) :
-                                          const SizedBox(),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 1.6.h,
-                                      ),
+                                      const SizedBox(),
                                     ],
                                   ),
+                                  SizedBox(
+                                    height: 1.6.h,
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Подписчики: ${model?.subscribersCount}',
+                                  style: TextStyle(
+                                    color: const Color.fromRGBO(32, 30, 31, 0.7),
+                                    fontSize: 11.5.sp,
+                                    fontFamily: ConstantsFonts.latoBold,
+                                    height: 0.15.h,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 1.6.h,
+                                ),
+                                if(model?.lastSubscribers != null)
                                 Row(
-                                  children: [
-                                    Text(
-                                      'Subscribers: ${model.subscribersCount}',
-                                      style: TextStyle(
-                                        color: const Color.fromRGBO(32, 30, 31, 0.7),
-                                        fontSize: 11.5.sp,
-                                        fontFamily: ConstantsFonts.latoBold,
-                                        height: 0.15.h,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 1.6.h,
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: List.generate(model.lastSubscribers!.length < 6 ?
-                                      model.lastSubscribers!.length :
-                                      6, (index) {
-                                        final dataList = model.lastSubscribers![index];
-                                        return dataList.avatar != '' ?
-                                        CachedNetworkImage(
-                                          imageUrl: dataList.avatar ?? '',
-                                          imageBuilder: (context, imageProvider) {
-                                            return SizedBox(
-                                              height: 4.6.h,
-                                              width: 7.5.w,
-                                              child: OverflowBox(
-                                                maxWidth: 12.w,
-                                                child: Container(
-                                                  decoration: const BoxDecoration(
-                                                    color: Colors.white,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  height: 5.5.h,
-                                                  width: 5.5.h,
-                                                  padding: EdgeInsets.all(0.2.h),
-                                                  child: Container(
-                                                    height: double.infinity,
-                                                    width: double.infinity,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: DecorationImage(
-                                                        image: imageProvider,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          placeholder: (context, indicator) {
-                                            return SizedBox(
-                                              height: 4.6.h,
-                                              width: 7.5.w,
-                                              child: OverflowBox(
-                                                maxWidth: 60,
-                                                child: SkeletonLoaderWidget(
-                                                  height: 5.5.h,
-                                                  width: 5.5.h,
-                                                  borderRadius: 50,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          errorWidget: (context, error, _) {
-                                            return SizedBox(
-                                              height: 4.6.h,
-                                              width: 7.5.w,
-                                              child: OverflowBox(
-                                                maxWidth: 12.w,
-                                                child: SkeletonLoaderWidget(
-                                                  height: 5.5.h,
-                                                  width: 5.5.h,
-                                                  borderRadius: 50,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ) :
-                                        SizedBox(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(model!.lastSubscribers!.length < 6 ?
+                                  model.lastSubscribers!.length :
+                                  6, (index) {
+                                    final dataList = model.lastSubscribers![index];
+                                    return dataList.avatar != '' ?
+                                    CachedNetworkImage(
+                                      imageUrl: dataList.avatar ?? '',
+                                      imageBuilder: (context, imageProvider) {
+                                        return SizedBox(
                                           height: 4.6.h,
                                           width: 7.5.w,
                                           child: OverflowBox(
                                             maxWidth: 12.w,
                                             child: Container(
                                               decoration: const BoxDecoration(
-                                                color: Color.fromRGBO(229, 232, 235, 1),
+                                                color: Colors.white,
                                                 shape: BoxShape.circle,
                                               ),
                                               height: 5.5.h,
                                               width: 5.5.h,
                                               padding: EdgeInsets.all(0.2.h),
-                                              child: Center(
-                                                child: Icon(
-                                                  Icons.camera_alt_rounded,
-                                                  size: 15.sp,
-                                                  color: const Color.fromRGBO(186, 186, 186, 1),
+                                              child: Container(
+                                                height: double.infinity,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                    image: imageProvider,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                         );
                                       },
+                                      placeholder: (context, indicator) {
+                                        return SizedBox(
+                                          height: 4.6.h,
+                                          width: 7.5.w,
+                                          child: OverflowBox(
+                                            maxWidth: 60,
+                                            child: SkeletonLoaderWidget(
+                                              height: 5.5.h,
+                                              width: 5.5.h,
+                                              borderRadius: 50,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorWidget: (context, error, _) {
+                                        return SizedBox(
+                                          height: 4.6.h,
+                                          width: 7.5.w,
+                                          child: OverflowBox(
+                                            maxWidth: 12.w,
+                                            child: SkeletonLoaderWidget(
+                                              height: 5.5.h,
+                                              width: 5.5.h,
+                                              borderRadius: 50,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ) :
+                                    SizedBox(
+                                      height: 4.6.h,
+                                      width: 7.5.w,
+                                      child: OverflowBox(
+                                        maxWidth: 12.w,
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Color.fromRGBO(229, 232, 235, 1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          height: 5.5.h,
+                                          width: 5.5.h,
+                                          padding: EdgeInsets.all(0.2.h),
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.camera_alt_rounded,
+                                              size: 15.sp,
+                                              color: const Color.fromRGBO(186, 186, 186, 1),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  },
+                                  ),
                                 ),
                               ],
                             ),
-                          ) :
-                          Padding(
-                            padding: EdgeInsets.only(
-                              top: 1.6.h,
-                              bottom: 1.6.h,
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SwitchBarWidget(
+                    switcher: CommunityOrCemeterySwitch.community,
+                  ),
+                  SizedBox(
+                    height: 1.6.h,
+                  ),
+                  model?.gallery != null && model!.gallery!.isNotEmpty ?
+                  Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 1.6.h,
+                        ),
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Color.fromRGBO(229, 232, 235, 1),
                             ),
-                            child: SizedBox(
-                              height: 14.h,
+                            top: BorderSide(
+                              color: Color.fromRGBO(229, 232, 235, 1),
+                            ),
+                          ),
+                          color: Color.fromRGBO(255, 255, 255, 1),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: 2.h,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Картинки',
+                                    style: TextStyle(
+                                      fontFamily: ConstantsFonts.latoBold,
+                                      fontSize: 14.sp,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: () {
+                                      Navigator.push(
+                                        tabBarProvider.mainContext,
+                                        verticalSoftNavigation(
+                                          AllPicturesScreen(
+                                            imagesList: model.gallery ?? [],
+                                            galleryTitle: model.title ?? '',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: 3.9.h,
+                                      child: Text(
+                                        'Все',
+                                        style: TextStyle(
+                                          fontFamily: ConstantsFonts.latoRegular,
+                                          fontSize: 11.5.sp,
+                                          color: tabBarProvider.currentTab != TabItem.places ? const Color.fromRGBO(23, 94, 217, 1) : const Color.fromRGBO(18, 175, 82, 1),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 2.h,
+                            ),
+                            SizedBox(
+                              height: 15.h,
                               child: ListView(
                                 shrinkWrap: true,
                                 scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
+                                physics: platformScrollPhysics(),
                                 children: [
                                   SizedBox(
                                     width: 2.h,
@@ -485,29 +563,65 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
                                     scrollDirection: Axis.horizontal,
                                     physics: const NeverScrollableScrollPhysics(),
                                     itemBuilder: (context, indexMenu) {
-                                      return OpenImage(
-                                        initialIndex: indexMenu,
-                                        disposeLevel: DisposeLevel.High,
-                                        dataImage: model.gallery!,
-                                        child: CachedNetworkImage(
-                                          imageUrl: model.gallery![indexMenu],
-                                          imageBuilder: (context, imageProvider) {
-                                            return Container(
-                                              width: 14.h,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(5),
-                                                image: DecorationImage(
-                                                  image: imageProvider,
-                                                  fit: BoxFit.fill,
+                                      return GestureDetector(
+                                        onTap: () => Navigator.push(
+                                          tabBarProvider.mainContext,
+                                          PageRouteBuilder(
+                                            opaque: false,
+                                            barrierColor: Colors.black.withOpacity(0.4),
+                                            pageBuilder: (BuildContext context, _, __) => FullScreenGallery(
+                                              title: model.title ?? '',
+                                              gallery: model.gallery ?? [],
+                                              initialIndex: indexMenu,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Hero(
+                                          tag: indexMenu,
+                                          child: CachedNetworkImage(
+                                            imageUrl: model.gallery![indexMenu],
+                                            imageBuilder: (context, imageProvider) {
+                                              return Container(
+                                                width: 15.h,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(5),
+                                                  image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.fill,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          },
+                                              );
+                                            },
+                                            errorWidget: (context, error, _) {
+                                              return Container(
+                                                width: 15.h,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(5),
+                                                  color: const Color.fromRGBO(0, 0, 0, 0.5),
+                                                ),
+                                                child: Center(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.symmetric(
+                                                      horizontal: 2.5.w,
+                                                    ),
+                                                    child: Text(
+                                                      'Got Error - $error',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily: ConstantsFonts.latoBlack,
+                                                        fontSize: 9.5.sp,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
                                         ),
                                       );
                                     },
                                     separatorBuilder: (context, index) => SizedBox(
-                                      width: 3.w,
+                                      width: 1.2.h,
                                     ),
                                     itemCount: model.gallery!.length,
                                   ),
@@ -517,182 +631,239 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
                                 ],
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      SizedBox(
+                        height: 1.6.h,
+                      ),
+
+                    ],
+                  ) :
+                  const SizedBox(),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final postModel = catalogProvider.postsDataModel!.data![index];
+                      return PostCard(
+                        model: postModel,
+                        isAdmin: model?.isAdmin ?? false,
+                        communityId: model?.id ?? 0,
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return SizedBox(
+                        height: 1.6.h,
+                      );
+                    },
+                    itemCount: catalogProvider.postsDataModel?.data != null ?
+                    catalogProvider.postsDataModel!.data!.length :
+                    0,
+                  ),
+                ]),
+              ),
+            ],
+          ),
+          loadingFlow: ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: 28.8.h,
+                width: double.infinity,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  fit: StackFit.expand,
+                  children: [
+                    SkeletonLoaderWidget(
+                      height: 28.8.h,
+                      width: double.infinity,
                     ),
-                    const SwitchBarWidget(
-                      switcher: CommunityOrCemeterySwitch.community,
-                    ),
-                    SizedBox(
-                      height: 1.6.h,
-                    ),
-                    model.gallery!.isNotEmpty ?
-                    Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 1.6.h,
-                          ),
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Color.fromRGBO(229, 232, 235, 1),
-                              ),
-                              top: BorderSide(
-                                color: Color.fromRGBO(229, 232, 235, 1),
+                    Positioned(
+                      top: 28.8.h / 2.14,
+                      left: 5.5.w,
+                      child: CachedNetworkImage(
+                        imageUrl: widget.avatar,
+                        imageBuilder: (context, imageProvider) {
+                          return Container(
+                            height: 19.h,
+                            width: 19.h,
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(255, 255, 255, 1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    offset: Offset(3, 5),
+                                    blurRadius: 30,
+                                    spreadRadius: 0,
+                                    color: Color.fromRGBO(0, 0, 0, 0.05),
+                                  ),
+                                ],
                               ),
                             ),
-                            color: Color.fromRGBO(255, 255, 255, 1),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: 2.h,
+                          );
+                        },
+                        errorWidget: (context, error, widget) {
+                          return Container(
+                            height: 19.h,
+                            width: 19.h,
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(255, 255, 255, 1),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: Offset(3, 5),
+                                  blurRadius: 30,
+                                  spreadRadius: 0,
+                                  color: Color.fromRGBO(0, 0, 0, 0.05),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      'Pictures',
-                                      style: TextStyle(
-                                        fontFamily: ConstantsFonts.latoBold,
-                                        fontSize: 14.sp,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      onTap: () {
-                                        Navigator.push(
-                                          tabBarProvider.mainContext,
-                                          verticalSoftNavigation(
-                                            AllPicturesScreen(
-                                              imagesList: model.gallery ?? [],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: SizedBox(
-                                        width: 3.9.h,
-                                        child: Text(
-                                          'All',
-                                          style: TextStyle(
-                                            fontFamily: ConstantsFonts.latoRegular,
-                                            fontSize: 11.5.sp,
-                                            color: tabBarProvider.currentTab != TabItem.places ? const Color.fromRGBO(23, 94, 217, 1) : const Color.fromRGBO(18, 175, 82, 1),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Image.asset(
+                                ConstantsAssets.memorialBookLogoImage,
+                                height: double.infinity,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
                               ),
-                              SizedBox(
-                                height: 2.h,
-                              ),
-                              SizedBox(
-                                height: 15.h,
-                                child: ListView(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
-                                  children: [
-                                    SizedBox(
-                                      width: 2.h,
-                                    ),
-                                    ListView.separated(
-                                      shrinkWrap: true,
-                                      scrollDirection: Axis.horizontal,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, indexMenu) {
-                                        return CachedNetworkImage(
-                                          imageUrl: model.gallery![indexMenu],
-                                          imageBuilder: (context, imageProvider) {
-                                            return Container(
-                                              width: 15.h,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(5),
-                                                image: DecorationImage(
-                                                  image: imageProvider,
-                                                  fit: BoxFit.fill,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          errorWidget: (context, error, _) {
-                                            return Container(
-                                              width: 15.h,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(5),
-                                                color: const Color.fromRGBO(0, 0, 0, 0.5),
-                                              ),
-                                              child: Center(
-                                                child: Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 2.5.w,
-                                                  ),
-                                                  child: Text(
-                                                    'Got Error - $error',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontFamily: ConstantsFonts.latoBlack,
-                                                      fontSize: 9.5.sp,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) => SizedBox(
-                                        width: 1.2.h,
-                                      ),
-                                      itemCount: model.gallery!.length,
-                                    ),
-                                    SizedBox(
-                                      width: 2.h,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          );
+                        },
+                        progressIndicatorBuilder: (context, url, downloadProgress) {
+                          return Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: SkeletonLoaderWidget(
+                              height: 19.h,
+                              width: 19.h,
+                              borderRadius: 100,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: 5.4.h,
+                      right: 2.h,
+                      left: 2.h,
+                      bottom: 1.6.h,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SkeletonLoaderWidget(
+                          height: 3.h,
+                          width: 86.w,
+                          borderRadius: 10,
+                        ),
+                        SizedBox(
+                          height: 2.4.h,
+                        ),
+                        SkeletonLoaderWidget(
+                          height: 1.6.h,
+                          width: 42.w,
+                          borderRadius: 10,
                         ),
                         SizedBox(
                           height: 1.6.h,
                         ),
-
-                      ],
-                    ) :
-                    const SizedBox(),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final postModel = catalogProvider.postsDataModel!.data![index];
-                        return PostCard(
-                          model: postModel,
-                          isAdmin: model.isAdmin ?? false,
-                          communityId: model.id ?? 0,
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(
+                        SkeletonLoaderWidget(
                           height: 1.6.h,
-                        );
-                      },
-                      itemCount: catalogProvider.postsDataModel?.data != null ?
-                      catalogProvider.postsDataModel!.data!.length :
-                      0,
+                          width: 50.w,
+                          borderRadius: 10,
+                        ),
+                        SizedBox(
+                          height: 2.h,
+                        ),
+                        SkeletonLoaderWidget(
+                          height: 1.6.h,
+                          width: double.infinity,
+                          borderRadius: 10,
+                        ),
+                        SizedBox(
+                          height: 0.7.h,
+                        ),
+                        SkeletonLoaderWidget(
+                          height: 1.6.h,
+                          width: 34.w,
+                          borderRadius: 10,
+                        ),
+                        SizedBox(
+                          height: 1.9.h,
+                        ),
+                        Row(
+                          children: [
+                            SkeletonLoaderWidget(
+                              height: 4.h,
+                              width: 54.w,
+                              borderRadius: 15,
+                            ),
+                            SizedBox(
+                              width: 2.h,
+                            ),
+                            SkeletonLoaderWidget(
+                              height: 4.h,
+                              width: 20.w,
+                              borderRadius: 15,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 0.8.h,
+                        ),
+                        SkeletonLoaderWidget(
+                          height: 4.h,
+                          width: 69.w,
+                          borderRadius: 15,
+                        ),
+                        SizedBox(
+                          height: 2.5.h,
+                        ),
+                        SkeletonLoaderWidget(
+                          height: 6.1.h,
+                          width: double.infinity,
+                          borderRadius: 10,
+                        ),
+                      ],
                     ),
-                  ]),
-                ),
-              ],
-            ),
+                  ),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 0.2.h,
+                      crossAxisSpacing: 0.2.h,
+                    ),
+                    itemCount: 3,
+                    itemBuilder: (BuildContext context, int index) {
+                      return SkeletonLoaderWidget(
+                        height: 28.h,
+                        width: double.infinity,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

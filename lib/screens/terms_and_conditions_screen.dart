@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/main_button.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:sizer/sizer.dart';
 
 import 'auth&reg_flow/registration_screen.dart';
@@ -25,7 +26,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
         body: Stack(
           children: [
             ListView(
-              physics: const BouncingScrollPhysics(),
+              physics: platformScrollPhysics(),
               children: [
                 SizedBox(
                   height: 1.4.h,
@@ -113,17 +114,23 @@ class TermsAndConditionsScreen extends StatelessWidget {
                   horizontal: 3.w,
                   vertical: 2.h,
                 ),
-                child: MainButton(
-                  text: 'Да, я согласен.',
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => const RegistrationScreen(),
-                      ),
-                    );
-                  },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MainButton(
+                      text: 'Да, я согласен.',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          CupertinoDialogRoute(
+                            builder: (context) => const RegistrationScreen(),
+                            context: context,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ) :

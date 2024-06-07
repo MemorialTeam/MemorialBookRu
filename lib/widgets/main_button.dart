@@ -6,7 +6,7 @@ import 'package:sizer/sizer.dart';
 class MainButton extends StatelessWidget {
   const MainButton({
     super.key,
-    required this.text,
+    this.text,
     this.condition,
     this.activeColor = const Color.fromRGBO(23, 94, 217, 1),
     this.inactiveColor = const Color.fromRGBO(23, 94, 217, 0.5),
@@ -15,9 +15,10 @@ class MainButton extends StatelessWidget {
     this.padding,
     this.border,
     this.textStyle,
+    this.child,
   });
 
-  final String text;
+  final String? text;
 
   final bool? condition;
 
@@ -31,6 +32,8 @@ class MainButton extends StatelessWidget {
   final BoxBorder? border;
 
   final TextStyle? textStyle;
+
+  final Widget? child;
 
   Color buttonColor() {
     if(condition != null) {
@@ -48,8 +51,6 @@ class MainButton extends StatelessWidget {
     if(condition != null) {
       if(condition == true) {
         return onTap();
-      } else {
-        return null;
       }
     } else {
       return onTap();
@@ -60,11 +61,9 @@ class MainButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PunchingAnimation(
       child: Container(
-        height: 7.h,
         width: padding == null ?
         double.infinity :
         null,
-        padding: padding,
         margin: margin,
         decoration: BoxDecoration(
           color: buttonColor(),
@@ -74,14 +73,22 @@ class MainButton extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
+            borderRadius: BorderRadius.circular(10),
             onTap: onTapEvent,
-            child: Center(
-              child: Text(
-                text,
-                style: textStyle ?? TextStyle(
-                  color: Colors.white,
-                  fontFamily: ConstantsFonts.latoRegular,
-                  fontSize: 12.sp,
+            child: Padding(
+              padding: padding ?? EdgeInsets.symmetric(
+                vertical: 1.6.h,
+              ),
+              child: child != null ?
+              child! :
+              Center(
+                child: Text(
+                  text ?? '',
+                  style: textStyle ?? TextStyle(
+                    color: Colors.white,
+                    fontFamily: ConstantsFonts.latoRegular,
+                    fontSize: 12.sp,
+                  ),
                 ),
               ),
             ),

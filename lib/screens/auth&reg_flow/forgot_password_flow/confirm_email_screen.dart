@@ -47,7 +47,7 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
                 height: 2.h,
               ),
               MainButton(
-                text: 'Continue',
+                text: 'Продолжить',
                 condition: emailController.text.isNotEmpty && RegExp('@').firstMatch(emailController.text) != null,
                 onTap: () async {
                   authProvider.setEmail(emailController.text);

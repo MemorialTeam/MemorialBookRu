@@ -5,8 +5,11 @@ import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_item/home_tab_bar_i
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_item/people_tab_bar_item.dart';
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_item/places_tab_bar_item.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../helpers/constants.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../provider/tab_bar_provider.dart';
 
 class BottomNavigationWidget extends StatelessWidget {
   const BottomNavigationWidget({Key? key,
@@ -19,6 +22,7 @@ class BottomNavigationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tabBarProvider = Provider.of<TabBarProvider>(context);
     return Theme(
       data: ThemeData(
         splashColor: Colors.transparent,
@@ -26,10 +30,12 @@ class BottomNavigationWidget extends StatelessWidget {
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           selectedLabelStyle: TextStyle(
             fontSize: 8.sp,
+            color: const Color.fromRGBO(23, 94, 217, 1),
             fontFamily: ConstantsFonts.latoRegular,
           ),
           unselectedLabelStyle: TextStyle(
             fontSize: 8.sp,
+            color: const Color.fromRGBO(0, 0, 0, 1),
             fontFamily: ConstantsFonts.latoRegular,
           ),
           selectedItemColor: currentTab.index != 1 ?
@@ -40,7 +46,6 @@ class BottomNavigationWidget extends StatelessWidget {
       ),
       child: BottomNavigationBar(
         backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-        elevation: 100,
         type: BottomNavigationBarType.fixed,
         items: [
           peopleTabBarItem(context),
@@ -54,9 +59,12 @@ class BottomNavigationWidget extends StatelessWidget {
           fontFamily: ConstantsFonts.latoRegular,
           color: const Color.fromRGBO(32, 30, 31, 1),
         ),
-        onTap: (index) => onSelectTab(
-          TabItem.values[index],
-        ),
+        onTap: (index) {
+          tabBarProvider.tabController.animateTo(index);
+          onSelectTab(
+            TabItem.values[index],
+          );
+        },
         currentIndex: currentTab.index,
       ),
     );

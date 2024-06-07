@@ -106,6 +106,13 @@ class ConstantsAssets {
   static String addToCardImage = 'assets/images/addToCardImage.png';
   static String removeFromCardImage = 'assets/images/removeFromCardImage.png';
   static String questionMarkImage = 'assets/images/questionMarkImage.png';
+  static String marketSearchImage = 'assets/images/marketSearchImage.png';
+  static String successfullyMarkImage = 'assets/images/successfullyMarkImage.png';
+  static String goToTopImage = 'assets/images/goToTopImage.png';
+  static String verifiedImage = 'assets/images/verifiedImage.png';
+  static String removeFromBasket = 'assets/images/removeFromBasket.png';
+  static String memorialBookIconImage = 'assets/images/memorialBookIconImage.png';
+  static String splashScreenImage = 'assets/images/splashScreenImage.png';
   ///
   static String buddhismImage = 'assets/images/buddhismImage.png';
   static String christianityImage = 'assets/images/christianityImage.png';
@@ -150,6 +157,7 @@ extension StringCasingExtension on String {
 }
 
 class ConstantsNavigatorKeys {
+
   static final navigatorKeys = {
     TabItem.people: GlobalKey<NavigatorState>(),
     TabItem.places: GlobalKey<NavigatorState>(),
@@ -160,11 +168,12 @@ class ConstantsNavigatorKeys {
 
   static const String root = '/';
   static const String detail = '/detail';
+  static const String marketplaceRoute = '/Marketplace';
 }
 
 class ConstEndpoints {
   static const String signUpEndPoint = 'auth/register';
-  static const String signInEndPoint = 'auth/login';
+  static const String signInEndPoint = 'auth/user/login';
   static const String peopleSearch = 'profiles/human/search';
   static const String communitiesSearch = 'communities/search';
   static const String placesSearch = 'profile/cemeteries/search';
@@ -178,9 +187,9 @@ class ConstEndpoints {
   static const String guestMainPage = 'guest/feed';
   static const String gettingPetProfile = 'profiles/pet/';
   static const String gettingPeopleProfile = 'profiles/human/';
-  static const String gettingCommunitiesProfile = 'communities/posts/';
-  static const String gettingCemeteryProfile = 'profile/cemeteries/';
-  static const String gettingCemeteries = 'profile/cemeteries';
+  static const String gettingCommunitiesProfile = 'communities/';
+  static const String gettingCemeteryProfile = 'profiles/cemeteries/';
+  static const String gettingCemeteries = 'profiles/cemeteries';
   static const String creatingProfile = 'profiles/humans';
   static const String creatingPet = 'profile/pets';
   static const String creatingCemetery = 'profile/cemeteries';
@@ -190,6 +199,7 @@ class ConstEndpoints {
   static const String createPost = 'communities/posts/';
   static const String sendCodeForPasswordRecovery = 'auth/password/email';
   static const String passwordRecovery = 'auth/password/recover';
+  static const String getUserCart = 'cart';
 }
 
 class ConstantsUrls {

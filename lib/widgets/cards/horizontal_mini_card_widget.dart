@@ -1,19 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:memorial_book/models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/skeleton_loader_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../helpers/constants.dart';
 import 'package:sizer/sizer.dart';
-import '../../provider/catalog_provider.dart';
 
 enum StateOfMemorial {
   added,
   notAdded,
 }
 
-class HorizontalMiniCardWidget extends StatelessWidget {
+class HorizontalMiniCardWidget extends StatefulWidget {
   const HorizontalMiniCardWidget({
     Key? key,
     required this.onTap,
@@ -40,16 +37,21 @@ class HorizontalMiniCardWidget extends StatelessWidget {
   final Color? color;
 
   @override
+  State<HorizontalMiniCardWidget> createState() => _HorizontalMiniCardWidgetState();
+}
+
+class _HorizontalMiniCardWidgetState extends State<HorizontalMiniCardWidget> {
+
+  @override
   Widget build(BuildContext context) {
-    final catalogProvider = Provider.of<CatalogProvider>(context);
     return PunchingAnimation(
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: onTap,
+          onTap: widget.onTap,
           child: Container(
-            decoration: isAddingPeople == true ?
+            decoration: widget.isAddingPeople == true ?
             BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               color: const Color.fromRGBO(255, 255, 255, 1),
@@ -68,7 +70,7 @@ class HorizontalMiniCardWidget extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CachedNetworkImage(
-                          imageUrl: avatar ?? '',
+                          imageUrl: widget.avatar ?? '',
                           imageBuilder: (context, imageProvider) {
                             return Container(
                               height: 7.h,
@@ -91,7 +93,7 @@ class HorizontalMiniCardWidget extends StatelessWidget {
                               ),
                               child: Image.asset(
                                 ConstantsAssets.memorialBookLogoImage,
-                                color: color,
+                                color: widget.color,
                               ),
                             );
                           },
@@ -111,7 +113,7 @@ class HorizontalMiniCardWidget extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                title,
+                                widget.title,
                                 style: TextStyle(
                                   fontFamily: ConstantsFonts.latoRegular,
                                   fontSize: 11.5.sp,
@@ -121,7 +123,7 @@ class HorizontalMiniCardWidget extends StatelessWidget {
                                 height: 0.6.h,
                               ),
                               Text(
-                                subtitle,
+                                widget.subtitle,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontFamily: ConstantsFonts.latoRegular,
@@ -135,17 +137,6 @@ class HorizontalMiniCardWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  isAddingPeople == true ?
-                  catalogProvider.stateAddWidget(
-                    catalogProvider.isAdded(index ?? 0),
-                    context,
-                    catalogProvider.selectedCommunity.id ?? 0,
-                    AddMemorialToTheCommunityRequestModel(
-                      memorialId: id ?? 0,
-                      memorialType: 'human',
-                    ),
-                  ) :
-                  const SizedBox(),
                 ],
               ),
             ),

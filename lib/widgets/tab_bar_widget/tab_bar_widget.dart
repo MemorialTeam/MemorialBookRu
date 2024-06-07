@@ -1,4 +1,5 @@
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
+import 'package:sizer/sizer.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/tab_bar_provider.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,23 @@ class TabBarWidget extends StatefulWidget {
   State<StatefulWidget> createState() => TabBarWidgetState();
 }
 
-class TabBarWidgetState extends State<TabBarWidget> {
+class TabBarWidgetState extends State<TabBarWidget> with SingleTickerProviderStateMixin {
+
+  @override
+  void initState() {
+    final tabBarProvider = Provider.of<TabBarProvider>(
+      context,
+      listen: false,
+    );
+    setState(() {
+      tabBarProvider.tabController = TabController(
+        length: 5,
+        initialIndex: 2,
+        vsync: this,
+      );
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +70,7 @@ class TabBarWidgetState extends State<TabBarWidget> {
               ),
             ],
           ),
-          height: 68,
+          height: 8.2.h,
           child: Stack(
             children: [
               Positioned(
@@ -61,7 +78,7 @@ class TabBarWidgetState extends State<TabBarWidget> {
                 right: 0.0,
                 left: 0.0,
                 child: SizedBox(
-                  height: 69,
+                  height: 8.3.h,
                   child: BottomNavigationWidget(
                     currentTab: tabBarProvider.currentTab,
                     onSelectTab: (tabItem) {
@@ -69,6 +86,7 @@ class TabBarWidgetState extends State<TabBarWidget> {
                       if(_authProvider.userRules == 'guest') {
                         if(tabItem == TabItem.account) {
                           _authProvider.logoutGuest(context);
+                          // _tabController.animateTo(tabItem);
                         }
                       }
                     },
@@ -78,31 +96,37 @@ class TabBarWidgetState extends State<TabBarWidget> {
               Positioned(
                 right: 0.0,
                 left: 0.0,
-                top: 0.2,
-                child: Row(
-                  children: List.generate(
-                    5,
-                    ((index) {
-                      if(index == tabBarProvider.tabItemIndex()) {
-                        return Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            height: 1.2,
-                            color: tabBarProvider.tabItemIndex() != 1 ?
-                            const Color.fromRGBO(23, 94, 217, 1) :
-                            const Color.fromRGBO(18, 175, 82, 1),
-                          ),
-                        );
-                      } else {
-                        return Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            height: 0.1,
-                            color: Colors.transparent,
-                          ),
-                        );
-                      }
-                    }),
+                child: IgnorePointer(
+                  child: SizedBox(
+                    height: 0.15.h,
+                    child: TabBar(
+                      enableFeedback: false,
+                      dividerColor: Colors.transparent,
+                      indicator: BoxDecoration(
+                        color: tabBarProvider.currentTab == TabItem.places ?
+                        const Color.fromRGBO(18, 175, 82, 1) :
+                        const Color.fromRGBO(23, 94, 217, 1),
+                      ),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      controller: tabBarProvider.tabController,
+                      tabs: const [
+                        Tab(
+                          child: SizedBox(),
+                        ),
+                        Tab(
+                          child: SizedBox(),
+                        ),
+                        Tab(
+                          child: SizedBox(),
+                        ),
+                        Tab(
+                          child: SizedBox(),
+                        ),
+                        Tab(
+                          child: SizedBox(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

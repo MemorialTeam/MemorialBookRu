@@ -7,33 +7,37 @@ class HomeFrameWidget extends StatelessWidget {
   const HomeFrameWidget({
     Key? key,
     required this.title,
-    required this.controller,
+    this.controller,
     required this.widget,
   }) : super(key: key);
 
   final String title;
 
-  final ScrollController controller;
+  final ScrollController? controller;
 
   final Widget widget;
 
   void animateRight() {
-    controller.animateTo(
-      controller.position.pixels + 100.w,
-      duration: const Duration(
-        milliseconds: 300,
-      ),
-      curve: Curves.fastOutSlowIn,
-    );
+    if(controller != null) {
+      controller!.animateTo(
+        controller!.position.pixels + 100.w,
+        duration: const Duration(
+          milliseconds: 300,
+        ),
+        curve: Curves.fastOutSlowIn,
+      );
+    }
   }
   void animateLeft() {
-    controller.animateTo(
-      controller.position.pixels - 100.w,
-      duration: const Duration(
-        milliseconds: 300,
-      ),
-      curve: Curves.fastOutSlowIn,
-    );
+    if(controller != null) {
+      controller!.animateTo(
+        controller!.position.pixels - 100.w,
+        duration: const Duration(
+          milliseconds: 300,
+        ),
+        curve: Curves.fastOutSlowIn,
+      );
+    }
   }
 
   @override
@@ -42,12 +46,13 @@ class HomeFrameWidget extends StatelessWidget {
       width: double.infinity,
       color: const Color.fromRGBO(255, 255, 255, 1),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-              top: 15,
-              left: 15,
-              right: 15,
+            padding: EdgeInsets.only(
+              top: 1.6.h,
+              left: 3.2.w,
+              right: 3.2.w,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,7 +64,7 @@ class HomeFrameWidget extends StatelessWidget {
                     fontFamily: ConstantsFonts.latoBold,
                   ),
                 ),
-                Row(
+                if(controller != null) Row(
                   children: [
                     PunchingAnimation(
                       child: Container(

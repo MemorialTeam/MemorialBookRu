@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../widgets/memorial_book_icon_widget.dart';
+import '../../widgets/platform_scroll_physics.dart';
 
 class SearchBurialPlaceScreen extends StatelessWidget {
   const SearchBurialPlaceScreen({super.key});
@@ -22,7 +23,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
       automaticallyImplyBackLeading: true,
       child: UnScopeScaffold(
         body: ListView(
-          physics: const BouncingScrollPhysics(),
+          physics: platformScrollPhysics(),
           children: [
             SizedBox(
               height: 1.h,

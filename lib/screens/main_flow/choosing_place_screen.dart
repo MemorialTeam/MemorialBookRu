@@ -179,7 +179,7 @@ class _ChoosingPlaceScreenState extends State<ChoosingPlaceScreen> {
                               null,
                               child: Center(
                                 child: Text(
-                                  'SAVE AND CONTINUE',
+                                  'СОХРАНИТЬ И ПРОДОЛЖИТЬ',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontFamily: ConstantsFonts.latoRegular,

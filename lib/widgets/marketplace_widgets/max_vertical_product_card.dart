@@ -1,19 +1,24 @@
+import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import '../../helpers/enums.dart';
+import '../../models/market/response/item_cart_response_model.dart';
 import '../../models/market/response/products_response_models/product_data_response_model.dart';
 import '../../provider/marketplace_provider.dart';
 import '../skeleton_loader_widget.dart';
 
-class MaxVerticalProductCard extends StatelessWidget {
+class MaxVerticalProductCard extends StatefulWidget {
   const MaxVerticalProductCard({
     super.key,
     required this.model,
     this.symbol,
     this.width,
+    required this.state,
   });
 
   final ProductDataResponseModel model;
@@ -21,50 +26,213 @@ class MaxVerticalProductCard extends StatelessWidget {
 
   final double? width;
 
-  @override
-  Widget build(BuildContext context) {
-    final marketplaceProvider = Provider.of<MarketplaceProvider>(context);
+  final MarketplaceProductType state;
 
-    Widget price() {
-      if(model.discountedPrice != null) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'US \$${model.price}',
-              style: TextStyle(
-                decoration: TextDecoration.lineThrough,
-                decorationColor: Colors.red,
-                fontFamily: ConstantsFonts.latoRegular,
-                fontSize: 7.5.sp,
-                color: const Color.fromRGBO(0, 0, 0, 1),
-              ),
-            ),
-            Text(
-              'US \$${model.discountedPrice}',
-              style: TextStyle(
-                fontFamily: ConstantsFonts.latoRegular,
-                fontSize: 9.5.sp,
-                color: const Color.fromRGBO(0, 0, 0, 1),
-              ),
-            )
-          ],
-        );
+  @override
+  State<MaxVerticalProductCard> createState() => _MaxVerticalProductCardState();
+}
+
+class _MaxVerticalProductCardState extends State<MaxVerticalProductCard> {
+
+  bool buttonLoading = false;
+
+  Widget check() {
+    final marketplaceProvider = Provider.of<MarketplaceProvider>(context);
+    bool checkInCart = false;
+    int quantity = 0;
+    int productId = 0;
+    for(ItemCartResponseModel a in marketplaceProvider.userCart?.items ?? []) {
+      if(a.productId == widget.model.id) {
+        checkInCart = true;
+        quantity = a.quantity ?? 0;
+        productId = a.id ?? 0;
+        break;
       } else {
-        return Text(
-          'US \$${model.price}',
-          style: TextStyle(
-            fontFamily: ConstantsFonts.latoRegular,
-            fontSize: 9.5.sp,
-            color: const Color.fromRGBO(0, 0, 0, 1),
-          ),
-        );
+        checkInCart = false;
       }
     }
+    return Container(
+      height: 5.h,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: checkInCart == false ?
+        const Color.fromRGBO(87, 167, 109, 1) :
+        Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: const Color.fromRGBO(87, 167, 109, 1),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: checkInCart == false ?
+          (() async {
+            setState(() => buttonLoading = true);
+            await marketplaceProvider.addProductToBasket(
+              widget.model.id ?? 0,
+              ((model) {
+                if(model != null) {
+                  if(model.status == true) {
+                    marketplaceProvider.getUserCart().whenComplete(
+                      (() => setState(() => buttonLoading = false)),
+                    );
+                  }
+                }
+              }),
+            );
+          }) :
+          null,
+          child: Center(
+            child: checkInCart == false ?
+            buttonLoading == false ?
+            Text(
+              'В корзину',
+              style: TextStyle(
+                fontSize: 9.5.sp,
+                color: Colors.white,
+                fontFamily: ConstantsFonts.latoBold,
+              ),
+            ) :
+            SizedBox(
+              height: 3.h,
+              width: 3.h,
+              child: const LoadingIndicator(
+                indicatorType: Indicator.ballSpinFadeLoader,
+                colors: [
+                  Colors.white,
+                ],
+              ),
+            ) :
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PunchingAnimation(
+                  child: GestureDetector(
+                    onTap: () async {
+                      if(quantity != 1) {
+                        for(ItemCartResponseModel a in marketplaceProvider.userCart?.items ?? []) {
+                          if(a.productId == widget.model.id) {
+                            setState(() {
+                              a.quantity = a.quantity! - 1;
+                            });
+                            break;
+                          }
+                        }
+                        await marketplaceProvider.changeItemQuantityInCart(productId, -1);
+                      }
+                      else {
+                        for(ItemCartResponseModel a in marketplaceProvider.userCart?.items ?? []) {
+                          if(a.productId == widget.model.id) {
+                            setState(() {
+                              marketplaceProvider.userCart!.items!.remove(a);
+                              a.quantity = a.quantity! - 1;
+                            });
+                            break;
+                          }
+                        }
+                        await marketplaceProvider.removeProductFromBasket(productId);
+                      }
+                      await marketplaceProvider.bounceCart();
+                    },
+                    behavior: HitTestBehavior.translucent,
+                    child: Image.asset(
+                      ConstantsAssets.removeFromBasket,
+                      height: 3.3.h,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 3.w,
+                ),
+                Center(
+                  child: AnimatedFlipCounter(
+                    suffix: ' шт',
+                    value: quantity,
+                    duration: const Duration(
+                      milliseconds: 200,
+                    ),
+                    textStyle: TextStyle(
+                      color: const Color.fromRGBO(32, 30, 31, 1),
+                      fontSize: 10.5.sp,
+                      fontFamily: ConstantsFonts.latoSemiBold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 3.w,
+                ),
+                PunchingAnimation(
+                  child: GestureDetector(
+                    onTap: () async {
+                      for(ItemCartResponseModel a in marketplaceProvider.userCart?.items ?? []) {
+                        if(a.productId == widget.model.id) {
+                          setState(() {
+                            a.quantity = a.quantity! + 1;
+                          });
+                          break;
+                        }
+                      }
+                      await marketplaceProvider.changeItemQuantityInCart(productId, 1);
+                      await marketplaceProvider.bounceCart();
+                    },
+                    behavior: HitTestBehavior.translucent,
+                    child: Image.asset(
+                      ConstantsAssets.productAddImage,
+                      height: 3.3.h,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  Widget price() {
+    if(widget.model.discountedPrice != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'US \$${widget.model.price}',
+            style: TextStyle(
+              decoration: TextDecoration.lineThrough,
+              decorationColor: Colors.red,
+              fontFamily: ConstantsFonts.latoRegular,
+              fontSize: 7.5.sp,
+              color: const Color.fromRGBO(0, 0, 0, 1),
+            ),
+          ),
+          Text(
+            'US \$${widget.model.discountedPrice}',
+            style: TextStyle(
+              fontFamily: ConstantsFonts.latoRegular,
+              fontSize: 9.5.sp,
+              color: const Color.fromRGBO(0, 0, 0, 1),
+            ),
+          )
+        ],
+      );
+    } else {
+      return Text(
+        'US \$${widget.model.price}',
+        style: TextStyle(
+          fontFamily: ConstantsFonts.latoRegular,
+          fontSize: 9.5.sp,
+          color: const Color.fromRGBO(0, 0, 0, 1),
+        ),
+      );
+    }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
-      width: width,
+      width: widget.width,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -73,7 +241,7 @@ class MaxVerticalProductCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: CachedNetworkImage(
-                imageUrl: model.mainPhoto ?? '',
+                imageUrl: widget.model.mainPhoto ?? '',
                 width: double.infinity,
                 imageBuilder: (context, image) {
                   return Container(
@@ -107,13 +275,6 @@ class MaxVerticalProductCard extends StatelessWidget {
               ),
             ),
           ),
-          // ClipRRect(
-          //   borderRadius: BorderRadius.circular(5),
-          //   child: Image.asset(
-          //     model.avatar,
-          //     width: double.infinity,
-          //   ),
-          // ),
           SizedBox(
             height: 1.h,
           ),
@@ -121,42 +282,38 @@ class MaxVerticalProductCard extends StatelessWidget {
             padding: EdgeInsets.only(
               left: 1.w,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      model.name ?? '',
-                      style: TextStyle(
-                        fontFamily: ConstantsFonts.latoBold,
-                        fontSize: 11.5.sp,
-                        color: const Color.fromRGBO(0, 0, 0, 1),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 1.h,
-                    ),
-                    price(),
-                  ],
-                ),
-                PunchingAnimation(
-                  child: GestureDetector(
-                    onTap: () => marketplaceProvider.addItem(model),
-                    behavior: HitTestBehavior.translucent,
-                    child: Padding(
-                      padding: EdgeInsets.all(1.w),
-                      child: Image.asset(
-                        ConstantsAssets.productAddImage,
-                        height: 3.6.h,
-                      ),
-                    ),
+                Text(
+                  widget.model.name ?? '',
+                  style: TextStyle(
+                    fontFamily: ConstantsFonts.latoBold,
+                    fontSize: 11.5.sp,
+                    color: const Color.fromRGBO(0, 0, 0, 1),
+                    height: 0.7.sp,
                   ),
                 ),
+                SizedBox(
+                  height: 1.h,
+                ),
+                price(),
               ],
             ),
           ),
+          if(widget.state == MarketplaceProductType.products)
+          SizedBox(
+            height: 1.h,
+          ),
+          if(widget.state == MarketplaceProductType.products)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 4.w,
+                ),
+                child: check(),
+              ),
+            ),
         ],
       ),
     );

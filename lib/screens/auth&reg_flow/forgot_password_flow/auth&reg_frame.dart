@@ -3,6 +3,8 @@ import '../../../helpers/constants.dart';
 import '../../../widgets/memorial_book.dart';
 import 'package:flutter/material.dart';
 
+import '../../../widgets/platform_scroll_physics.dart';
+
 class AuthRegFrame extends StatelessWidget {
   const AuthRegFrame({
     super.key,
@@ -20,7 +22,7 @@ class AuthRegFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       reverse: true,
-      physics: const BouncingScrollPhysics(),
+      physics: platformScrollPhysics(),
       child: Column(
         children: [
           SizedBox(

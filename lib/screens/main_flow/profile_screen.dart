@@ -8,6 +8,8 @@ import 'package:memorial_book/screens/main_flow/change_information_screen.dart';
 import 'package:memorial_book/screens/main_flow/quick_links_screens/family_tree_screen.dart';
 import 'package:memorial_book/screens/terms_and_conditions_screen.dart';
 import 'package:memorial_book/widgets/account_widgets/quick_link_widget.dart';
+import 'package:memorial_book/widgets/element_selection/popupAlertWidget.dart';
+import 'package:memorial_book/widgets/main_button.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,7 @@ import '../../helpers/constants.dart';
 import '../../provider/account_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/tab_bar_provider.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/skeleton_loader_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -108,8 +111,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 3.2.w,
                         ),
                         child: Column(
                           children: [
@@ -287,14 +290,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               activeFlow: ListView(
-                physics: const BouncingScrollPhysics(),
+                physics: platformScrollPhysics(),
                 children: [
                   SizedBox(
                     height: 2.4.h,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 3.2.w,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,41 +453,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(
                                   height: 2.h,
                                 ),
-                                Container(
-                                  height: 5.h,
-                                  margin: EdgeInsets.symmetric(
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
                                     horizontal: 18.w,
                                   ),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(8),
+                                  child: MainButton(
+                                    activeColor: Colors.transparent,
                                     border: Border.all(
                                       color: const Color.fromRGBO(23, 94, 217, 1),
                                     ),
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      highlightColor: const Color.fromRGBO(23, 94, 217, 0.5),
-                                      borderRadius: BorderRadius.circular(8),
-                                      onTap: () => Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                          builder: (context) => ChangeInformationScreen(
-                                            model: data!.user!,
-                                          ),
+                                    text: 'ИЗМЕНИТЬ ДАННЫЕ',
+                                    textStyle: TextStyle(
+                                      color: const Color.fromRGBO(23, 94, 217, 1),
+                                      fontSize: 9.5.sp,
+                                      fontFamily: ConstantsFonts.latoBold,
+                                    ),
+                                    onTap: () => Navigator.push(
+                                      tabBarProvider.mainContext,
+                                      CupertinoDialogRoute(
+                                        builder: (context) => ChangeInformationScreen(
+                                          model: data!.user!,
                                         ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'ИЗМЕНИТЬ ДАННЫЕ',
-                                          style: TextStyle(
-                                            color: const Color.fromRGBO(23, 94, 217, 1),
-                                            fontSize: 9.5.sp,
-                                            fontFamily: ConstantsFonts.latoBold,
-                                          ),
-                                        ),
+                                        context: tabBarProvider.mainContext,
                                       ),
                                     ),
                                   ),
@@ -503,8 +493,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 3.2.w,
                         ),
                         child: Text(
                           'Быстрые ссылки',
@@ -528,9 +518,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 3.6.h,
                               width: 10.w,
                             ),
-                            margin: const EdgeInsets.only(
-                              right: 5,
-                              left: 16,
+                            margin: EdgeInsets.only(
+                              right: 1.w,
+                              left: 3.2.w,
                             ),
                           ),
                           QuickLinkWidget(
@@ -542,9 +532,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 7.4.w,
                               height: 4.h,
                             ),
-                            margin: const EdgeInsets.only(
-                              left: 5,
-                              right: 16,
+                            margin: EdgeInsets.only(
+                              left: 1.w,
+                              right: 3.2.w,
                             ),
                           ),
                         ],
@@ -570,9 +560,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 4.4.h,
                               width: 8.w,
                             ),
-                            margin: const EdgeInsets.only(
-                              right: 5,
-                              left: 16,
+                            margin: EdgeInsets.only(
+                              right: 1.w,
+                              left: 3.2.w,
                             ),
                           ),
                           QuickLinkWidget(
@@ -586,9 +576,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 8.9.w,
                               height: 4.4.h,
                             ),
-                            margin: const EdgeInsets.only(
-                              left: 5,
-                              right: 16,
+                            margin: EdgeInsets.only(
+                              left: 1.w,
+                              right: 3.2.w,
                             ),
                           ),
                         ],
@@ -615,9 +605,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 4.4.h,
                               color: const Color.fromRGBO(52, 168, 83, 0.2),
                             ),
-                            margin: const EdgeInsets.only(
-                              right: 5,
-                              left: 16,
+                            margin: EdgeInsets.only(
+                              right: 1.w,
+                              left: 3.2.w,
                             ),
                           ),
                           QuickLinkWidget(
@@ -632,9 +622,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 8.6.w,
                               color: const Color.fromRGBO(25, 114, 216, 0.1),
                             ),
-                            margin: const EdgeInsets.only(
-                              left: 5,
-                              right: 16,
+                            margin: EdgeInsets.only(
+                              left: 1.w,
+                              right: 3.2.w,
                             ),
                           ),
                         ],
@@ -652,18 +642,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ConstantsAssets.reminderImage,
                               height: 4.4.h,
                             ),
-                            margin: const EdgeInsets.only(
-                              right: 5,
-                              left: 16,
+                            margin: EdgeInsets.only(
+                              right: 1.w,
+                              left: 3.2.w,
                             ),
                           ),
                           Expanded(
                             child: Container(
                               height: 12.5.h,
                               width: double.infinity,
-                              margin: const EdgeInsets.only(
-                                left: 5,
-                                right: 16,
+                              margin: EdgeInsets.only(
+                                left: 1.w,
+                                right: 3.2.w,
                               ),
                             ),
                           ),
@@ -673,8 +663,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 3.4.h,
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 3.2.w,
                         ),
                         child: Column(
                           children: [
@@ -697,8 +687,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 23,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 5.w,
                                     ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
@@ -732,8 +722,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 23,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 5.w,
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -781,8 +771,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     );
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 23,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 5.w,
                                     ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
@@ -819,12 +809,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(10),
                                   onTap: () {
-                                    logout();
-                                    tabBarProvider.tabBarDispose();
+                                    popupAlertWidget(
+                                      title: 'Выход...',
+                                      subtitle: 'Вы уверены, что хотите выйти из аккаунта?',
+                                      context: tabBarProvider.mainContext,
+                                      onCancel: () => Navigator.pop(tabBarProvider.mainContext),
+                                      onAgree: () {
+                                        Navigator.pop(tabBarProvider.mainContext);
+                                        logout();
+                                        tabBarProvider.tabBarDispose();
+                                      },
+                                    );
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 23,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 5.w,
                                     ),
                                     child: Center(
                                       child: Text(

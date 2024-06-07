@@ -7,7 +7,6 @@ import 'package:flutter_geocoder/geocoder.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:memorial_book/models/common/community_edit_model.dart';
 import 'package:memorial_book/models/common/coords_request.dart';
 import 'package:memorial_book/models/communitites/request/edit_community_request_model.dart';
@@ -37,7 +36,6 @@ import '../models/people/response/related_profiles_response_model.dart';
 import '../models/pet/request/creating_pet_request_model.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'auth_provider.dart';
 import 'catalog_provider.dart';
 
@@ -454,15 +452,15 @@ class ProfileCreationProvider extends ChangeNotifier {
   String generateTitle(CheckFlow checkFlow) {
     switch(checkFlow) {
       case CheckFlow.profile:
-        return 'Profile creation';
+        return 'Создание профиля';
       case CheckFlow.pet:
-        return 'Profile pets creation';
+        return 'Создание профиля домашнего животного';
       case CheckFlow.cemetery:
         return 'New cemetery';
       case CheckFlow.community:
-        return 'New community';
+        return 'Новое сообщество';
       case CheckFlow.editCommunity:
-        return 'Edit community';
+        return 'Редактировать сообщество';
     }
   }
 
@@ -830,190 +828,6 @@ class ProfileCreationProvider extends ChangeNotifier {
     );
   }
 
-  Future showPostPublicationDate(BuildContext context) async {
-    return await elementSelectionWidget(
-      context: context,
-      title: 'Select the publication date',
-      textButton: 'Close',
-      child: Row(
-        children: [
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Day',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.dayList(),
-                )[item] as Text;
-                dayPublicationDate = item;
-                dayPublicationDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: dayPublicationDate,
-              ),
-              children: data.dayList(),
-            ),
-          ),
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Month',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.monthList(),
-                )[item] as Text;
-                monthPublicationDate = item;
-                monthPublicationDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: monthPublicationDate,
-              ),
-              children: data.monthList(),
-            ),
-          ),
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Year',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.yearList(),
-                )[item] as Text;
-                yearPublicationDate = item;
-                yearPublicationDateText = text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: yearPublicationDate,
-              ),
-              children: data.yearList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future showPostPublicationTime(BuildContext context) async {
-    return await elementSelectionWidget(
-      context: context,
-      title: 'Select the publication time',
-      textButton: 'Close',
-      child: Row(
-        children: [
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Hour',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.hourList(),
-                )[item] as Text;
-                hourPublicationDate = item;
-                hourPublicationDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: hourPublicationDate,
-              ),
-              children: data.hourList(),
-            ),
-          ),
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Minute',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.minuteList(),
-                )[item] as Text;
-                minutePublicationDate = item;
-                minutePublicationDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: minutePublicationDate,
-              ),
-              children: data.minuteList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future showDeathDate(BuildContext context) async {
-    return await elementSelectionWidget(
-      context: context,
-      title: 'Choose death date',
-      textButton: 'Close',
-      child: Row(
-        children: [
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Day',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.dayList(),
-                )[item] as Text;
-                dayDeathDate = item;
-                dayDeathDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: dayDeathDate,
-              ),
-              children: data.dayList(),
-            ),
-          ),
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Month',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.monthList(),
-                )[item] as Text;
-                monthDeathDate = item;
-                monthDeathDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: monthDeathDate,
-              ),
-              children: data.monthList(),
-            ),
-          ),
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Year',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.yearList(),
-                )[item] as Text;
-                yearDeathDate = item;
-                yearDeathDateText = text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: yearDeathDate,
-              ),
-              children: data.yearList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   bool creatingPostValidate() {
     if(dateOfCreatePostController.text.isEmpty && timeOfCreatePostController.text.isEmpty) {
       return true;
@@ -1077,8 +891,8 @@ class ProfileCreationProvider extends ChangeNotifier {
       confirmText: 'Select',
       builder: (BuildContext context, Widget? widget) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light(
-            primary: const Color.fromRGBO(23, 94, 217, 1),
+          colorScheme: const ColorScheme.light(
+            primary: Color.fromRGBO(23, 94, 217, 1),
           ),
           dialogTheme: DialogTheme(
             shape: RoundedRectangleBorder(
@@ -1093,16 +907,17 @@ class ProfileCreationProvider extends ChangeNotifier {
   }
   Future humanDeathDatePicker(BuildContext context) async {
     humanDeathDate = await showDatePicker(
+      locale: const Locale('ru', 'RU'),
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      cancelText: 'Close',
-      confirmText: 'Select',
+      cancelText: 'Закрыть',
+      confirmText: 'Выбрать',
       builder: (BuildContext context, Widget? widget) => Theme(
         data: ThemeData(
-          colorScheme: ColorScheme.light(
-            primary: const Color.fromRGBO(23, 94, 217, 1),
+          colorScheme: const ColorScheme.light(
+            primary: Color.fromRGBO(23, 94, 217, 1),
           ),
           dialogTheme: DialogTheme(
             shape: RoundedRectangleBorder(

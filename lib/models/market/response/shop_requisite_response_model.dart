@@ -1,4 +1,4 @@
-class ShopRequisiteResponseModel {
+class RequisiteResponseModel {
   int? id;
   int? shopId;
   String? fullName;
@@ -12,7 +12,7 @@ class ShopRequisiteResponseModel {
   String? correspondentAccount;
   String? bankName;
 
-  ShopRequisiteResponseModel({
+  RequisiteResponseModel({
     required this.id,
     required this.shopId,
     required this.fullName,
@@ -27,7 +27,7 @@ class ShopRequisiteResponseModel {
     required this.bankName,
   });
 
-  ShopRequisiteResponseModel.fromJson(Map<String, dynamic> json) {
+  RequisiteResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     shopId = json['shop_id'];
     fullName = json['full_name'];

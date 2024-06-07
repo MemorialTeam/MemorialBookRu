@@ -1,5 +1,9 @@
+import 'dart:ui';
+
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/screens/marketplace/check_out_screen.dart';
 import 'package:memorial_book/widgets/main_button.dart';
 import 'package:memorial_book/widgets/marketplace_app_bar.dart';
@@ -7,20 +11,43 @@ import 'package:memorial_book/widgets/marketplace_widgets/product_card_shopping_
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
-import '../../models/market/response/products_response_models/product_data_response_model.dart';
+import '../../models/market/response/item_cart_response_model.dart';
 import '../../provider/marketplace_provider.dart';
+import 'package:animate_do/animate_do.dart';
 
-class ShoppingCartScreen extends StatelessWidget {
+import '../../widgets/platform_scroll_physics.dart';
+
+class ShoppingCartScreen extends StatefulWidget {
   const ShoppingCartScreen({super.key});
+
+  @override
+  State<ShoppingCartScreen> createState() => _ShoppingCartScreenState();
+}
+
+class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
+
+  @override
+  void initState() {
+    final marketplaceProvider = Provider.of<MarketplaceProvider>(
+      context,
+      listen: false,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_)  {
+      marketplaceProvider.checkChangesCart(context);
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final marketplaceProvider = Provider.of<MarketplaceProvider>(context);
     return MarketplaceAppBar(
+      toHideBasket: true,
       child: Stack(
         children: [
           ListView(
-            physics: const BouncingScrollPhysics(),
+            physics: platformScrollPhysics(),
             children: [
               SizedBox(
                 height: 2.2.h,
@@ -30,7 +57,7 @@ class ShoppingCartScreen extends StatelessWidget {
                   horizontal: 3.w,
                 ),
                 child: Text(
-                  'Shopping cart',
+                  'Корзина',
                   style: TextStyle(
                     fontFamily: ConstantsFonts.latoSemiBold,
                     fontSize: 18.5.sp,
@@ -41,14 +68,14 @@ class ShoppingCartScreen extends StatelessWidget {
               SizedBox(
                 height: 2.h,
               ),
-              marketplaceProvider.basket.isNotEmpty ?
+              marketplaceProvider.userCart?.items != null && marketplaceProvider.userCart!.items!.isNotEmpty ?
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  final ProductDataResponseModel model = marketplaceProvider.basket[index];
+                  final ItemCartResponseModel model = marketplaceProvider.userCart!.items![index];
                   return Container(
-                    decoration: index == marketplaceProvider.basket.length - 1 ?
+                    decoration: index == marketplaceProvider.userCart!.items!.length - 1 ?
                     BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
@@ -69,7 +96,7 @@ class ShoppingCartScreen extends StatelessWidget {
                     color: const Color.fromRGBO(0, 0, 0, 0.1),
                   );
                 },
-                itemCount: marketplaceProvider.basket.length,
+                itemCount: marketplaceProvider.userCart?.items?.length ?? 0,
               ) :
               Padding(
                 padding: EdgeInsets.symmetric(
@@ -118,7 +145,7 @@ class ShoppingCartScreen extends StatelessWidget {
                     ),
                     MainButton(
                       text: 'ПЕРЕЙТИ НА ГЛАВНУЮ',
-                      onTap: () {},
+                      onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(ConstantsNavigatorKeys.marketplaceRoute)),
                       activeColor: const Color.fromRGBO(225, 228, 231, 1),
                       textStyle: TextStyle(
                         color: const Color.fromRGBO(0, 0, 0, 1),
@@ -131,78 +158,128 @@ class ShoppingCartScreen extends StatelessWidget {
               ),
             ],
           ),
-          marketplaceProvider.basket.isNotEmpty ?
+          marketplaceProvider.userCart?.items != null && marketplaceProvider.userCart!.items!.isNotEmpty ?
           Positioned(
             bottom: 0,
             right: 0,
             left: 0,
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(6.w),
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(255, 255, 255, 1),
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, -10),
-                    blurRadius: 40,
-                    spreadRadius: 0,
-                    color: Color.fromRGBO(0, 0, 0, 0.05),
+            child: Stack(
+              children: [
+                FadeInUp(
+                  duration: const Duration(
+                    milliseconds: 500,
                   ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Grand Total',
-                        style: TextStyle(
-                          color: const Color.fromRGBO(0, 0, 0, 0.5),
-                          fontSize: 9.5.sp,
-                          fontFamily: ConstantsFonts.latoSemiBold,
+                  delay: const Duration(
+                    milliseconds: 200,
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(6.w),
+                    decoration: const BoxDecoration(
+                      color: Color.fromRGBO(255, 255, 255, 1),
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0, -10),
+                          blurRadius: 40,
+                          spreadRadius: 0,
+                          color: Color.fromRGBO(0, 0, 0, 0.05),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Общая сумма',
+                              style: TextStyle(
+                                color: const Color.fromRGBO(0, 0, 0, 0.5),
+                                fontSize: 9.5.sp,
+                                fontFamily: ConstantsFonts.latoSemiBold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 0.5.h,
+                            ),
+                            AnimatedFlipCounter(
+                              prefix: '\$',
+                              value: marketplaceProvider.grandTotal(),
+                              fractionDigits: 2,
+                              duration: const Duration(
+                                milliseconds: 200,
+                              ),
+                              textStyle: TextStyle(
+                                color: const Color.fromRGBO(0, 0, 0, 1),
+                                fontSize: 19.5.sp,
+                                fontFamily: ConstantsFonts.latoBlack,
+                              ),
+                            ),
+                          ],
+                        ),
+                        MainButton(
+                          text: 'ОФОРМИТЬ',
+                          padding: EdgeInsets.symmetric(
+                            vertical: 2.h,
+                            horizontal: 10.2.w,
+                          ),
+                          textStyle: TextStyle(
+                            color: const Color.fromRGBO(255, 255, 255, 1),
+                            fontSize: 10.5.sp,
+                            fontFamily: ConstantsFonts.latoSemiBold,
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            CupertinoDialogRoute(
+                              builder: (context) => const CheckOutScreen(),
+                              context: context,),
+                          ),
+                          activeColor: const Color.fromRGBO(87, 167, 109, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if(marketplaceProvider.priceCheckCart == true)
+                ClipRRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 5.0,
+                      sigmaY: 5.0,
+                    ),
+                    child: Container(
+                      color: Colors.transparent,
+                      height: 12.6.h,
+                      width: double.infinity,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 6.h,
+                              child: const LoadingIndicator(
+                                indicatorType: Indicator.ballPulse,
+                                colors: [
+                                  Colors.black,
+                                ],
+                              ),
+                            ),
+                            Text(
+                              'Считаем сумму',
+                              style: TextStyle(
+                                fontFamily: ConstantsFonts.latoSemiBold,
+                                fontSize: 11.5.sp,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(
-                        height: 0.5.h,
-                      ),
-                      AnimatedFlipCounter(
-                        prefix: '\$',
-                        value: marketplaceProvider.grandTotal(),
-                        fractionDigits: 2,
-                        duration: const Duration(
-                          milliseconds: 200,
-                        ),
-                        textStyle: TextStyle(
-                          color: const Color.fromRGBO(0, 0, 0, 1),
-                          fontSize: 19.5.sp,
-                          fontFamily: ConstantsFonts.latoBlack,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  MainButton(
-                    text: 'CHECK OUT',
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.2.w,
-                    ),
-                    textStyle: TextStyle(
-                      color: const Color.fromRGBO(255, 255, 255, 1),
-                      fontSize: 10.5.sp,
-                      fontFamily: ConstantsFonts.latoSemiBold,
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      CupertinoDialogRoute(
-                        builder: (context) => const CheckOutScreen(),
-                        context: context,),
-                    ),
-                    activeColor: const Color.fromRGBO(87, 167, 109, 1),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ) :
           const SizedBox(),

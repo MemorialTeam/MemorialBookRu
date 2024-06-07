@@ -69,7 +69,7 @@ class _ConfirmNewPasswordScreenState extends State<ConfirmNewPasswordScreen> {
                 height: 2.h,
               ),
               MainButton(
-                text: 'Continue',
+                text: 'Продолжить',
                 condition: newPasswordController.text == repeatedNewPasswordController.text && newPasswordController.text.isNotEmpty && repeatedNewPasswordController.text.isNotEmpty,
                 onTap: () async => await authProvider.passwordRecovery(
                   newPasswordController.text,

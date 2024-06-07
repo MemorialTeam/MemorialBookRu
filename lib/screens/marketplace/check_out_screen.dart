@@ -9,6 +9,7 @@ import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
 import '../../provider/marketplace_provider.dart';
 import '../../widgets/main_button.dart';
+import '../../widgets/platform_scroll_physics.dart';
 
 class CheckOutScreen extends StatelessWidget {
   const CheckOutScreen({super.key});
@@ -24,7 +25,7 @@ class CheckOutScreen extends StatelessWidget {
               horizontal: 3.w,
             ),
             child: ListView(
-              physics: const BouncingScrollPhysics(),
+              physics: platformScrollPhysics(),
               children: [
                 SizedBox(
                   height: 2.2.h,

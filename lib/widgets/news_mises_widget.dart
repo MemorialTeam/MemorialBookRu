@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/skeleton_loader_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'news_item_widget.dart';
@@ -217,7 +218,7 @@ class NewsMisesWidget extends StatelessWidget {
                   controller: profilesController,
                   shrinkWrap: true,
                   scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
+                  physics: platformScrollPhysics(),
                   children: [
                     const SizedBox(
                       width: 16,

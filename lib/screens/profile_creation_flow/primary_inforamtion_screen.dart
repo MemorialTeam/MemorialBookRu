@@ -9,6 +9,7 @@ import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
 import '../../provider/profile_creation_provider.dart';
 import '../../widgets/creation_flow/primary_information/pi_community_body.dart';
+import '../../widgets/platform_scroll_physics.dart';
 
 class PrimaryInformationScreen extends StatefulWidget {
   const PrimaryInformationScreen({
@@ -50,7 +51,7 @@ class _PrimaryInformationScreenState extends State<PrimaryInformationScreen> {
       },
       child: SingleChildScrollView(
         padding: EdgeInsets.zero,
-        physics: const BouncingScrollPhysics(),
+        physics: platformScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 3.2.w,
@@ -70,6 +71,7 @@ class _PrimaryInformationScreenState extends State<PrimaryInformationScreen> {
                       color: const Color.fromRGBO(32, 30, 31, 1),
                       fontFamily: ConstantsFonts.latoBlack,
                       fontSize: 21.sp,
+                      height: 0.9.sp,
                     ),
                   ),
                   SizedBox(
@@ -229,7 +231,7 @@ class _PrimaryInformationScreenState extends State<PrimaryInformationScreen> {
                       vertical: 2.2.h,
                       horizontal: 15.w,
                     ),
-                    text: 'CONTINUE',
+                    text: 'ПРОДОЛЖИТЬ',
                     onTap: (() {
                       profileCreationProvider.pageController.nextPage(
                         duration: const Duration(

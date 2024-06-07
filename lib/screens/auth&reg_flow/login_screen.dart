@@ -38,6 +38,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>();
+
   bool passwordState = true;
 
   @override
@@ -49,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: AuthRegFrame(
         title: 'Вход',
         body: Form(
+          key: _formKey,
           onChanged: () => setState(() {}),
           child: Column(
             children: [
@@ -59,6 +62,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.text,
                 hintText: 'Введите email',
                 obscureText: false,
+                validate: (value) {
+                  if(value == null || value.isEmpty) {
+                    return 'Почта не может быть пустой';
+                  } else if(!value.contains('@')) {
+                    return 'Не правильный формат почты';
+                  }
+                  return null;
+                },
                 controller: emailController,
               ),
               SizedBox(
@@ -69,6 +80,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: 'Введите пароль',
                 obscureText: passwordState,
                 controller: passController,
+                validate: (value) {
+                  if(value == null || value.isEmpty) {
+                    return 'Введите Ваш пароль';
+                  } else if(value.length < 6) {
+                    return 'Пароль должен содержать не менее 6 символов';
+                  }
+                  return null;
+                },
                 showHide: ObscureWidget(
                   state: passwordState,
                   controller: passController,
@@ -80,14 +99,16 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               MainButton(
                 text: 'Продолжить',
-                condition: emailController.text.isNotEmpty && passController.text.length > 5,
+                condition: emailController.text.isNotEmpty && passController.text.isNotEmpty,
                 onTap: () async {
-                  await authProvider.signIn(
-                    context,
-                    emailController.text,
-                    passController.text,
-                  );
-                  tabBarProvider.tabBarDispose();
+                  if (_formKey.currentState!.validate()) {
+                    await authProvider.signIn(
+                      context,
+                      emailController.text,
+                      passController.text,
+                    );
+                    tabBarProvider.tabBarDispose();
+                  }
                 },
               ),
               SizedBox(
@@ -106,42 +127,34 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 2.h,
               ),
-              Container(
-                height: 7.h,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(51, 51, 51, 1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      authProvider.signAsGuest(context);
-                      tabBarProvider.tabBarDispose();
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          ConstantsAssets.profileImage,
-                          color: const Color.fromRGBO(255, 255, 255, 1),
-                          height: 3.4.h,
-                          width: 3.4.h,
-                        ),
-                        SizedBox(
-                          width: 2.6.w,
-                        ),
-                        Text(
-                          'Войти как гость',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontFamily: ConstantsFonts.latoRegular,
-                            color: const Color.fromRGBO(255, 255, 255, 1),
-                          ),
-                        ),
-                      ],
+              MainButton(
+                onTap: () async {
+                  authProvider.signAsGuest(context);
+                  tabBarProvider.tabBarDispose();
+                },
+                activeColor: const Color.fromRGBO(51, 51, 51, 1),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      ConstantsAssets.profileImage,
+                      color: const Color.fromRGBO(255, 255, 255, 1),
+                      height: 3.4.h,
+                      width: 3.4.h,
                     ),
-                  ),
+                    SizedBox(
+                      width: 2.6.w,
+                    ),
+                    Text(
+                      'Войти как гость',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: ConstantsFonts.latoRegular,
+                        fontSize: 12.sp,
+                      ),
+                    )
+                  ],
                 ),
               ),
               SizedBox(
@@ -161,10 +174,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: 'Зарегистрироваться',
                         onTap: () => Navigator.push(
                           context,
-                          CupertinoPageRoute(
+                          CupertinoDialogRoute(
                             builder: (context) => const TermsAndConditionsScreen(
                               isConfirm: true,
                             ),
+                            context: context,
                           ),
                         ),
                       ),
@@ -183,6 +197,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     builder: (context) => const ConfirmEmailScreen(),
                   ),
                 ),
+              ),
+              SizedBox(
+                height: 1.8.h,
               ),
             ],
           ),

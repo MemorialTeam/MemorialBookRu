@@ -17,6 +17,7 @@ import '../../widgets/cards/horizontal_mini_card_widget.dart';
 import '../../widgets/cards/vertical_mini_card_widget.dart';
 import '../../widgets/home_frame_skeleton_widget.dart';
 import '../../widgets/home_frame_widget.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/skeleton_loader_widget.dart';
 
 class CemeteryScreen extends StatefulWidget {
@@ -211,7 +212,7 @@ class _CemeteryScreenState extends State<CemeteryScreen> {
               ],
             ),
             activeFlow: ListView(
-              physics: const BouncingScrollPhysics(),
+              physics: platformScrollPhysics(),
               children: [
                 SizedBox(
                   height: 1.2.h,
@@ -385,16 +386,15 @@ class _CemeteryScreenState extends State<CemeteryScreen> {
                     itemBuilder: (context, index) {
                       final dataList = catalogProvider.cemeteryList[index];
                       return HorizontalMiniCardWidget(
-                        onTap: () => catalogProvider.gettingCemeteryProfile(context, dataList.id ?? 0, (model) {
-                          if(model!.status == true) {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => const SelectedCemeteryScreen(),
-                              ),
-                            );
-                          }
-                        }),
+                        onTap: () => Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => SelectedCemeteryScreen(
+                              avatar: dataList.avatar ?? '',
+                              id: dataList.id ?? 0,
+                            ),
+                          ),
+                        ),
                         avatar: dataList.avatar,
                         title: dataList.title ?? '',
                         subtitle: dataList.subtitle ?? '',
@@ -419,7 +419,7 @@ class _CemeteryScreenState extends State<CemeteryScreen> {
                     child: ListView(
                       controller: featuredCommunitiesController,
                       scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
+                      physics: platformScrollPhysics(),
                       children: [
                         SizedBox(
                           width: 3.2.w,
@@ -432,21 +432,17 @@ class _CemeteryScreenState extends State<CemeteryScreen> {
                           itemBuilder: (context, index) {
                             final dataList = catalogProvider.featuredCemeteriesList[index];
                             return VerticalMiniCardWidget(
-                              onTap: () {
-                                catalogProvider.gettingCemeteryProfile(context, dataList.id ?? 0, (model) {
-                                  if(model!.status == true) {
-                                    Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                        builder: (context) => const SelectedCemeteryScreen(
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                });
-                              },
-                              title: dataList.title,
-                              subtitle: dataList.subtitle,
+                              onTap: () => Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => SelectedCemeteryScreen(
+                                    avatar: dataList.avatar ?? '',
+                                    id: dataList.id ?? 0,
+                                  ),
+                                ),
+                              ),
+                              title: dataList.name,
+                              subtitle: dataList.address,
                               avatar: dataList.avatar,
                               banner: dataList.banner,
                               color: const Color.fromRGBO(18, 175, 82, 1),

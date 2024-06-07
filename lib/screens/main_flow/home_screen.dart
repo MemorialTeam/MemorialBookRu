@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/provider/account_provider.dart';
@@ -21,6 +20,7 @@ import '../../provider/auth_provider.dart';
 import '../../provider/catalog_provider.dart';
 import '../../widgets/animation/punching_animation.dart';
 import '../../widgets/cards/vertical_mini_card_widget.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/skeleton_loader_widget.dart';
 import '../profile_creation_flow/creation_flow.dart';
 
@@ -45,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     final _catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
     final _authProvider = Provider.of<AuthProvider>(context, listen: false);
-    // _catalogProvider.clearMainContent();
     _catalogProvider.setCustomMarker();
     if(_authProvider.userRules == 'authorized') {
       _catalogProvider.gettingAuthorizedMainContent(context, (model) {});
@@ -192,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               activeFlow: ListView(
-                physics: const BouncingScrollPhysics(),
+                physics: platformScrollPhysics(),
                 children: [
                   SizedBox(
                     height: 1.2.h,
@@ -203,14 +202,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Люди',
                     controller: relatedProfilesController,
                     widget: SizedBox(
-                      height: 26.h,
+                      height: 26.5.h,
                       child: ListView(
                         controller: relatedProfilesController,
                         scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
+                        physics: platformScrollPhysics(),
                         children: [
                           SizedBox(
-                            width: 3.2.w,
+                            width: 2.2.w,
                           ),
                           ListView.separated(
                             shrinkWrap: true,
@@ -219,39 +218,37 @@ class _HomeScreenState extends State<HomeScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               final dataList = catalogProvider.humans[index];
-                              final String? firstName = dataList.firstName == '' || dataList.firstName == null ?
+                              final String firstName = dataList.firstName == '' || dataList.firstName == null ?
                               '' :
                               '${dataList.firstName} ';
-                              final String? lastName = dataList.lastName == '' || dataList.lastName == null ?
+                              final String lastName = dataList.lastName == '' || dataList.lastName == null ?
                               '' :
                               '${dataList.lastName}';
                               return VerticalCardWidget(
-                                onTap: () async => await accountProvider.gettingPeopleProfile(context, dataList.id ?? 0, (model) {
-                                  if(model!.status == true) {
-                                    Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                        builder: (context) => SelectedPeopleScreen(
-                                          model: model,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                }),
+                                onTap: () async => Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => SelectedPeopleScreen(
+                                      avatar: dataList.avatar ?? '',
+                                      id: dataList.id ?? 0,
+                                    ),
+                                  ),
+                                ),
                                 subtitle: '${dataList.yearBirth} - ${dataList.yearDeath} y.',
-                                title: firstName! + lastName!,
+                                title: firstName + lastName,
                                 avatar: dataList.avatar,
+                                isCelebrity: dataList.isCelebrity ?? false,
                               );
                             },
                             separatorBuilder: (BuildContext context, int index) {
                               return SizedBox(
-                                width: 3.2.w,
+                                width: 2.2.w,
                               );
                             },
                           ),
                           SizedBox(
                             width: catalogProvider.humans.isNotEmpty ?
-                            3.2.w :
+                            2.2.w :
                             0,
                           ),
                           authProvider.userRules == 'authorized' ?
@@ -328,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ListView(
                         controller: cemeteryController,
                         scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
+                        physics: platformScrollPhysics(),
                         children: [
                           SizedBox(
                             width: 3.2.w,
@@ -341,19 +338,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemBuilder: (context, index) {
                               final dataList = catalogProvider.cemeteries[index];
                               return VerticalMiniCardWidget(
-                                onTap: () {
-                                  catalogProvider.gettingCemeteryProfile(context, dataList.id ?? 0, (model) {
-                                    if(model!.status == true) {
-                                      Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                          builder: (context) => const SelectedCemeteryScreen(
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  });
-                                },
+                                onTap: () => Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => SelectedCemeteryScreen(
+                                      avatar: dataList.avatar ?? '',
+                                      id: dataList.id ?? 0,
+                                    ),
+                                  ),
+                                ),
                                 title: dataList.title,
                                 subtitle: dataList.subtitle,
                                 avatar: dataList.avatar,
@@ -483,14 +476,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Питомцы',
                     controller: celebrityPetsController,
                     widget: LimitedBox(
-                      maxHeight: 26.h,
+                      maxHeight: 26.5.h,
                       child: ListView(
                         controller: celebrityPetsController,
                         scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
+                        physics: platformScrollPhysics(),
                         children: [
                           SizedBox(
-                            width: 3.2.w,
+                            width: 2.2.w,
                           ),
                           ListView.separated(
                             shrinkWrap: true,
@@ -500,94 +493,108 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemBuilder: (context, index) {
                               final dataList = catalogProvider.pets[index];
                               return GestureDetector(
-                                onTap: () {
-                                  accountProvider.gettingPetProfile(context, dataList.id ?? 0, (model) {
-                                    if(model!.status == true) {
-                                      Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                          builder: (context) => SelectedPetScreen(
-                                            model: model,
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  });
-                                },
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CachedNetworkImage(
-                                      width: 28.w,
-                                      height: 18.3.h,
-                                      imageUrl: dataList.avatar ?? '',
-                                      imageBuilder: (context, imageProvider) {
-                                        return Container(
-                                          width: 28.w,
-                                          height: 18.3.h,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(5),
-                                            image: DecorationImage(
-                                              image: imageProvider,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      errorWidget: (context, error, _) {
-                                        return Container(
-                                          width: 28.w,
-                                          height: 18.3.h,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(5),
-                                            image: DecorationImage(
-                                              image: AssetImage(ConstantsAssets.memorialBookLogoImage),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      progressIndicatorBuilder: (context, url, downloadProgress) {
-                                        return SkeletonLoaderWidget(
-                                          width: 28.w,
-                                          height: 18.3.h,
-                                          borderRadius: 5,
-                                        );
-                                      },
+                                onTap: () => Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => SelectedPetScreen(
+                                      id: dataList.id ?? 0,
+                                      avatar: dataList.avatar ?? '',
                                     ),
-                                    SizedBox(
-                                      height: 1.4.h,
-                                    ),
-                                    Text(
-                                      '${dataList.yearBirth} - ${dataList.yearDeath} y.',
-                                      style: TextStyle(
-                                        fontSize: 8.sp,
-                                        fontFamily: ConstantsFonts.latoRegular,
+                                  ),
+                                ),
+                                // child: SizedBox(
+                                //   height: 26.h,
+                                //   width: 29.w,
+                                //   child: Column(
+                                //     mainAxisSize: MainAxisSize.min,
+                                //     children: [
+                                //       CachedNetworkImage(
+                                //         width: 28.w,
+                                //         height: 18.3.h,
+                                //         imageUrl: dataList.avatar ?? '',
+                                //         imageBuilder: (context, imageProvider) {
+                                //           return Container(
+                                //             width: 28.w,
+                                //             height: 18.3.h,
+                                //             decoration: BoxDecoration(
+                                //               borderRadius: BorderRadius.circular(5),
+                                //               image: DecorationImage(
+                                //                 image: imageProvider,
+                                //                 fit: BoxFit.cover,
+                                //               ),
+                                //             ),
+                                //           );
+                                //         },
+                                //         errorWidget: (context, error, _) {
+                                //           return Container(
+                                //             width: 28.w,
+                                //             height: 18.3.h,
+                                //             decoration: BoxDecoration(
+                                //               borderRadius: BorderRadius.circular(5),
+                                //               image: DecorationImage(
+                                //                 image: AssetImage(ConstantsAssets.memorialBookLogoImage),
+                                //               ),
+                                //             ),
+                                //           );
+                                //         },
+                                //         progressIndicatorBuilder: (context, url, downloadProgress) {
+                                //           return SkeletonLoaderWidget(
+                                //             width: 28.w,
+                                //             height: 18.3.h,
+                                //             borderRadius: 5,
+                                //           );
+                                //         },
+                                //       ),
+                                //       SizedBox(
+                                //         height: 1.4.h,
+                                //       ),
+                                //       Text(
+                                //         '${dataList.yearBirth} - ${dataList.yearDeath} y.',
+                                //         style: TextStyle(
+                                //           fontSize: 8.sp,
+                                //           fontFamily: ConstantsFonts.latoRegular,
+                                //         ),
+                                //       ),
+                                //       SizedBox(
+                                //         height: 0.6.h,
+                                //       ),
+                                //       Text(
+                                //         dataList.name ?? '',
+                                //         textAlign: TextAlign.center,
+                                //         style: TextStyle(
+                                //           fontSize: 10.sp,
+                                //           fontFamily: ConstantsFonts.latoBold,
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                                child: VerticalCardWidget(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => SelectedPetScreen(
+                                        id: dataList.id ?? 0,
+                                        avatar: dataList.avatar ?? '',
                                       ),
                                     ),
-                                    SizedBox(
-                                      height: 0.6.h,
-                                    ),
-                                    Text(
-                                      dataList.name ?? '',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 10.sp,
-                                        fontFamily: ConstantsFonts.latoBold,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
+                                  title: dataList.name,
+                                  subtitle: '${dataList.yearBirth} - ${dataList.yearDeath} y.',
+                                  avatar: dataList.avatar,
+                                  isCelebrity: dataList.isCelebrity ?? false,
                                 ),
                               );
                             },
                             separatorBuilder: (BuildContext context, int index) {
                               return SizedBox(
-                                width: 3.2.w,
+                                width: 2.2.w,
                               );
                             },
                           ),
                           SizedBox(
                             width: catalogProvider.pets.isNotEmpty ?
-                            3.2.w :
+                            2.2.w :
                             0,
                           ),
                           authProvider.userRules == 'authorized' ?
@@ -659,7 +666,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ListView(
                         controller: communitiesController,
                         scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
+                        physics: platformScrollPhysics(),
                         children: [
                           SizedBox(
                             width: 3.2.w,
@@ -672,18 +679,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemBuilder: (context, index) {
                               final dataList = catalogProvider.communities[index];
                               return VerticalMiniCardWidget(
-                                onTap: () {
-                                  catalogProvider.gettingCommunityProfile(context, dataList.id ?? 0, (model) {
-                                    if(model!.status == true) {
-                                      Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                          builder: (context) => const SelectedCommunityScreen(),
-                                        ),
-                                      );
-                                    }
-                                  });
-                                },
+                                onTap: () => Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => SelectedCommunityScreen(
+                                      id: dataList.id ?? 0,
+                                      avatar: dataList.avatar ?? '',
+                                    ),
+                                  ),
+                                ),
                                 title: dataList.title,
                                 subtitle: dataList.subtitle,
                                 avatar: dataList.avatar,

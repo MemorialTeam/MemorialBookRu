@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
 import '../../provider/profile_creation_provider.dart';
+import '../../widgets/platform_scroll_physics.dart';
 
 class PostingScreen extends StatefulWidget {
   const PostingScreen({
@@ -45,7 +46,7 @@ class _PostingScreenState extends State<PostingScreen> {
     print(profileCreationProvider.titleCard(widget.checkFlow).length);
     return SingleChildScrollView(
       padding: EdgeInsets.zero,
-      physics: const BouncingScrollPhysics(),
+      physics: platformScrollPhysics(),
       child: Column(
         children: [
           SizedBox(
@@ -64,6 +65,7 @@ class _PostingScreenState extends State<PostingScreen> {
                     color: const Color.fromRGBO(32, 30, 31, 1),
                     fontFamily: ConstantsFonts.latoBlack,
                     fontSize: 21.sp,
+                    height: 0.9.sp,
                   ),
                 ),
                 SizedBox(

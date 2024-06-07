@@ -12,6 +12,7 @@ enum TabItem {
   home,
   communities,
   account,
+  marketplace,
 }
 
 class TabBarCore extends StatelessWidget {
@@ -42,6 +43,10 @@ class TabBarCore extends StatelessWidget {
           ConstantsNavigatorKeys.root: (context) => const CommunitiesScreen(),
         };
       case TabItem.account:
+        return {
+          ConstantsNavigatorKeys.root: (context) => const ProfileScreen(),
+        };
+      case TabItem.marketplace:
         return {
           ConstantsNavigatorKeys.root: (context) => const ProfileScreen(),
         };

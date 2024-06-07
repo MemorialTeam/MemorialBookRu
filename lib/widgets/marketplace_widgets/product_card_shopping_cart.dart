@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
-import '../../models/market/response/products_response_models/product_data_response_model.dart';
+import '../../models/market/response/item_cart_response_model.dart';
 import '../../provider/marketplace_provider.dart';
 import '../animation/punching_animation.dart';
+import '../element_selection/popupAlertWidget.dart';
 import '../skeleton_loader_widget.dart';
 
 class ProductCardShoppingCart extends StatefulWidget {
@@ -15,7 +17,7 @@ class ProductCardShoppingCart extends StatefulWidget {
     required this.model,
   });
 
-  final ProductDataResponseModel model;
+  final ItemCartResponseModel model;
 
   @override
   State<ProductCardShoppingCart> createState() => _ProductCardShoppingCartState();
@@ -23,31 +25,15 @@ class ProductCardShoppingCart extends StatefulWidget {
 
 class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
 
-  double totalPrice() {
-    double convertPriceToDouble = double.parse(widget.model.price.toString().replaceAll(',', '.'));
-    double convertedTotalPrice = convertPriceToDouble * widget.model.numberOfAdded;
-    return convertedTotalPrice;
-  }
-
-  double? totalPriceDiscount() {
-    if(widget.model.discountedPrice != null) {
-      double convertPriceToDouble = double.parse(widget.model.discountedPrice.toString().replaceAll(',', '.'));
-      double convertedTotalPrice = convertPriceToDouble * widget.model.numberOfAdded;
-      return convertedTotalPrice;
-    } else {
-      return null;
-    }
-  }
-
   Widget price() {
-    if(widget.model.discountedPrice != null) {
+    if(widget.model.totalDiscountPrice != null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           AnimatedFlipCounter(
             prefix: 'US \$',
-            value: totalPrice(),
+            value: widget.model.price!,
             fractionDigits: 2,
             duration: const Duration(
               milliseconds: 200,
@@ -64,7 +50,7 @@ class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
           ),
           AnimatedFlipCounter(
             prefix: 'US \$',
-            value: totalPriceDiscount()!,
+            value: widget.model.totalDiscountPrice ?? 0,
             fractionDigits: 2,
             duration: const Duration(
               milliseconds: 200,
@@ -81,7 +67,7 @@ class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
     } else {
       return AnimatedFlipCounter(
         prefix: 'US \$',
-        value: totalPrice(),
+        value: widget.model.price ?? 0,
         fractionDigits: 2,
         duration: const Duration(
           milliseconds: 200,
@@ -93,6 +79,17 @@ class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
         ),
       );
     }
+  }
+  Timer? _debounce;
+  Future<void> bounceCart() async {
+    final marketplaceProvider = Provider.of<MarketplaceProvider>(
+      context,
+      listen: false,
+    );
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 1000), () async {
+      return await marketplaceProvider.getUserCart();
+    });
   }
 
   @override
@@ -108,7 +105,7 @@ class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
           CachedNetworkImage(
             height: 12.h,
             width: 12.h,
-            imageUrl: widget.model.mainPhoto ?? '',
+            imageUrl: widget.model.avatar ?? 'https://static-01.daraz.lk/p/53fd0b6aebc9eff7acbee04a4389c77b.jpg',
             imageBuilder: (context, image) {
               return Container(
                 height: 12.h,
@@ -190,10 +187,28 @@ class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
                       children: [
                         PunchingAnimation(
                           child: GestureDetector(
-                            onTap: () => marketplaceProvider.removeItem(
-                              widget.model,
-                              context,
-                            ),
+                            onTap: () {
+                              setState(() {
+                                if(widget.model.quantity! != 1) {
+                                  widget.model.quantity = widget.model.quantity! - 1;
+                                  marketplaceProvider.changeItemQuantityInCart(widget.model.id ?? 0, -1);
+                                }
+                                else {
+                                  popupAlertWidget(
+                                    title: 'Удалить товар из корзины',
+                                    subtitle: 'Вы удалите 1 позицию в корзине',
+                                    context: context,
+                                    onCancel: () => Navigator.pop(context),
+                                    onAgree: () {
+                                      marketplaceProvider.userCart!.items!.remove(widget.model);
+                                      marketplaceProvider.removeProductFromBasket(widget.model.id ?? 0);
+                                      Navigator.pop(context);
+                                    },
+                                  );
+                                }
+                                bounceCart();
+                              });
+                            },
                             behavior: HitTestBehavior.translucent,
                             child: Image.asset(
                               ConstantsAssets.removeFromCardImage,
@@ -208,7 +223,7 @@ class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
                           width: 6.4.w,
                           child: Center(
                             child: Text(
-                              widget.model.numberOfAdded.toString(),
+                              widget.model.quantity!.toString(),
                               style: TextStyle(
                                 color: const Color.fromRGBO(32, 30, 31, 1),
                                 fontSize: 11.5.sp,
@@ -222,7 +237,13 @@ class _ProductCardShoppingCartState extends State<ProductCardShoppingCart> {
                         ),
                         PunchingAnimation(
                           child: GestureDetector(
-                            onTap: () => marketplaceProvider.addItem(widget.model),
+                            onTap: () async {
+                              setState(() {
+                                widget.model.quantity = widget.model.quantity! + 1;
+                              });
+                              await marketplaceProvider.changeItemQuantityInCart(widget.model.id ?? 0, 1);
+                              bounceCart();
+                            },
                             behavior: HitTestBehavior.translucent,
                             child: Image.asset(
                               ConstantsAssets.addToCardImage,

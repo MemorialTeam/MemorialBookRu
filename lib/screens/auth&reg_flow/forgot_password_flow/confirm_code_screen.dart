@@ -44,7 +44,7 @@ class _ConfirmCodeScreenState extends State<ConfirmCodeScreen> {
               ),
               const RetryCodeWidget(),
               MainButton(
-                text: 'Continue',
+                text: 'Продолжить',
                 condition: codeController.text == authProvider.codeConfirm,
                 onTap: () => Navigator.push(
                   context,

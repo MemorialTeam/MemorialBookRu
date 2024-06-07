@@ -139,7 +139,7 @@ class OnboardingFlow extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(
-                          height: 3.h,
+                          height: 2.5.h,
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(
@@ -162,9 +162,6 @@ class OnboardingFlow extends StatelessWidget {
                         ),
                         SizedBox(
                           height: 5.2.h,
-                        ),
-                        SizedBox(
-                          height: 7.h,
                         ),
                       ],
                     ),
@@ -259,7 +256,7 @@ class OnboardingFlow extends StatelessWidget {
                           },
                           child: Center(
                             child: Text(
-                              'Continue',
+                              'Продолжить',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12.sp,

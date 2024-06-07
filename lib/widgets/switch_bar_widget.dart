@@ -1,20 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:memorial_book/models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/provider/catalog_provider.dart';
 import 'package:memorial_book/screens/main_flow/adding_profiles_in_memorial_screen.dart';
 import 'package:memorial_book/screens/main_flow/all_profiles_screen.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/link_widget.dart';
+import 'package:memorial_book/widgets/main_button.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/search_engine.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../helpers/constants.dart';
-import '../provider/account_provider.dart';
+import '../models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import '../screens/main_flow/some_selected_screens/selected_people_screen.dart';
-import '../test_data.dart';
 import 'animation/animated_fade_out_in.dart';
-import 'memorial_book_icon_widget.dart';
 import 'switch_bar_items/cemetery_contacts.dart';
 import 'cards/horizontal_mini_card_widget.dart';
 
@@ -34,7 +34,24 @@ class SwitchBarWidget extends StatefulWidget {
   State<SwitchBarWidget> createState() => _SwitchBarWidgetState();
 }
 
-class _SwitchBarWidgetState extends State<SwitchBarWidget> {
+class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProviderStateMixin {
+
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   final FocusNode cemeteryMemorialsNode = FocusNode();
   final FocusNode communityMemorialsNode = FocusNode();
@@ -45,28 +62,30 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
   int communitySearch = 1;
   int selectedMenuIndex = 0;
 
-  Widget widgetSwitch(int index) {
+  List<Widget> widgetSwitch(int value) {
     final catalogProvider = Provider.of<CatalogProvider>(context);
-    final accountProvider = Provider.of<AccountProvider>(context);
     if(widget.switcher == CommunityOrCemeterySwitch.cemetery) {
-      final model = catalogProvider.selectedCemetery;
-      switch(index) {
-        case 0:
-          return Padding(
+      final model = catalogProvider.cemeteryProfileModel;
+      return [
+        Visibility(
+          visible: selectedMenuIndex == 0,
+          child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 5.w,
             ),
             child: Text(
-              model.description ?? '',
+              model?.description ?? '',
               style: TextStyle(
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey.shade700,
               ),
             ),
-          );
-        case 1:
-          return Padding(
+          ),
+        ),
+        Visibility(
+          visible: selectedMenuIndex == 1,
+          child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 3.6.w,
             ),
@@ -77,123 +96,125 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                 SearchEngine(
                   focusNode: communityMemorialsNode,
                   controller: communityMemorialsController,
-                  isNotEmptyFunc: (text) => catalogProvider.communityMemorialsSearch(text, model.id!),
-                  isEmptyFunc: () => catalogProvider.gettingCommunityProfile(context, model.id ?? 0, (model) {}),
+                  isNotEmptyFunc: (text) => catalogProvider.communityMemorialsSearch(text, model?.id ?? 0),
+                  isEmptyFunc: () => catalogProvider.gettingCommunityProfile(context, model?.id ?? 0),
                   isSearching: catalogProvider.isMemorialsCommunitySearch,
                 ),
                 SizedBox(
-                  height: 2.4.h,
+                  height: 2.2.h,
                 ),
                 ListView.builder(
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    final dataList = model.memorials?[index];
+                    final dataList = model?.memorials?[index];
+                    final String firstName = dataList?.firstName == '' || dataList?.firstName == null ?
+                    '' :
+                    '${dataList?.firstName} ';
+                    final String lastName = dataList?.lastName == '' || dataList?.lastName == null ?
+                    '' :
+                    '${dataList?.lastName}';
                     return HorizontalMiniCardWidget(
                       isAddingPeople: false,
-                      onTap: () => accountProvider.gettingPeopleProfile(
+                      onTap: () => Navigator.push(
                         context,
-                        dataList?.id ?? 0,
-                        ((model) {
-                          if(model != null) {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => SelectedPeopleScreen(
-                                  model: model,
-                                ),
-                              ),
-                            );
-                          }
-                        }),
+                        CupertinoPageRoute(
+                          builder: (context) => SelectedPeopleScreen(
+                            avatar: dataList?.avatar ?? '',
+                            id: dataList?.id ?? 0,
+                          ),
+                        ),
                       ),
                       avatar: dataList?.avatar,
-                      title: dataList?.fullName ?? '',
+                      title: firstName + lastName,
                       subtitle: '${dataList?.dateBirth.toString()} - ${dataList?.dateDeath.toString()}',
                       id: dataList?.id ?? 0,
                     );
                   },
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: model.memorials?.length != null && model.memorials!.length > 5 ?
+                  itemCount: model?.memorials?.length != null && model!.memorials!.length > 5 ?
                   5 :
-                  model.memorials?.length ?? 0,
+                  model?.memorials?.length ?? 0,
                 ),
-                SizedBox(
-                  height: 2.4.h,
-                ),
-                model.memorials?.length != null && model.memorials!.length > 5 ?
-                Container(
-                  height: 6.4.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    color: const Color.fromRGBO(245, 247, 249, 1),
-                    border: Border.all(
-                      color: const Color.fromRGBO(18, 175, 82, 1),
+                if(model?.memorials?.length != null && model!.memorials!.length > 5)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: 2.2.h,
                     ),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'SHOW MORE',
-                      style: TextStyle(
-                        color: Color.fromRGBO(18, 175, 82, 1),
+                    child: MainButton(
+                      text: 'ПОКАЗАТЬ БОЛЬШЕ',
+                      activeColor: const Color.fromRGBO(245, 247, 249, 1),
+                      border: Border.all(
+                        color: const Color.fromRGBO(18, 175, 82, 1),
+                        width: 0.1.h,
                       ),
+                      textStyle: TextStyle(
+                        color: const Color.fromRGBO(18, 175, 82, 1),
+                        fontFamily: ConstantsFonts.latoSemiBold,
+                        fontSize: 9.5.sp,
+                      ),
+                      onTap: () {
+
+                      },
                     ),
                   ),
-                ) :
-                const SizedBox(),
               ],
             ),
-          );
-        case 2:
-          return const CemeteryContacts();
-        default:
-          return const SizedBox();
-      }
+          ),
+        ),
+        Visibility(
+          visible: selectedMenuIndex == 2,
+          child: const CemeteryContacts(),
+        ),
+      ];
     }
     else if(widget.switcher == CommunityOrCemeterySwitch.community) {
-      final selectedCommunityModel = catalogProvider.selectedCommunity;
+      final selectedCommunityModel = catalogProvider.communityProfileModel;
       final memorialModel = catalogProvider.memorialDataModel;
-      switch(index) {
-        case 0:
-          return Padding(
+      return [
+        Visibility(
+          visible: value == 0,
+          maintainState: true,
+          child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 5.w,
             ),
             child: Text(
-              selectedCommunityModel.description ?? '',
+              selectedCommunityModel?.description ?? '',
               style: TextStyle(
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w400,
                 color: Colors.grey.shade700,
               ),
             ),
-          );
-        case 1:
-          return Padding(
+          ),
+        ),
+        Visibility(
+          visible: value == 1,
+          maintainState: true,
+          child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 3.6.w,
             ),
             child: memorialModel != null && memorialModel.data!.isNotEmpty ?
             Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SearchEngine(
                   focusNode: communityMemorialsNode,
                   controller: communityMemorialsController,
-                  isNotEmptyFunc: (text) => catalogProvider.communityMemorialsSearch(communityMemorialsController.text, selectedCommunityModel.id!),
-                  isEmptyFunc: () => catalogProvider.gettingMemorialsOfCommunity(
-                    selectedCommunityModel.id ?? 0,
+                  isNotEmptyFunc: (text) async => await catalogProvider.communityMemorialsSearch(communityMemorialsController.text, selectedCommunityModel?.id ?? 0),
+                  isEmptyFunc: () async => await catalogProvider.gettingMemorialsOfCommunity(
+                    selectedCommunityModel?.id ?? 0,
                     ((model) {}),
                   ),
                   isSearching: catalogProvider.isMemorialsCommunitySearch,
-
                 ),
                 SizedBox(
                   height: 1.8.h,
                 ),
-                selectedCommunityModel.isAdmin! ?
-                GestureDetector(
+                if(selectedCommunityModel?.isAdmin == true) GestureDetector(
                   onTap: () {
                     catalogProvider.disposeAddPeopleScreen();
                     Navigator.push(
@@ -221,7 +242,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                           width: 2.w,
                         ),
                         Text(
-                          'Add profile to Memorial',
+                          'Добавить профиль в "Мемориалы"',
                           style: TextStyle(
                             fontFamily: ConstantsFonts.latoRegular,
                             fontSize: 10.5.sp,
@@ -232,72 +253,75 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                       ],
                     ),
                   ),
-                ) :
-                const SizedBox(),
+                ),
                 ListView.builder(
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     final dataList = memorialModel.data![index];
-                    final String? firstName = dataList.firstName == '' || dataList.firstName == null ?
-                    '' :
-                    '${dataList.firstName} ';
-                    final String? middleName = dataList.middleName == '' || dataList.middleName == null ?
-                    '' :
-                    '${dataList.middleName} ';
-                    final String? lastName = dataList.lastName == '' || dataList.lastName == null ?
-                    '' :
-                    '${dataList.lastName}';
                     return Stack(
                       children: [
                         HorizontalMiniCardWidget(
-                          onTap: () => accountProvider.gettingPeopleProfile(context, dataList.id ?? 0, (model) {
-                            if(model!.status == true) {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => SelectedPeopleScreen(
-                                    model: model,
-                                  ),
-                                ),
-                              );
-                            }
-                          }),
+                          onTap: () => Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => SelectedPeopleScreen(
+                                avatar: dataList.avatar ?? '',
+                                id: dataList.id ?? 0,
+                              ),
+                            ),
+                          ),
                           avatar: dataList.avatar,
-                          title: firstName! + middleName! + lastName!,
+                          title: dataList.fullName ?? '',
                           subtitle: '${dataList.dateBirth.toString()} - ${dataList.dateDeath.toString()}',
                           isAddingPeople: false,
                           id: dataList.id ?? 0,
                         ),
-                        selectedCommunityModel.isAdmin! ?
+                        if(selectedCommunityModel?.isAdmin == true)
                         Positioned(
-                          top: 0,
-                          bottom: 0,
-                          right: 4.w,
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: () {
-                                print(dataList.id ?? 0);
-                                // catalogProvider.removeMemorialFromTheCommunity(
-                                //   context,
-                                //   selectedCommunityModel.id ?? 0,
-                                //   AddMemorialToTheCommunityRequestModel(
-                                //     memorialId: dataList.id ?? 0,
-                                //     memorialType: 'human',
-                                //   ),
-                                //   ((model) {
-                                //
-                                //   }),
-                                // );
-                              },
-                              child: Icon(
-                                Icons.remove_circle,
-                                size: 22.sp,
-                                color: Colors.red,
-                              ),
+                          right: dataList.isLoading == false ?
+                          0 :
+                          12,
+                          top: 1.2.h,
+                          bottom: 1.2.h,
+                          child: dataList.isLoading == false ?
+                          IconButton(
+                            onPressed: () async {
+                              setState(() {
+                                dataList.isLoading = true;
+                              });
+                              await catalogProvider.removeMemorialFromTheCommunity(
+                                context,
+                                selectedCommunityModel?.id ?? 0,
+                                AddMemorialToTheCommunityRequestModel(
+                                  memorialId: dataList.id ?? 0,
+                                  memorialType: 'human',
+                                ),
+                                ((model) {
+                                  if(model != null) {
+                                    if(model.status == true) {
+                                      catalogProvider.updateMemorialsOfCommunity(selectedCommunityModel?.id ?? 0).whenComplete(() => setState(() => dataList.isLoading = false));
+                                    }
+                                  }
+                                }),
+                              );
+                            },
+                            icon: Icon(
+                              Icons.remove_circle,
+                              size: 22.sp,
+                              color: Colors.red,
+                            ),
+                          ) :
+                          SizedBox(
+                            height: 4.h,
+                            width: 4.h,
+                            child: const LoadingIndicator(
+                              indicatorType: Indicator.ballSpinFadeLoader,
+                              colors: [
+                                Colors.red,
+                              ],
                             ),
                           ),
-                        ) :
-                        const SizedBox(),
+                        ),
                       ],
                     );
                   },
@@ -306,8 +330,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                   6 :
                   memorialModel.data!.length,
                 ),
-                memorialModel.data!.length >= 7 ?
-                Column(
+                if(memorialModel.data!.length >= 7) Column(
                   children: [
                     SizedBox(
                       height: 1.h,
@@ -330,14 +353,14 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                               context,
                               CupertinoPageRoute(
                                 builder: (context) => AllProfilesScreen(
-                                  communityId: selectedCommunityModel.id ?? 0,
+                                  communityId: selectedCommunityModel?.id ?? 0,
                                 ),
                               ),
                             ),
                             borderRadius: BorderRadius.circular(7),
                             child: Center(
                               child: Text(
-                                'SHOW MORE',
+                                'ПОКАЗАТЬ БОЛЬШЕ',
                                 style: TextStyle(
                                   color: const Color.fromRGBO(23, 94, 217, 1),
                                   fontFamily: ConstantsFonts.latoBold,
@@ -350,8 +373,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                       ),
                     ),
                   ],
-                ) :
-                const SizedBox(),
+                ),
               ],
             ) :
             GestureDetector(
@@ -382,7 +404,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                       width: 2.w,
                     ),
                     Text(
-                      'Add profile to Memorial',
+                      'Добавить профиль в "Мемориалы"',
                       style: TextStyle(
                         fontFamily: ConstantsFonts.latoRegular,
                         fontSize: 10.5.sp,
@@ -394,26 +416,26 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                 ),
               ),
             ),
-          );
-          // const MemorialBookIconWidget(
-          //   title: 'There are no memorials in the community',
-          //   color: Color.fromRGBO(23, 94, 217, 0.5),
-          // )
-        case 2:
-          return Padding(
+          ),
+        ),
+        Visibility(
+          visible: value == 2,
+          maintainState: true,
+          child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 3.4.w,
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                selectedCommunityModel.website != null ?
+                selectedCommunityModel?.website != null ?
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Website',
+                      'Вебсайт',
                       style: TextStyle(
                         fontSize: 12.5.sp,
                         fontFamily: ConstantsFonts.latoSemiBold,
@@ -424,7 +446,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                       height: 2.4.h,
                     ),
                     LinkWidget(
-                      link: selectedCommunityModel.website ?? '',
+                      link: selectedCommunityModel?.website ?? '',
                     ),
                     SizedBox(
                       height: 2.4.h,
@@ -432,12 +454,12 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                   ],
                 ) :
                 const SizedBox(),
-                selectedCommunityModel.socialLinks != null ?
+                selectedCommunityModel?.socialLinks != null ?
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Social',
+                      'Социальное',
                       style: TextStyle(
                         fontSize: 12.5.sp,
                         fontFamily: ConstantsFonts.latoSemiBold,
@@ -451,8 +473,8 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-                        String key = selectedCommunityModel.socialLinks?.keys.elementAt(index) ?? '';
-                        final data = selectedCommunityModel.socialLinks?[key];
+                        String key = selectedCommunityModel?.socialLinks?.keys.elementAt(index) ?? '';
+                        final data = selectedCommunityModel?.socialLinks?[key];
                         return LinkWidget(
                           link: data ?? '',
                         );
@@ -462,262 +484,19 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
                           height: 2.h,
                         );
                       },
-                      itemCount: selectedCommunityModel.socialLinks?.length ?? 0,
+                      itemCount: selectedCommunityModel?.socialLinks?.length ?? 0,
                     ),
                   ],
                 ) :
                 const SizedBox(),
               ],
             ),
-          );
-          // return Padding(
-          //   padding: EdgeInsets.symmetric(
-          //     horizontal: 3.2.w,
-          //   ),
-          //   child: Row(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     mainAxisSize: MainAxisSize.min,
-          //     children: [
-          //       Flexible(
-          //         child: Column(
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           mainAxisSize: MainAxisSize.min,
-          //           children: [
-          //             Row(
-          //               children: [
-          //                 Text(
-          //                   'Products',
-          //                   style: TextStyle(
-          //                     color: const Color.fromRGBO(32, 30, 31, 1),
-          //                     fontWeight: FontWeight.w700,
-          //                     fontSize: 15.sp,
-          //                     height: 0.115.h,
-          //                   ),
-          //                 ),
-          //                 SizedBox(
-          //                   width: 2.w,
-          //                 ),
-          //                 Image.asset(
-          //                   ConstantsAssets.iosArrowRightImage,
-          //                   height: 1.45.h,
-          //                 ),
-          //               ],
-          //             ),
-          //             SizedBox(
-          //               height: 1.8.h,
-          //             ),
-          //             GridView.builder(
-          //               clipBehavior: Clip.none,
-          //               itemCount: 10,
-          //               shrinkWrap: true,
-          //               physics: const NeverScrollableScrollPhysics(),
-          //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //                 crossAxisCount: 2,
-          //                 mainAxisExtent: 19.h,
-          //                 mainAxisSpacing: 10,
-          //                 crossAxisSpacing: 10,
-          //               ),
-          //               itemBuilder: (context, index) {
-          //                 return Stack(
-          //                   children: [
-          //                     Container(
-          //                       height: 19.h,
-          //                       width: double.infinity,
-          //                       decoration: BoxDecoration(
-          //                         color: const Color.fromRGBO(225, 228, 231, 1),
-          //                         borderRadius: BorderRadius.circular(8),
-          //                       ),
-          //                       child: Padding(
-          //                         padding: EdgeInsets.symmetric(
-          //                           horizontal: 1.2.h,
-          //                           vertical: 0.6.h,
-          //                         ),
-          //                         child: Column(
-          //                           crossAxisAlignment: CrossAxisAlignment.start,
-          //                           mainAxisAlignment: MainAxisAlignment.end,
-          //                           children: [
-          //                             Text(
-          //                               'Венки',
-          //                               style: TextStyle(
-          //                                 color: const Color.fromRGBO(32, 30, 31, 1),
-          //                                 fontSize: 10.sp,
-          //                                 fontWeight: FontWeight.w400,
-          //                               ),
-          //                             ),
-          //                             SizedBox(
-          //                               height: 0.4.h,
-          //                             ),
-          //                             Text(
-          //                               'US \$29,99',
-          //                               style: TextStyle(
-          //                                 color: const Color.fromRGBO(32, 30, 31, 1),
-          //                                 fontSize: 10.sp,
-          //                                 fontWeight: FontWeight.w700,
-          //                               ),
-          //                             ),
-          //                           ],
-          //                         ),
-          //                       ),
-          //                     ),
-          //                     Container(
-          //                       height: 13.h,
-          //                       decoration: BoxDecoration(
-          //                         color: const Color.fromRGBO(255, 255, 255, 1),
-          //                         borderRadius: BorderRadius.circular(8),
-          //                         image: DecorationImage(
-          //                           image: AssetImage(ConstantsAssets.flowersImage),
-          //                           fit: BoxFit.fill,
-          //                         ),
-          //                         boxShadow: const [
-          //                           BoxShadow(
-          //                             offset: Offset(0, 4),
-          //                             blurRadius: 25,
-          //                             spreadRadius: 0,
-          //                             color: Color.fromRGBO(0, 0, 0, 0.03),
-          //                           ),
-          //                         ],
-          //                       ),
-          //                     ),
-          //                   ],
-          //                 );
-          //               },
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //       const SizedBox(
-          //         width: 10,
-          //       ),
-          //       Column(
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         mainAxisSize: MainAxisSize.min,
-          //         children: [
-          //           Row(
-          //             children: [
-          //               Text(
-          //                 'Services',
-          //                 style: TextStyle(
-          //                   color: const Color.fromRGBO(32, 30, 31, 1),
-          //                   fontWeight: FontWeight.w700,
-          //                   fontSize: 15.sp,
-          //                   height: 0.115.h,
-          //                 ),
-          //               ),
-          //               SizedBox(
-          //                 width: 2.w,
-          //               ),
-          //               Image.asset(
-          //                 ConstantsAssets.iosArrowRightImage,
-          //                 height: 1.45.h,
-          //               ),
-          //             ],
-          //           ),
-          //           SizedBox(
-          //             height: 1.8.h,
-          //           ),
-          //           SizedBox(
-          //             width: 130,
-          //             child: GridView.builder(
-          //               clipBehavior: Clip.none,
-          //               itemCount: 5,
-          //               shrinkWrap: true,
-          //               physics: const NeverScrollableScrollPhysics(),
-          //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //                 crossAxisCount: 1,
-          //                 mainAxisExtent: 19.h,
-          //                 mainAxisSpacing: 10,
-          //                 crossAxisSpacing: 10,
-          //               ),
-          //               itemBuilder: (context, index) {
-          //                 return Stack(
-          //                   children: [
-          //                     Container(
-          //                       height: 19.h,
-          //                       width: double.infinity,
-          //                       decoration: BoxDecoration(
-          //                         color: const Color.fromRGBO(225, 228, 231, 1),
-          //                         borderRadius: BorderRadius.circular(8),
-          //                       ),
-          //                       child: Padding(
-          //                         padding: EdgeInsets.symmetric(
-          //                           horizontal: 1.2.h,
-          //                           vertical: 0.6.h,
-          //                         ),
-          //                         child: Column(
-          //                           crossAxisAlignment: CrossAxisAlignment.start,
-          //                           mainAxisAlignment: MainAxisAlignment.end,
-          //                           children: [
-          //                             Text(
-          //                               'Installing QR-code',
-          //                               style: TextStyle(
-          //                                 color: const Color.fromRGBO(32, 30, 31, 1),
-          //                                 fontSize: 10.sp,
-          //                                 fontWeight: FontWeight.w400,
-          //                               ),
-          //                             ),
-          //                             SizedBox(
-          //                               height: 0.4.h,
-          //                             ),
-          //                             Text(
-          //                               'US \$29,99',
-          //                               style: TextStyle(
-          //                                 color: const Color.fromRGBO(32, 30, 31, 1),
-          //                                 fontSize: 10.sp,
-          //                                 fontWeight: FontWeight.w700,
-          //                               ),
-          //                             ),
-          //                           ],
-          //                         ),
-          //                       ),
-          //                     ),
-          //                     Container(
-          //                       height: 13.h,
-          //                       decoration: BoxDecoration(
-          //                         color: const Color.fromRGBO(255, 255, 255, 1),
-          //                         borderRadius: BorderRadius.circular(8),
-          //                         image: DecorationImage(
-          //                           image: AssetImage(
-          //                             ConstantsAssets.tombstoneImage,
-          //                           ),
-          //                           fit: BoxFit.fill,
-          //                         ),
-          //                         boxShadow: const [
-          //                           BoxShadow(
-          //                             offset: Offset(0, 4),
-          //                             blurRadius: 25,
-          //                             spreadRadius: 0,
-          //                             color: Color.fromRGBO(0, 0, 0, 0.03),
-          //                           ),
-          //                         ],
-          //                       ),
-          //                     ),
-          //                   ],
-          //                 );
-          //               },
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // );
-        default:
-          return const SizedBox();
-      }
+          ),
+        ),
+      ];
     }
     else {
-      return const SizedBox();
-    }
-  }
-
-  List menuItemSwitch() {
-    switch(widget.switcher) {
-      case CommunityOrCemeterySwitch.cemetery:
-        final List menuItemsCemetery = TestData().menuOfCemetery;
-        return menuItemsCemetery;
-      case CommunityOrCemeterySwitch.community:
-        final List menuItemsCommunity = TestData().menuOfCommunity;
-        return menuItemsCommunity;
+      return [];
     }
   }
 
@@ -729,69 +508,48 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
       ),
       color: const Color.fromRGBO(255, 255, 255, 1),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             height: 4.4.h,
-            child: ListView(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              children: [
-                SizedBox(
-                  width: 2.7.w,
+            child: TabBar(
+              padding: EdgeInsets.symmetric(
+                horizontal: 4.w,
+              ),
+              onTap: (indexMenu) {
+                setState(() => selectedMenuIndex = indexMenu);
+              },
+              physics: platformScrollPhysics(),
+              dividerColor: Colors.transparent,
+              indicatorPadding: EdgeInsets.symmetric(
+                horizontal: -4.w
+              ),
+              labelColor: const Color.fromRGBO(32, 30, 31, 0.8),
+              labelStyle: TextStyle(
+                fontFamily: ConstantsFonts.latoBold,
+                fontSize: 11.5.sp,
+              ),
+              unselectedLabelColor: const Color.fromRGBO(32, 30, 31, 0.8),
+              unselectedLabelStyle: TextStyle(
+                fontFamily: ConstantsFonts.latoRegular,
+                fontSize: 11.5.sp,
+              ),
+              controller: _tabController,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(35),
+                color: const Color.fromRGBO(232, 239, 252, 1),
+              ),
+              isScrollable: true,
+              tabs: const [
+                Tab(
+                  text: 'Мемориальная стена',
                 ),
-                ListView.separated(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, indexMenu) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(35),
-                        color: indexMenu == selectedMenuIndex ?
-                        const Color.fromRGBO(232, 239, 252, 1) :
-                        Colors.transparent,
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(35),
-                          onTap: () {
-                            setState(() => selectedMenuIndex = indexMenu);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 2.h,
-                            ),
-                            child: Center(
-                              child: Text(
-                                menuItemSwitch()[indexMenu],
-                                style: indexMenu == 0 ?
-                                TextStyle(
-                                  color: const Color.fromRGBO(32, 30, 31, 0.8),
-                                  fontFamily: ConstantsFonts.latoBold,
-                                  fontSize: 11.5.sp,
-                                ) :
-                                TextStyle(
-                                  color: const Color.fromRGBO(32, 30, 31, 0.8),
-                                  fontFamily: ConstantsFonts.latoRegular,
-                                  fontSize: 9.5.sp,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) => SizedBox(
-                    width: 3.w,
-                  ),
-                  itemCount: menuItemSwitch().length,
+                Tab(
+                  text: 'Мемориалы',
                 ),
-                SizedBox(
-                  width: 2.7.w,
+                Tab(
+                  text: 'Социальное',
                 ),
               ],
             ),
@@ -799,12 +557,19 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> {
           SizedBox(
             height: 2.h,
           ),
+          // IndexedStack(
+          //   children: widgetSwitch(value),
+          //   index: selectedMenuIndex,
+          // ),
           AnimatedFadeOutIn<int>(
             data: selectedMenuIndex,
             duration: const Duration(
               milliseconds: 200,
             ),
-            builder: (value) => widgetSwitch(value),
+            builder: (value) => IndexedStack(
+              index: selectedMenuIndex,
+              children: widgetSwitch(value),
+            ),
           ),
         ],
       ),

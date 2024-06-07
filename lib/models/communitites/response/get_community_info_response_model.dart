@@ -1,37 +1,33 @@
 import 'package:flutter/cupertino.dart';
 import 'package:memorial_book/helpers/constants.dart';
 
+import '../../catalog/response/get_authorized_content_response_model.dart';
+
 class GetCommunityInfoResponseModel {
   bool? status;
-  CommunitiesInfoResponseModel? community;
-  List<CommunitiesInfoResponseModel>? communities;
-  List<CommunitiesInfoResponseModel>? featuredCommunities;
+  List<CommunityDataResponseModel>? communities;
+  List<CommunityDataResponseModel>? featuredCommunities;
 
   GetCommunityInfoResponseModel({
     required this.status,
-    required this.community,
     required this.communities,
     required this.featuredCommunities,
   });
 
   GetCommunityInfoResponseModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    if(json['communities'] != null && json['communities'].runtimeType == [].runtimeType) {
-      communities = List
-          .from(json['communities'])
-          .map(
-            (index) => CommunitiesInfoResponseModel.fromJson(index),
-      ).toList();
-    } else {
-      community = CommunitiesInfoResponseModel.fromJson(json['communities']);
+    if(json['status'] == true) {
+      if(json['communities'] != null) {
+        communities = List.from(json['communities']).map(
+          ((index) => CommunityDataResponseModel.fromJson(index)),
+        ).toList();
+      }
+      if(json['featured_communities'] != null) {
+        featuredCommunities = List.from(json['featured_communities']).map(
+          ((index) => CommunityDataResponseModel.fromJson(index)),
+        ).toList();
+      }
     }
-    json['featured_communities'] != null ?
-    featuredCommunities = List
-        .from(json['featured_communities'])
-        .map(
-          (index) => CommunitiesInfoResponseModel.fromJson(index),
-    ).toList() :
-    null;
   }
 }
 

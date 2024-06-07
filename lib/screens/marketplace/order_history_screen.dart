@@ -9,6 +9,7 @@ import 'package:memorial_book/widgets/marketplace_widgets/product_history_card.d
 import 'package:sizer/sizer.dart';
 
 import '../../models/market/product_model.dart';
+import '../../widgets/platform_scroll_physics.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -24,12 +25,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return MarketplaceAppBar(
+      toHideHistory: true,
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 3.w,
         ),
         child: ListView(
-          physics: const BouncingScrollPhysics(),
+          physics: platformScrollPhysics(),
           children: [
             SizedBox(
               height: 2.2.h,

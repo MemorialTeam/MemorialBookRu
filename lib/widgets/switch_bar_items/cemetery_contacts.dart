@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../provider/catalog_provider.dart';
+import '../main_button.dart';
 
 class CemeteryContacts extends StatefulWidget {
   const CemeteryContacts({
@@ -35,6 +37,7 @@ class _CemeteryContactsState extends State<CemeteryContacts> {
     final catalogProvider = Provider.of<CatalogProvider>(context);
     return Column(
       children: [
+        if(catalogProvider.cemeteryProfileMapLoading == false)
         SizedBox(
           height: 46.h,
           width: double.infinity,
@@ -48,6 +51,15 @@ class _CemeteryContactsState extends State<CemeteryContacts> {
             tiltGesturesEnabled: false,
             zoomControlsEnabled: false,
             markers: Set<Marker>.of(catalogProvider.cemeteryMarkers.values),
+          ),
+        ) else SizedBox(
+          height: 6.2.h,
+          width: 6.2.h,
+          child: const LoadingIndicator(
+            indicatorType: Indicator.ballSpinFadeLoader,
+            colors: [
+              Color.fromRGBO(18, 175, 82, 1),
+            ],
           ),
         ),
         SizedBox(
@@ -103,57 +115,36 @@ class _CemeteryContactsState extends State<CemeteryContacts> {
               SizedBox(
                 height: 6.4.h,
               ),
-              Container(
-                height: 6.4.h,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
-                  color: const Color.fromRGBO(18, 175, 82, 1),
+              MainButton(
+                text: 'НАПИСАТЬ СООБЩЕНИЕ',
+                onTap: () async {
+                  final email = Uri.parse('mailto:kuchum.emile@gmail.com');
+                  await launchUrl(email);
+                },
+                textStyle: TextStyle(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  fontSize: 9.5.sp,
+                  fontFamily: ConstantsFonts.latoBold,
                 ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () async {
-                      final email = Uri.parse('mailto:kuchum.emile@gmail.com');
-                      await launchUrl(email);
-                    },
-                    borderRadius: BorderRadius.circular(7),
-                    child: Center(
-                      child: Text(
-                        'WRITE MESSAGE',
-                        style: TextStyle(
-                          color: const Color.fromRGBO(255, 255, 255, 1),
-                          fontSize: 9.5.sp,
-                          fontFamily: ConstantsFonts.latoBold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                activeColor: const Color.fromRGBO(18, 175, 82, 1),
               ),
               SizedBox(
                 height: 1.8.h,
               ),
-              Container(
-                height: 6.4.h,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  border: Border.all(
-                    color: const Color.fromRGBO(18, 175, 82, 1),
-                  ),
+              MainButton(
+                text: 'ПРОЛОЖИТЬ МАРШРУТ',
+                onTap: () async {
+
+                },
+                border: Border.all(
+                  color: const Color.fromRGBO(18, 175, 82, 1),
                 ),
-                child: Center(
-                  child: Text(
-                    'PLOT ROUT',
-                    style: TextStyle(
-                      color: const Color.fromRGBO(18, 175, 82, 1),
-                      fontSize: 9.5.sp,
-                      fontFamily: ConstantsFonts.latoBold,
-                    ),
-                  ),
+                textStyle: TextStyle(
+                  color: const Color.fromRGBO(18, 175, 82, 1),
+                  fontSize: 9.5.sp,
+                  fontFamily: ConstantsFonts.latoBold,
                 ),
+                activeColor: const Color.fromRGBO(255, 255, 255, 1),
               ),
             ],
           ),

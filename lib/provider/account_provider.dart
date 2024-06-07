@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:memorial_book/models/pet/response/created_pet_profile_response_model.dart';
 import 'package:memorial_book/models/pet/response/getting_created_pets_profiles_response_model.dart';
 import 'package:memorial_book/provider/auth_provider.dart';
 import 'package:memorial_book/provider/tab_bar_provider.dart';
@@ -12,7 +11,6 @@ import '../data_handler/mapper.dart';
 import '../data_handler/service.dart';
 import '../helpers/constants.dart';
 import '../helpers/enums.dart';
-import '../models/people/response/created_human_profile_response_model.dart';
 import '../models/people/response/get_people_info_response_model.dart';
 import '../models/people/response/getting_created_humans_profiles_response_model.dart';
 import '../models/pet/response/get_pet_info_response_model.dart';
@@ -128,20 +126,25 @@ class AccountProvider extends ChangeNotifier {
 
   }
 
+  bool getPetProfileState = false;
+  GetPetInfoResponseModel? petProfileModel;
+
   void gettingPetProfile(
       BuildContext context,
       int id,
-      ValueSetter<GetPetInfoResponseModel?> completion,
       ) async {
-    SVProgressHUD.show();
+    getPetProfileState = true;
+    notifyListeners();
     try {
       service.gettingPetProfileRequest(id, (response) {
+        getPetProfileState = false;
+        notifyListeners();
         mapper.gettingPetProfileResponse(response, (model) {
-          SVProgressHUD.dismiss();
           if(model != null) {
-            completion(model);
-          } else {
-            completion(null);
+            if(model.status == true) {
+              petProfileModel = model;
+              notifyListeners();
+            }
           }
         });
       });
@@ -350,21 +353,26 @@ class AccountProvider extends ChangeNotifier {
     }
   }
 
+
+  bool getPeopleProfileState = false;
+  GetPeopleInfoResponseModel? peopleProfileModel;
+
   Future gettingPeopleProfile(
       BuildContext context,
       int id,
-      ValueSetter<GetPeopleInfoResponseModel?> completion,
       ) async {
+    getPeopleProfileState = true;
+    peopleProfileModel = null;
     try {
-      SVProgressHUD.show();
       await service.gettingPeopleProfileRequest(id, (response) {
+        getPeopleProfileState = false;
+        notifyListeners();
         mapper.gettingPeopleProfileResponse(response, (model) {
-          print(response?.body);
-          SVProgressHUD.dismiss();
           if(model != null) {
-            completion(model);
-          } else {
-            completion(null);
+            if(model.status == true) {
+              peopleProfileModel = model;
+              notifyListeners();
+            }
           }
         });
       });

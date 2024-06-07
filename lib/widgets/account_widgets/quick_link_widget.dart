@@ -92,7 +92,7 @@ class QuickLinkWidget extends StatelessWidget {
                           Color.fromRGBO(13, 153, 255, 1),
                         ],
                       ),
-                      text: 'Coming soon',
+                      text: 'Скоро',
                       style: TextStyle(
                         fontSize: 9.sp,
                         fontFamily: ConstantsFonts.latoRegular,

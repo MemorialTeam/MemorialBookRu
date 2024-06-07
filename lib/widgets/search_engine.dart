@@ -10,10 +10,12 @@ class SearchEngine extends StatefulWidget {
     required this.focusNode,
     required this.controller,
     this.isSearching,
+    this.autofocus,
     this.activeColor,
     this.inactiveColor,
     this.backgroundColor,
     this.enabledBorder,
+    this.focusedBorder,
     this.textStyle,
     this.title,
     this.isEmptyFunc,
@@ -25,12 +27,14 @@ class SearchEngine extends StatefulWidget {
   final TextEditingController controller;
 
   final bool? isSearching;
+  final bool? autofocus;
 
   final Color? activeColor;
   final Color? inactiveColor;
   final Color? backgroundColor;
 
   final InputBorder? enabledBorder;
+  final InputBorder? focusedBorder;
 
   final TextStyle? textStyle;
 
@@ -71,12 +75,13 @@ class _SearchEngineState extends State<SearchEngine> {
   @override
   Widget build(BuildContext context) {
     return TextFieldSearchWidget(
-      autofocus: false,
+      autofocus: widget.autofocus ?? false,
       focusNode: widget.focusNode,
       controller: widget.controller,
-      hintText: widget.title ?? 'Search on this page',
+      hintText: widget.title ?? 'Поиск',
       enabledBorder: widget.enabledBorder,
       textStyle: widget.textStyle,
+      focusedBorder: widget.focusedBorder,
       backgroundColor: widget.backgroundColor,
       onChanged: (text) {
         if(text.isEmpty) {

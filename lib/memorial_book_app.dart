@@ -68,23 +68,31 @@ class _MemorialBookAppState extends State<MemorialBookApp> with WidgetsBindingOb
       child: Sizer(
         builder: (context, orientation, deviceType) {
           return MaterialApp(
-            // theme: ThemeData(
-            //   scrollbarTheme: ScrollbarThemeData(
-            //     thumbVisibility: MaterialStateProperty.all(true),
-            //     trackVisibility: MaterialStateProperty.all(true),
-            //     trackColor: MaterialStateProperty.all(Color.fromRGBO(32, 30, 31, 0.2)),
-            //
-            //     interactive: true,
-            //     mainAxisMargin: 6.h,
-            //     crossAxisMargin: 1.w,
-            //     thickness: MaterialStateProperty.all(1.w),
-            //     thumbColor: MaterialStateProperty.all(const Color.fromRGBO(23, 94, 217, 1)),
-            //     radius: const Radius.circular(10),
-            //     minThumbLength: 10.h,
-            //   ),
-            // ),
+            localizationsDelegates: const [
+            ],
+            theme: ThemeData(
+              useMaterial3: true,
+              textSelectionTheme: const TextSelectionThemeData(
+                selectionColor: Color.fromRGBO(23, 94, 217, 1),
+                selectionHandleColor: Color.fromRGBO(23, 94, 217, 1),
+                cursorColor: Color.fromRGBO(23, 94, 217, 1),
+              ),
+              // scrollbarTheme: ScrollbarThemeData(
+              //   thumbVisibility: MaterialStateProperty.all(true),
+              //   trackVisibility: MaterialStateProperty.all(true),
+              //   trackColor: MaterialStateProperty.all(Color.fromRGBO(32, 30, 31, 0.2)),
+              //
+              //   interactive: true,
+              //   mainAxisMargin: 6.h,
+              //   crossAxisMargin: 1.w,
+              //   thickness: MaterialStateProperty.all(1.w),
+              //   thumbColor: MaterialStateProperty.all(const Color.fromRGBO(23, 94, 217, 1)),
+              //   radius: const Radius.circular(10),
+              //   minThumbLength: 10.h,
+              // ),
+            ),
             debugShowCheckedModeBanner: false,
-            home: AnimationManager(),
+            home: const AnimationManager(),
           );
         },
       ),

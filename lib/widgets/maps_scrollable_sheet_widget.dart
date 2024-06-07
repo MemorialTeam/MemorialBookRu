@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorial_book/widgets/map_ui/show_as_widget.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:sizer/sizer.dart';
 import '../helpers/constants.dart';
 
@@ -78,7 +79,7 @@ class _MapsScrollableSheetWidgetState extends State<MapsScrollableSheetWidget> {
                 color: const Color.fromRGBO(255, 255, 255, 1),
               ),
               child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                physics: platformScrollPhysics(),
                 controller: scrollController,
                 padding: EdgeInsets.zero,
                 child: Column(
@@ -100,12 +101,7 @@ class _MapsScrollableSheetWidgetState extends State<MapsScrollableSheetWidget> {
                     SizedBox(
                       height: 2.2.h,
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 3.6.w,
-                      ),
-                      child: widget.child,
-                    ),
+                    widget.child,
                     SizedBox(
                       height: 1.2.h,
                     ),
@@ -133,6 +129,9 @@ class _MapsScrollableSheetWidgetState extends State<MapsScrollableSheetWidget> {
                       ],
                     ) :
                     const SizedBox(),
+                    SizedBox(
+                      height: 6.2.h,
+                    ),
                   ],
                 ),
               ),
@@ -149,7 +148,7 @@ class _MapsScrollableSheetWidgetState extends State<MapsScrollableSheetWidget> {
                 sheetController: widget.sheetController,
                 childSizeSheet: 0.3,
                 image: ConstantsAssets.showAsMapImage,
-                title: 'Show as a map',
+                title: 'Показать в виде карты',
                 color: widget.color,
               ),
             ),

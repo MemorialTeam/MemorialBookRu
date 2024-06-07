@@ -49,11 +49,15 @@ class TextFieldProfileWidget extends StatelessWidget {
       minLines: minLines,
       autocorrect: false,
       onChanged: onChanged,
+      style: TextStyle(
+        fontSize: 12.sp,
+        fontFamily: ConstantsFonts.latoRegular,
+      ),
       decoration: InputDecoration(
         suffixIcon: suffixIcon,
         hintStyle: TextStyle(
           color: const Color.fromRGBO(32, 30, 31, 0.5),
-          fontSize: 13.sp,
+          fontSize: 12.sp,
           fontFamily: ConstantsFonts.latoRegular,
         ),
         isDense: true,
@@ -81,10 +85,9 @@ class TextFieldProfileWidget extends StatelessWidget {
             Radius.circular(8.0),
           ),
         ),
-        contentPadding: EdgeInsets.only(
-          bottom: 10,
-          top: 10,
-          left: 1.6.h,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 1.1.h,
+          horizontal: 3.2.w,
         ),
       ),
     );

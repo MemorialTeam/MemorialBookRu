@@ -1,11 +1,9 @@
 import 'package:memorial_book/models/catalog/response/get_authorized_content_response_model.dart';
 import 'package:memorial_book/models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import 'package:memorial_book/models/people/request/search_people_request_model.dart';
-import '../models/catalog/response/get_guest_content_response_model.dart';
 import '../models/cemetery/response/getting_the_users_cemeteries_response_model.dart';
 import '../models/communitites/response/get_community_info_response_model.dart';
 import '../models/cemetery/response/get_cemetery_info_response_model.dart';
-import '../models/communitites/response/community_response_model.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/communitites/response/getting_memorials_of_community_response_model.dart';
@@ -31,29 +29,29 @@ class CatalogProvider extends ChangeNotifier {
   List<CelebrityPetDataResponseModel> pets = [];
   List<CommunityDataResponseModel> communities = [];
   List news = [];
-  List<CommunitiesInfoResponseModel> communitiesFollowList() {
+  List<CommunityDataResponseModel> communitiesFollowList() {
     if(isCommunitiesManaged == true) {
       return toEditManagedCommunitiesList;
     } else {
       return toEditFollowCommunitiesList;
     }
   }
-  List<CommunitiesInfoResponseModel> finalManagedCommunitiesList = [];
-  List<CommunitiesInfoResponseModel> toEditFollowCommunitiesList = [];
-  List<CommunitiesInfoResponseModel> toEditManagedCommunitiesList = [];
-  List<CommunitiesInfoResponseModel> featuredCommunitiesList = [];
-  List<CommunitiesInfoResponseModel> communitiesList = [];
+  List<CommunityDataResponseModel> finalManagedCommunitiesList = [];
+  List<CommunityDataResponseModel> toEditFollowCommunitiesList = [];
+  List<CommunityDataResponseModel> toEditManagedCommunitiesList = [];
+  List<CommunityDataResponseModel> featuredCommunitiesList = [];
+  List<CommunityDataResponseModel> communitiesList = [];
   List<CemeteriesResponseModel> cemeteryList = [];
-  List<CemeteriesResponseModel> featuredCemeteriesList = [];
+  List<SearchCemeteriesResponseModel> featuredCemeteriesList = [];
   List<CemeteryResponseModel> searchFeaturedCemeteriesList = [];
   List<HumanDataResponseModel>? peoples = [];
-  List<CemeteriesResponseModel>? places = [];
+  List<SearchCemeteriesResponseModel>? places = [];
   List<HumanDataResponseModel> addPeopleFoundPeoples = [];
   List<MemorialsResponseModel> allMemorialsOfCommunityList = [];
-  List<CommunitiesInfoResponseModel> searchedCommunitiesList = [];
-  List<CommunitiesInfoResponseModel> searchedFeaturedCommunitiesList = [];
-  List<CommunitiesInfoResponseModel> searchedAllCommunitiesFollowList = [];
-  List<CommunitiesInfoResponseModel> searchedManagedCommunitiesList = [];
+  List<CommunityDataResponseModel> searchedCommunitiesList = [];
+  List<CommunityDataResponseModel> searchedFeaturedCommunitiesList = [];
+  List<CommunityDataResponseModel> searchedAllCommunitiesFollowList = [];
+  List<CommunityDataResponseModel> searchedManagedCommunitiesList = [];
 
   bool isCommunitiesManaged = false;
   bool isCemeteriesManaged = false;
@@ -98,9 +96,7 @@ class CatalogProvider extends ChangeNotifier {
   final FocusNode searchFollowNode = FocusNode();
   final FocusNode addPeopleFocusNode = FocusNode();
 
-  late CommunitiesInfoResponseModel selectedCommunity;
 
-  late CemeteryResponseModel selectedCemetery;
 
   late Completer<GoogleMapController> peopleMapController;
   late Completer<GoogleMapController> placesMapController;
@@ -111,8 +107,8 @@ class CatalogProvider extends ChangeNotifier {
   }
 
   void toSortCommunitiesFollowList(String enteredKeyword) {
-    List<CommunitiesInfoResponseModel> managedCommunitiesResults = [];
-    List<CommunitiesInfoResponseModel> followCommunitiesResults = [];
+    List<CommunityDataResponseModel> managedCommunitiesResults = [];
+    List<CommunityDataResponseModel> followCommunitiesResults = [];
     if(enteredKeyword.isNotEmpty) {
       managedCommunitiesResults = finalManagedCommunitiesList.where(
         ((community) => community.title!.toLowerCase().contains(
@@ -136,12 +132,13 @@ class CatalogProvider extends ChangeNotifier {
   }
 
   void setManagedCommunityList() {
+    print('true');
     searchFollowNode.unfocus();
     searchFollowController.clear();
     toEditManagedCommunitiesList.clear();
     finalManagedCommunitiesList.clear();
-    for(CommunitiesInfoResponseModel model in communitiesList) {
-      if(model.isAdmin == true) {
+    for(CommunityDataResponseModel model in communitiesList) {
+      if(model.isOwner == true) {
         finalManagedCommunitiesList.add(model);
         toEditManagedCommunitiesList.add(model);
         notifyListeners();
@@ -151,7 +148,11 @@ class CatalogProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setMarkers() async {
+  bool cemeteryProfileMapLoading = false;
+
+  Future setMarkers() async {
+    cemeteryProfileMapLoading = true;
+    notifyListeners();
     MarkerId markerId = const MarkerId('1');
     cemeteryImageMarker = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(
@@ -161,8 +162,9 @@ class CatalogProvider extends ChangeNotifier {
       ConstantsAssets.cemeteryPointMapImage,
     );
 
-    final latText = selectedCemetery.addressCoords?.lat;
-    final lngText = selectedCemetery.addressCoords?.lng;
+    final latText = cemeteryProfileModel?.addressCoords?.lat;
+    final lngText = cemeteryProfileModel?.addressCoords?.lng;
+    notifyListeners();
 
     if(latText != null && lngText != null) {
       double lat = double.parse(latText);
@@ -180,6 +182,15 @@ class CatalogProvider extends ChangeNotifier {
         target: LatLng(lat, lng),
         zoom: 10.8,
       );
+      cemeteryProfileMapLoading = false;
+      notifyListeners();
+    } else {
+      cemeteryCameraPosition = const CameraPosition(
+        target: LatLng(55.751244, 37.618423),
+        zoom: 10.8,
+      );
+      cemeteryProfileMapLoading = false;
+      notifyListeners();
     }
   }
 
@@ -377,6 +388,24 @@ class CatalogProvider extends ChangeNotifier {
       });
     });
   }
+  Future updateMemorialsOfCommunity(int id) async {
+    memorialPageNumber = 1;
+    memorialLastPageNumber = 1;
+    notifyListeners();
+    await service.gettingMemorialsOfCommunityRequest(id, memorialPageNumber, (response) {
+      mapper.gettingMemorialsOfCommunityResponse(response, (model) {
+        if(model != null) {
+          if (model.status == true) {
+            if (model.posts?.data != null) {
+              memorialDataModel = model.posts;
+              memorialLastPageNumber = model.posts?.lastPage ?? 0;
+              notifyListeners();
+            }
+          }
+        }
+      });
+    });
+  }
   Future paginationMemorialsOfCommunity(int id) async {
     memorialPaginationLoading = true;
     memorialPageNumber++;
@@ -464,7 +493,7 @@ class CatalogProvider extends ChangeNotifier {
       service.gettingCemeteryProfileRequest(id, (response) {
         mapper.gettingCemeteryProfileResponse(response, (model) {
           if(model?.status == true) {
-            selectedCemetery = model!.cemetery!;
+            cemeteryProfileModel = model!.cemetery!;
             notifyListeners();
           }
           if(model != null) {
@@ -536,18 +565,25 @@ class CatalogProvider extends ChangeNotifier {
     });
   }
 
+  bool getCommunityProfileState = false;
+  CommunitiesInfoResponseModel? communityProfileModel;
+
   Future gettingCommunityProfile(
       BuildContext context,
       int id,
-      ValueSetter<CommunityResponseModel?> completion,
       ) async {
     try {
-      SVProgressHUD.show();
+      communityProfileModel = null;
+      getCommunityProfileState = true;
+      notifyListeners();
       await service.gettingCommunitiesProfileRequest(id, (response) {
+        getCommunityProfileState = false;
+        notifyListeners();
         mapper.gettingCommunitiesProfileResponse(response, (model) async {
-          SVProgressHUD.dismiss();
           if(model != null) {
             if(model.status == true) {
+              communityProfileModel = model.communities!;
+              notifyListeners();
               await gettingPostsOfCommunity(id).whenComplete(
                 (() async => await gettingMemorialsOfCommunity(
                   id,
@@ -556,12 +592,7 @@ class CatalogProvider extends ChangeNotifier {
                   }),
                 )),
               );
-              selectedCommunity = model.communities!;
-              notifyListeners();
             }
-            completion(model);
-          } else {
-            completion(null);
           }
         });
       });
@@ -580,7 +611,7 @@ class CatalogProvider extends ChangeNotifier {
           SVProgressHUD.dismiss();
           if(model != null) {
             if(model.status == true) {
-              selectedCommunity = model.communities!;
+              communityProfileModel = model.communities!;
               notifyListeners();
             }
           }
@@ -598,6 +629,7 @@ class CatalogProvider extends ChangeNotifier {
     service.gettingGuestCommunitiesRequest((response) {
       mapper.gettingGuestCommunitiesResponse(response, (model) async {
         if (model != null) {
+          print('тут${response?.body}');
           searchedCommunitiesList = model.communities ?? [];
           searchedFeaturedCommunitiesList = model.featuredCommunities ?? [];
           featuredCommunitiesList = model.featuredCommunities ?? [];
@@ -696,14 +728,14 @@ class CatalogProvider extends ChangeNotifier {
   }
 
   StateOfMemorial isAdded(int index) {
-    // for (var elementOfCommunity in selectedCommunity.memorials!) {
-    //   if(elementOfCommunity.id == addPeopleFoundPeoples[index].id) {
-    //     addPeopleFoundPeoples[index].isAdded = StateOfMemorial.added;
-    //     break;
-    //   } else {
-    //     addPeopleFoundPeoples[index].isAdded = StateOfMemorial.notAdded;
-    //   }
-    // }
+    for (var elementOfCommunity in memorialDataModel?.data ?? []) {
+      if(elementOfCommunity.id == addPeopleFoundPeoples[index].id) {
+        addPeopleFoundPeoples[index].isAdded = StateOfMemorial.added;
+        break;
+      } else {
+        addPeopleFoundPeoples[index].isAdded = StateOfMemorial.notAdded;
+      }
+    }
     return addPeopleFoundPeoples[index].isAdded ?? StateOfMemorial.notAdded;
   }
 
@@ -789,9 +821,8 @@ class CatalogProvider extends ChangeNotifier {
     mapPlacesTotal = null;
     notifyListeners();
     CemeteryResponseModel model = CemeteryResponseModel(
-      title: placesController.text,
+      name: placesController.text,
     );
-
     await service.placesSearchRequest(model, (response) {
       mapper.placesSearchResponse(response, (model) async {
         if(model != null) {
@@ -800,24 +831,24 @@ class CatalogProvider extends ChangeNotifier {
           placeListLoading = false;
           if(model.cemeteryList != null && model.cemeteryList!.isNotEmpty) {
             for (var element in model.cemeteryList!) {
-              if(element.addressCoords?.lat != null && element.addressCoords?.lng != null) {
+              if(element.coords?.lat != null && element.coords?.lng != null) {
                 String markerIdVal = '${element.id}';
                 MarkerId markerId = MarkerId(markerIdVal);
                 final Marker marker = Marker(
                   markerId: markerId,
                   icon: mapMarker,
                   position: LatLng(
-                    double.parse(element.addressCoords!.lat!),
-                    double.parse(element.addressCoords!.lng!),
+                    double.parse(element.coords!.lat!),
+                    double.parse(element.coords!.lng!),
                   ),
                 );
                 markersPlaces[markerId] = marker;
                 notifyListeners();
               }
             }
-            if(model.cemeteryList?[0].addressCoords?.lat != null && model.cemeteryList?[0].addressCoords?.lng != null) {
-              double lat = double.parse(model.cemeteryList![0].addressCoords!.lat);
-              double lng = double.parse(model.cemeteryList![0].addressCoords!.lng);
+            if(model.cemeteryList?[0].coords?.lat != null && model.cemeteryList?[0].coords?.lng != null) {
+              double lat = double.parse(model.cemeteryList![0].coords!.lat);
+              double lng = double.parse(model.cemeteryList![0].coords!.lng);
               gcontroller.animateCamera(
                 CameraUpdate.newCameraPosition(
                   CameraPosition(
@@ -855,10 +886,24 @@ class CatalogProvider extends ChangeNotifier {
         print(response?.body);
         mapper.peopleSearchResponse(response, (model) async {
           addPeopleIsLoading = false;
-
           addPeopleFoundPeoples = model?.humans ?? [];
           notifyListeners();
         });
+      });
+    });
+  }
+  Future updateCommunityPeopleSearch() async {
+    SearchPeopleRequestModel model = SearchPeopleRequestModel(
+      fullName: addPeopleController.text,
+      birthYearFrom: '',
+      deathYearFrom: '',
+      country: '',
+    );
+
+    await service.peopleSearchRequest(model, (response) {
+      mapper.peopleSearchResponse(response, (model) async {
+        addPeopleFoundPeoples = model?.humans ?? [];
+        notifyListeners();
       });
     });
   }
@@ -883,23 +928,26 @@ class CatalogProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool getCemeteryProfileState = false;
+  CemeteryResponseModel? cemeteryProfileModel;
+
   Future gettingCemeteryProfile(
       BuildContext context,
       int id,
-      ValueSetter<GetCemeteryInfoResponseModel?> completion,
       ) async {
     try {
-      SVProgressHUD.show();
+      getCemeteryProfileState = true;
+      notifyListeners();
       service.gettingCemeteryProfileRequest(id, (response) {
-        mapper.gettingCemeteryProfileResponse(response, (model) {
-          SVProgressHUD.dismiss();
+        getCemeteryProfileState = false;
+        notifyListeners();
+        mapper.gettingCemeteryProfileResponse(response, (model) async {
           if(model != null) {
             if(model.status == true) {
-              selectedCemetery = model.cemetery!;
+              cemeteryProfileModel = model.cemetery;
+              notifyListeners();
+              await setMarkers();
             }
-            completion(model);
-          } else {
-            completion(null);
           }
         });
       });
@@ -909,108 +957,33 @@ class CatalogProvider extends ChangeNotifier {
   }
 
   ///add memorial
-  Future addMemorialToTheCommunity(BuildContext context, int communityId, AddMemorialToTheCommunityRequestModel model) async {
-    try {
-      SVProgressHUD.show();
-      service.addMemorialToTheCommunityRequest(communityId, model, (response) {
-        mapper.statusResponse(response, (model) async {
-          print('clicked');
-          print(response?.body);
-          SVProgressHUD.dismiss();
-          if(model != null) {
-            if(model.status == true) {
-              await gettingMemorialsOfCommunity(
-                communityId,
-                ((model) {
-
-                }),
-              );
-              await addToCommunityPeopleSearch();
-              await gettingPostsOfCommunity(communityId);
-              await gettingGuestCommunities(context, (model) {});
-            }
-          }
-        });
+  Future addMemorialToTheCommunity(BuildContext context, int communityId, AddMemorialToTheCommunityRequestModel model, ValueSetter<StatusResponseModel?> completion) async {
+    service.addMemorialToTheCommunityRequest(communityId, model, (response) {
+      mapper.statusResponse(response, (model) async {
+        if(model != null) {
+          completion(model);
+        } else {
+          completion(null);
+        }
       });
-    } catch (error) {
-      SVProgressHUD.dismiss();
-      print('the following error occurred (sign up request) ---> $error');
-    }
-  }
-
-  Widget stateAddWidget(
-      StateOfMemorial state,
-      BuildContext context,
-      int communityId,
-      AddMemorialToTheCommunityRequestModel model,
-      ) {
-    switch(state) {
-      case StateOfMemorial.added:
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => removeMemorialFromTheCommunity(
-            context,
-            communityId,
-            model,
-            ((model) async {
-              if(model != null) {
-                if(model.status == true) {
-                  await addToCommunityPeopleSearch();
-                  await gettingGuestCommunities(context, (model) {});
-                }
-              }
-            }),
-          ),
-          child: SizedBox(
-            height: 4.h,
-            child: Icon(
-              Icons.check_circle,
-              color: const Color.fromRGBO(204, 204, 204, 1),
-              size: 24.sp,
-            ),
-          ),
-        );
-      case StateOfMemorial.notAdded:
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => addMemorialToTheCommunity(context, communityId, model),
-          child: SizedBox(
-            height: 4.h,
-            child: Icon(
-              Icons.add_circle,
-              color: const Color.fromRGBO(18, 175, 82, 1),
-              size: 24.sp,
-            ),
-          ),
-        );
-    }
+    });
   }
 
   Future removeMemorialFromTheCommunity(BuildContext context, int communityId, AddMemorialToTheCommunityRequestModel model, ValueSetter<StatusResponseModel?> completion) async {
-    try {
-      SVProgressHUD.show();
-      await service.removeMemorialFromTheCommunityRequest(communityId, model, (response) {
-        mapper.statusResponse(response, (model) async {
-          SVProgressHUD.dismiss();
-          if(model != null) {
-            if(model.status == true) {
-              await gettingPostsOfCommunity(communityId);
-            }
-            completion(model);
-          } else {
-            completion(null);
-          }
-        });
+    await service.removeMemorialFromTheCommunityRequest(communityId, model, (response) {
+      mapper.statusResponse(response, (model) async {
+        if(model != null) {
+          completion(model);
+        } else {
+          completion(null);
+        }
       });
-    } catch (error) {
-      SVProgressHUD.dismiss();
-      print('the following error occurred (sign up request) ---> $error');
-    }
+    });
   }
 
   void activateMainCommunitiesFilter(String enteredKeyword) {
-    List<CommunitiesInfoResponseModel> defaultCommunitiesResults = [];
-    List<CommunitiesInfoResponseModel> featuredCommunitiesResults = [];
+    List<CommunityDataResponseModel> defaultCommunitiesResults = [];
+    List<CommunityDataResponseModel> featuredCommunitiesResults = [];
     if (enteredKeyword.isEmpty) {
       defaultCommunitiesResults = communitiesList;
       featuredCommunitiesResults = featuredCommunitiesList;
@@ -1035,8 +1008,8 @@ class CatalogProvider extends ChangeNotifier {
   }
 
   void activateCommunitiesFollowFilter(String enteredKeyword) {
-    List<CommunitiesInfoResponseModel> defaultCommunitiesResults = [];
-    List<CommunitiesInfoResponseModel> featuredCommunitiesResults = [];
+    List<CommunityDataResponseModel> defaultCommunitiesResults = [];
+    List<CommunityDataResponseModel> featuredCommunitiesResults = [];
     if (enteredKeyword.isEmpty) {
 
       defaultCommunitiesResults = communitiesList;

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:memorial_book/screens/main_flow/search_burial_place_screen.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/creation_body_widget.dart';
@@ -10,8 +9,8 @@ import 'package:sizer/sizer.dart';
 import '../../../helpers/constants.dart';
 import '../../../provider/profile_creation_provider.dart';
 import '../../../provider/tab_bar_provider.dart';
-import '../../../screens/main_flow/choosing_place_screen.dart';
 import '../../chooser_widget.dart';
+import '../../platform_scroll_physics.dart';
 import '../../text_field_profile_widget.dart';
 
 class PIProfileBody extends StatelessWidget {
@@ -28,33 +27,33 @@ class PIProfileBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const RequiredText(
-                text: 'First name:',
+                text: 'Имя:',
               ),
               SizedBox(
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.firstNameController,
-                hintText: 'First name',
+                hintText: 'Имя',
               ),
               SizedBox(
                 height: 3.6.h,
               ),
               const RequiredText(
-                text: 'Last name:',
+                text: 'Фамилия:',
               ),
               SizedBox(
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.lastNameController,
-                hintText: 'Last name',
+                hintText: 'Фамилия',
               ),
               SizedBox(
                 height: 3.6.h,
               ),
               Text(
-                'Middle name:',
+                'Отчество:',
                 style: TextStyle(
                   color: const Color.fromRGBO(32, 30, 31, 0.5),
                   fontFamily: ConstantsFonts.latoRegular,
@@ -66,13 +65,13 @@ class PIProfileBody extends StatelessWidget {
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.middleNameController,
-                hintText: 'Middle name',
+                hintText: 'Отчество',
               ),
               SizedBox(
                 height: 3.6.h,
               ),
               const RequiredText(
-                text: 'Gender',
+                text: 'Пол',
               ),
               SizedBox(
                 height: 0.5.h,
@@ -96,7 +95,7 @@ class PIProfileBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const RequiredText(
-                text: 'Birth date',
+                text: 'Дата рождения:',
               ),
               SizedBox(
                 height: 0.5.h,
@@ -121,7 +120,7 @@ class PIProfileBody extends StatelessWidget {
                       padding: EdgeInsets.all(1.2.h),
                       child: Text(
                         profileCreationProvider.humanBirthDate == null ?
-                        'dd.mm.yyyy' :
+                        'дд.мм.гггг' :
                         '${profileCreationProvider.humanBirthDate!.day.toString().padLeft(2, '0')}.${profileCreationProvider.humanBirthDate!.month.toString().padLeft(2, '0')}.${profileCreationProvider.humanBirthDate!.year}',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -148,7 +147,7 @@ class PIProfileBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               const RequiredText(
-                text: 'Death date',
+                text: 'Дата смерти:',
               ),
               SizedBox(
                 height: 0.5.h,
@@ -173,7 +172,7 @@ class PIProfileBody extends StatelessWidget {
                       padding: EdgeInsets.all(1.2.h),
                       child: Text(
                         profileCreationProvider.humanDeathDate == null ?
-                        'dd.mm.yyyy' :
+                        'дд.мм.гггг' :
                         '${profileCreationProvider.humanDeathDate!.day.toString().padLeft(2, '0')}.${profileCreationProvider.humanDeathDate!.month.toString().padLeft(2, '0')}.${profileCreationProvider.humanDeathDate!.year}',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -200,7 +199,7 @@ class PIProfileBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               Text(
-                'Death cause:',
+                'Причина смерти:',
                 style: TextStyle(
                   color: const Color.fromRGBO(32, 30, 31, 0.5),
                   fontFamily: ConstantsFonts.latoRegular,
@@ -212,7 +211,7 @@ class PIProfileBody extends StatelessWidget {
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.profileDeathCauseController,
-                hintText: 'Specify а cause',
+                hintText: 'Укажите причину',
                 minLines: 1,
                 maxLines: 14,
               ),
@@ -220,20 +219,20 @@ class PIProfileBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               const RequiredText(
-                text: 'Birth place:',
+                text: 'Место рождения:',
               ),
               SizedBox(
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.profileBirthPlaceController,
-                hintText: 'Birth place',
+                hintText: 'Место рождения',
               ),
               SizedBox(
                 height: 3.6.h,
               ),
               Text(
-                'Burial place:',
+                'Место захоронения:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(
@@ -266,10 +265,10 @@ class PIProfileBody extends StatelessWidget {
                         children: [
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            physics: const BouncingScrollPhysics(),
+                            physics: platformScrollPhysics(),
                             child: Text(
                               profileCreationProvider.selectedCemetery.isEmpty ?
-                              'Burial place:' :
+                              'Место захоронения' :
                               profileCreationProvider.selectedCemetery,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -308,7 +307,7 @@ class PIProfileBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               Text(
-                'Death certificate:',
+                'Свидетельство о смерти:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(

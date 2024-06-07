@@ -18,7 +18,7 @@ class ProductDataResponseModel {
   int? discountedPrice;
   OptionsResponseModel? options;
   String? createdAt;
-  List<ImageResponseResponseModel>? gallery;
+  List<ImageResponseModel>? gallery;
 
   ProductDataResponseModel({
     required this.id,
@@ -41,7 +41,9 @@ class ProductDataResponseModel {
   ProductDataResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     shopId = json['shop_id'];
-    category = CategoryResponseModel.fromJson(json['category']);
+    if(json['category'] != null) {
+      category = CategoryResponseModel.fromJson(json['category']);
+    }
     numberOfAdded = 0;
     if(json['status'] != null) {
       status = json['status'];
@@ -58,7 +60,7 @@ class ProductDataResponseModel {
     options = OptionsResponseModel.fromJson(json['options']);
     createdAt = json['created_at'];
     gallery = List.of(json['gallery']).map(
-      ((index) => ImageResponseResponseModel.fromJson(index)),
+      ((index) => ImageResponseModel.fromJson(index)),
     ).toList();
   }
 }

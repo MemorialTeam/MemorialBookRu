@@ -22,7 +22,6 @@ class ShowAsWidget extends StatelessWidget {
   final String? image;
 
   void onTap() {
-    print(childSizeSheet);
     sheetController.animateTo(
       childSizeSheet,
       // childSizeSheet,
@@ -36,8 +35,6 @@ class ShowAsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 5.h,
-      width: 36.w,
       decoration: BoxDecoration(
         color: const Color.fromRGBO(255, 255, 255, 1),
         borderRadius: BorderRadius.circular(30),
@@ -61,26 +58,33 @@ class ShowAsWidget extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(30),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                image ?? ConstantsAssets.menuBarImage,
-                height: 1.4.h,
-                color: color ?? const Color.fromRGBO(23, 94, 217, 1),
-              ),
-              SizedBox(
-                width: 2.4.w,
-              ),
-              Text(
-                title ?? 'Show as a list',
-                style: TextStyle(
-                  color: const Color.fromRGBO(0, 0, 0, 1),
-                  fontFamily: ConstantsFonts.latoRegular,
-                  fontSize: 9.5.sp,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 5.w,
+              vertical: 1.5.h,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  image ?? ConstantsAssets.menuBarImage,
+                  height: 1.4.h,
+                  color: color ?? const Color.fromRGBO(23, 94, 217, 1),
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: 2.4.w,
+                ),
+                Text(
+                  title ?? 'Показать в виде списка',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(0, 0, 0, 1),
+                    fontFamily: ConstantsFonts.latoRegular,
+                    fontSize: 9.5.sp,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

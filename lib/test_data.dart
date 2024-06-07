@@ -5,52 +5,40 @@ class TestData {
 
   List<OnboardingPartModel> onboardingsDataList = [
     OnboardingPartModel(
-      title: 'Create profiles',
-      description: 'Creating a profile is easy and fast. To do this, you need to follow a few simple steps',
+      title: 'Создание профилей',
+      description: 'Создать профиль легко и быстро. Для этого Вам нужно выполнить несколько простых шагов',
       paddingTop: 9.9.h,
       paddingBottom: 0,
       descriptionFrameSize: 20.9.h,
     ),
     OnboardingPartModel(
-      title: 'Page for the cemetery',
-      description: 'You can find the burial places of famous personalities and create a new burial place. To do this, you need to enter the name and surname of the person whose burial place you want to find, and click the "Find" button.',
+      title: 'Страница для кладбища',
+      description: 'Вы можете найти места захоронения известных личностей и создать новое место захоронения. Для этого Вам нужно ввести имя и фамилию человека, место захоронения которого Вы хотите найти, и нажать кнопку "Найти".',
       paddingTop: 0,
       paddingBottom: 4.h,
       descriptionFrameSize: 30.h,
     ),
     OnboardingPartModel(
-      title: 'Catalog of goods and services',
-      description: 'In our application, you can order a product or service. Select the desired product or service from the list of available ones. Then fill out the order form, specifying your contact details.',
+      title: 'Каталог товаров и услуг',
+      description: 'В нашем приложении Вы можете заказать товар или услугу. Выберите нужный товар или услугу из списка доступных. Затем заполните форму заказа, указав свои контактные данные.',
       paddingTop: 0,
       paddingBottom: 4.h,
       descriptionFrameSize: 30.h,
     ),
     OnboardingPartModel(
-      title: 'Page for the community',
-      description: 'In our app, you can create your own community, invite friends and events, and share photos and videos.',
+      title: 'Страница для сообщества',
+      description: 'В нашем приложении Вы можете создать свое собственное сообщество, приглашать друзей на мероприятия, а также делиться фотографиями и видео.',
       paddingTop: 9.9.h,
       paddingBottom: 0,
       descriptionFrameSize: 24.h,
     ),
     OnboardingPartModel(
-      title: 'Personal account',
-      description: 'A personal account is a place where you can manage your accounts and access your data. In your personal account you will find information about your orders, delivery status, purchase history and much more',
+      title: 'Личный кабинет',
+      description: 'Личный кабинет - это место, где Вы можете управлять своими учетными записями и получать доступ к своим данным. В личном кабинете Вы найдете информацию о своих заказах, статусе доставки, истории покупок и многое другое.',
       paddingTop: 9.9.h,
       paddingBottom: 0,
       descriptionFrameSize: 31.h,
     ),
-  ];
-
-  final List menuOfCommunity = [
-    'Memorial wall',
-    'Memorials',
-    'Social',
-  ];
-
-  final List menuOfCemetery = [
-    'About the cemetery',
-    'Memorials',
-    'Contacts',
   ];
 
   final List listTiles = [

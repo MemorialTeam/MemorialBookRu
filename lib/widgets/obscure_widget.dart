@@ -22,7 +22,7 @@ class ObscureWidget extends StatelessWidget {
       behavior: HitTestBehavior.translucent,
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.all(1.5.h),
+        padding: EdgeInsets.all(1.6.h),
         child: Image.asset(
           state == true ?
           ConstantsAssets.eyeClosedImage :

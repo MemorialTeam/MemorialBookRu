@@ -27,6 +27,13 @@ class AuthProvider extends ChangeNotifier {
   final TextEditingController regPasswordController = TextEditingController();
   final TextEditingController regRepeatPasswordController = TextEditingController();
 
+  void clearRegControllers() {
+    regUsernameController.clear();
+    regEmailController.clear();
+    regPasswordController.clear();
+    regRepeatPasswordController.clear();
+  }
+
   late DeviceInfoModel device;
 
   final service = Service();

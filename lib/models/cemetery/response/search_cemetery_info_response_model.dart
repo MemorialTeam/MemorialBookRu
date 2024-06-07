@@ -3,7 +3,7 @@ import 'package:memorial_book/models/cemetery/response/getting_the_users_cemeter
 class SearchCemeteryInfoResponseModel {
   bool? status;
   int? total;
-  List<CemeteriesResponseModel>? cemeteryList;
+  List<SearchCemeteriesResponseModel>? cemeteryList;
 
   SearchCemeteryInfoResponseModel({
     required this.status,
@@ -17,7 +17,7 @@ class SearchCemeteryInfoResponseModel {
     json['cemeteries'] != null ?
     cemeteryList = List.of(json['cemeteries'])
         .map(
-          (index) => CemeteriesResponseModel.fromJson(index),
+          (index) => SearchCemeteriesResponseModel.fromJson(index),
     ).toList() :
     null;
   }

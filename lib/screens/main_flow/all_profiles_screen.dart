@@ -4,11 +4,11 @@ import 'package:memorial_book/screens/main_flow/some_selected_screens/selected_p
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
-import '../../provider/account_provider.dart';
 import '../../provider/catalog_provider.dart';
 import '../../widgets/cards/horizontal_mini_card_widget.dart';
 import '../../widgets/memorial_app_bar.dart';
 import '../../widgets/memorial_book_icon_widget.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/search_engine.dart';
 import '../../widgets/unscope_scaffold.dart';
 
@@ -22,14 +22,13 @@ class AllProfilesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accountProvider = Provider.of<AccountProvider>(context);
     final catalogProvider = Provider.of<CatalogProvider>(context);
     return MemorialAppBar(
       automaticallyImplyBackLeading: true,
       child: UnScopeScaffold(
         backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
         body: ListView(
-          physics: const BouncingScrollPhysics(),
+          physics: platformScrollPhysics(),
           children: [
             SizedBox(
               height: 1.2.h,
@@ -62,15 +61,6 @@ class AllProfilesScreen extends StatelessWidget {
                 }
                 else {
                   final memorialModel = catalogProvider.memorialDataModel!.data![index];
-                  final String? firstName = memorialModel.firstName == '' || memorialModel.firstName == null ?
-                  '' :
-                  '${memorialModel.firstName} ';
-                  final String? middleName = memorialModel.middleName == '' || memorialModel.middleName == null ?
-                  '' :
-                  '${memorialModel.middleName} ';
-                  final String? lastName = memorialModel.lastName == '' || memorialModel.lastName == null ?
-                  '' :
-                  '${memorialModel.lastName}';
                   if(catalogProvider.memorialPageNumber != catalogProvider.memorialLastPageNumber &&
                   index == catalogProvider.memorialDataModel!.data!.length - 1 &&
                   catalogProvider.memorialPaginationLoading == false) {
@@ -82,20 +72,17 @@ class AllProfilesScreen extends StatelessWidget {
                       children: [
                         HorizontalMiniCardWidget(
                           index: index,
-                          onTap: () => accountProvider.gettingPeopleProfile(context, memorialModel.id ?? 0, (model) {
-                            if(model!.status == true) {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => SelectedPeopleScreen(
-                                    model: model,
-                                  ),
-                                ),
-                              );
-                            }
-                          }),
+                          onTap: () => Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => SelectedPeopleScreen(
+                                avatar: memorialModel.avatar ?? '',
+                                id: memorialModel.id ?? 0,
+                              ),
+                            ),
+                          ),
                           avatar: memorialModel.avatar,
-                          title: firstName! + middleName! + lastName!,
+                          title: memorialModel.fullName ?? '',
                           subtitle: '${memorialModel.dateBirth} - ${memorialModel.dateDeath}',
                           id: memorialModel.id ?? 0,
                         ),

@@ -5,10 +5,12 @@ import '../helpers/constants.dart';
 
 class TabBarProvider extends ChangeNotifier {
   TabItem currentTab = TabItem.home;
-  final Map navigatorKeys = ConstantsNavigatorKeys.navigatorKeys;
+  final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = ConstantsNavigatorKeys.navigatorKeys;
 
   late BuildContext mainContext;
   PageController galleryController = PageController();
+
+  late TabController tabController;
 
   int tabItemIndex() {
     switch(currentTab) {
@@ -22,6 +24,8 @@ class TabBarProvider extends ChangeNotifier {
         return 3;
       case TabItem.account:
         return 4;
+      case TabItem.marketplace:
+        return 5;
     }
   }
 
@@ -35,7 +39,7 @@ class TabBarProvider extends ChangeNotifier {
 
   void selectTab(TabItem tabItem) {
     if (tabItem == currentTab) {
-      navigatorKeys[tabItem].currentState.popUntil((Route<dynamic> route) => route.isFirst);
+      navigatorKeys[tabItem]!.currentState!.popUntil((Route<dynamic> route) => route.isFirst);
     } else {
       currentTab = tabItem;
       notifyListeners();

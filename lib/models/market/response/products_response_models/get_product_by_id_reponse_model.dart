@@ -12,7 +12,11 @@ class GetProductByIdResponseModel {
   GetProductByIdResponseModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     if(json['status'] == true) {
-      product = ProductDataResponseModel.fromJson(json['product']);
+      if(json['product'] != null) {
+        product = ProductDataResponseModel.fromJson(json['product']);
+      } else {
+        product = ProductDataResponseModel.fromJson(json['service']);
+      }
     }
   }
 }

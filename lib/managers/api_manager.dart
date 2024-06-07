@@ -5,9 +5,7 @@ import '../helpers/constants.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'dart:io';
-
 import '../models/catalog/request/edit_post_request_model.dart';
-import '../models/common/coords_request.dart';
 
 class APIManager {
   Future getRequest(
@@ -24,6 +22,7 @@ class APIManager {
       );
 
       print(requestURL);
+      print('---${response.body}');
 
       switch (response.statusCode) {
         case 200:
@@ -292,7 +291,7 @@ class APIManager {
     }
   }
 
-  void postRequest(
+  Future postRequest(
       String endpoint,
       Map<String, String>? headers,
       ValueSetter<Response?> completion,
@@ -439,12 +438,10 @@ class APIManager {
       ) async {
     final Uri requestURL = Uri.parse(ConstantsUrls.baseUrl + endpoint);
 
-    final Object encodedBody = jsonEncode(body);
-
     final Response response = await delete(
       requestURL,
       headers: headers,
-      body: encodedBody,
+      body: jsonEncode(body),
     );
 
     print(response.body);

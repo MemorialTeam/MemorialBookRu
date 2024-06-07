@@ -1,15 +1,15 @@
-class ImageResponseResponseModel {
+class ImageResponseModel {
   int? id;
   String? url;
   String? thumb;
 
-  ImageResponseResponseModel({
+  ImageResponseModel({
     required this.id,
     required this.url,
     required this.thumb,
   });
 
-  ImageResponseResponseModel.fromJson(Map<String, dynamic> json) {
+  ImageResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     url = json['url'];
     thumb = json['thumb'];

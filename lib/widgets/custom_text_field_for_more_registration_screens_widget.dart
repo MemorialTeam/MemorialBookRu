@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:memorial_book/helpers/constants.dart';
 import 'package:sizer/sizer.dart';
 
 class CustomTextFieldForMoreRegistrationScreensWidget extends StatelessWidget {
@@ -15,6 +16,7 @@ class CustomTextFieldForMoreRegistrationScreensWidget extends StatelessWidget {
     this.showHide,
     this.maxLines,
     this.keyboardType,
+    this.validate,
   }) : super(key: key);
 
   final TextEditingController? controller;
@@ -35,49 +37,79 @@ class CustomTextFieldForMoreRegistrationScreensWidget extends StatelessWidget {
 
   final List<TextInputFormatter>? inputFormatters;
 
+  final String? Function(String?)? validate;
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 7.h,
-      child: TextFormField(
-        focusNode: focusNode,
-        controller: controller,
-        obscureText: obscureText,
-        inputFormatters: inputFormatters,
-        style: TextStyle(
-          fontSize: 12.sp,
+    return TextFormField(
+      cursorColor: const Color.fromRGBO(23, 94, 217, 1),
+      focusNode: focusNode,
+      controller: controller,
+      obscureText: obscureText,
+      inputFormatters: inputFormatters,
+      style: TextStyle(
+        fontSize: 12.sp,
+        fontFamily: ConstantsFonts.latoRegular,
+      ),
+      keyboardType: keyboardType,
+      maxLines: maxLines ?? 1,
+      minLines: 1,
+      validator: validate,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 1.6.h,
+          horizontal: 4.w,
         ),
-        keyboardType: keyboardType,
-        maxLines: maxLines ?? 1,
-        minLines: 1,
-        decoration: InputDecoration(
-          prefixIcon: prefixIcon,
-          isDense: true,
-          filled: true,
-          hintText: hintText,
-          fillColor: const Color.fromRGBO(250, 250, 250, 1),
-          hintStyle: TextStyle(
-            color: const Color.fromRGBO(158, 158, 158, 1),
-            fontSize: 12.sp,
+        prefixIcon: prefixIcon,
+        errorStyle: TextStyle(
+          color: const Color.fromRGBO(250, 18, 46, 1),
+          fontSize: 9.5.sp,
+          fontFamily: ConstantsFonts.latoRegular,
+        ),
+        isDense: true,
+        filled: true,
+        hintText: hintText,
+        fillColor: const Color.fromRGBO(250, 250, 250, 1),
+        hintStyle: TextStyle(
+          color: const Color.fromRGBO(189, 189, 189, 1),
+          fontSize: 12.sp,
+          fontFamily: ConstantsFonts.latoRegular
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 1,
+            color: Color.fromRGBO(0, 0, 0, 0.15),
           ),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 1,
-              color: Color.fromRGBO(0, 0, 0, 0.15),
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(13.0),
-            ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(13.0),
           ),
-          suffixIcon: showHide,
-          focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 1,
-              color: Colors.black,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(13.0),
-            ),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 1,
+            color: Color.fromRGBO(250, 18, 46, 1),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(13.0),
+          ),
+        ),
+        errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 1,
+            color: Color.fromRGBO(250, 18, 46, 1),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(13.0),
+          ),
+        ),
+        suffixIcon: showHide,
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 1,
+            color: Colors.black,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(13.0),
           ),
         ),
       ),

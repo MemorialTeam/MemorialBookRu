@@ -68,20 +68,15 @@ class PeopleScreen extends StatelessWidget {
                   '${dataList.lastName}';
                   return HorizontalMiniCardWidget(
                     isAddingPeople: false,
-                    onTap: () {
-                      accountProvider.gettingPeopleProfile(context, dataList.id ?? 0, (model) {
-                        if(model!.status == true) {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => SelectedPeopleScreen(
-                                model: model,
-                              ),
-                            ),
-                          );
-                        }
-                      });
-                    },
+                    onTap: () => Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => SelectedPeopleScreen(
+                          avatar: dataList.avatar ?? '',
+                          id: dataList.id ?? 0,
+                        ),
+                      ),
+                    ),
                     avatar: dataList.avatar,
                     title: firstName! + middleName! + lastName!,
                     subtitle: '${dataList.dateBirth.toString()} - ${dataList.dateDeath.toString()}',

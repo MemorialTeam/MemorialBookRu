@@ -256,6 +256,121 @@ class Service {
     );
   }
 
+  Future getUserCartRequest(
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = ConstEndpoints.getUserCart;
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future addProductToBasketRequest(
+      int productId,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    print(headers);
+
+    String endpoint = 'cart/product/$productId/add';
+
+    await APIManager().postRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future removeProductFromBasketRequest(
+      int productId,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'cart/item/$productId/delete';
+
+    await APIManager().deleteRequest(
+      endpoint,
+      headers,
+      null,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future changeItemQuantityRequest(
+      int itemId,
+      int quantity,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'cart/item/$itemId/quantity/$quantity';
+
+    await APIManager().postRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
   Future getProductsOnMainRequest(
       int shopId,
       ValueSetter<Response?> completion,
@@ -315,6 +430,7 @@ class Service {
   Future getProductsCategoryRequest(
       int page,
       int shopId,
+      String? name,
       ValueSetter<Response?> completion,
       ) async {
     final storage = await SharedPreferences.getInstance();
@@ -326,7 +442,7 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-    String endpoint = 'shop/$shopId/products?page=$page';
+    String endpoint = 'shop/$shopId/products?page=$page${name != null && name.isNotEmpty ? '&name=$name' : ''}';
 
     await APIManager().getRequest(
       endpoint,
@@ -344,6 +460,7 @@ class Service {
   Future getServicesCategoryRequest(
       int page,
       int shopId,
+      String? name,
       ValueSetter<Response?> completion,
       ) async {
     final storage = await SharedPreferences.getInstance();
@@ -355,7 +472,7 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-    String endpoint = 'shop/$shopId/services?page=$page';
+    String endpoint = 'shop/$shopId/services?page=$page${name != null && name.isNotEmpty ? '&name=$name' : ''}';
 
     await APIManager().getRequest(
       endpoint,
@@ -384,6 +501,34 @@ class Service {
     };
 
     String endpoint = 'shop/product/$id';
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future getServiceByIdRequest(
+      int id,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'shop/service/$id';
 
     await APIManager().getRequest(
       endpoint,
@@ -443,10 +588,10 @@ class Service {
     };
 
     Map<String, dynamic> body = {
-      'title': model.title,
+      'name': model.name,
     };
 
-    String endpoint = 'profile/cemeteries/search';
+    String endpoint = 'profiles/cemeteries/search';
 
     await APIManager().getRequestEncodedBody(
       endpoint,
@@ -639,7 +784,6 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-
     String endpoint = ConstEndpoints.gettingCommunitiesProfile;
 
     APIManager().getRequest(
@@ -780,9 +924,9 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-    String endpoint = 'profile/cemeteries/$id/subscribe';
+    String endpoint = 'profiles/cemeteries/$id/subscribe';
 
-    APIManager().postRequest(
+    await APIManager().postRequest(
       endpoint,
       headers,
       ((response) {
@@ -808,7 +952,7 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-    String endpoint = 'profile/cemeteries/$id/unsubscribe';
+    String endpoint = 'profiles/cemeteries/$id/unsubscribe';
 
     APIManager().postRequest(
       endpoint,

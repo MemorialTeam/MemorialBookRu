@@ -39,9 +39,9 @@ class DataAuthorizedContentResponseModel {
     humans = List.of(json['humans']).map(
       ((index) => HumanDataResponseModel.fromJson(index)),
     ).toList();
-    cemeteries = List.of(json['cemeteries']).map(
-      ((index) => CemeteryDataResponseModel.fromJson(index)),
-    ).toList();
+    // cemeteries = List.of(json['cemeteries']).map(
+    //   ((index) => CemeteryDataResponseModel.fromJson(index)),
+    // ).toList();
     pets = List.of(json['pets']).map(
       ((index) => CelebrityPetDataResponseModel.fromJson(index)),
     ).toList();
@@ -54,6 +54,7 @@ class DataAuthorizedContentResponseModel {
 class HumanDataResponseModel {
   int? id;
   bool? isCelebrity;
+  late bool isLoading;
   StateOfMemorial? isAdded;
   String? firstName;
   String? lastName;
@@ -68,6 +69,7 @@ class HumanDataResponseModel {
 
   HumanDataResponseModel({
     required this.id,
+    required this.isLoading,
     required this.firstName,
     required this.lastName,
     required this.middleName,
@@ -85,6 +87,7 @@ class HumanDataResponseModel {
     if(json['id'] != null) {
       id = json['id'];
     }
+    isLoading = false;
     firstName = json['first_name'];
     lastName = json['last_name'];
     middleName = json['middle_name'];

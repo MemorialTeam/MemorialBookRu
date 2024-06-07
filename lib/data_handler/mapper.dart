@@ -25,6 +25,7 @@ import '../models/create_profile/response/get_religions_response_model.dart';
 import '../models/market/response/get_shop_response_model.dart';
 import '../models/market/response/products_response_models/get_product_by_id_reponse_model.dart';
 import '../models/market/response/products_response_models/get_products_category_response_model.dart';
+import '../models/market/response/user_cart_response_model.dart';
 import '../models/people/response/get_map_of_people_response_model.dart';
 import '../models/people/response/get_people_info_response_model.dart';
 import '../models/people/response/getting_created_humans_profiles_response_model.dart';
@@ -156,6 +157,19 @@ class Mapper {
     if (response != null) {
       Map<String, dynamic> body = json.decode(response.body);
       GetShopResponseModel model = GetShopResponseModel.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getUserCartResponse(
+      Response? response,
+      ValueSetter<UserCartResponseModel?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      UserCartResponseModel model = UserCartResponseModel.fromJson(body);
       completion(model);
     } else {
       completion(null);
@@ -363,6 +377,7 @@ class Mapper {
       ) {
     if (response != null) {
       Map<String, dynamic> body = json.decode(response.body);
+      print(body);
       GetCemeteryInfoResponseModel model = GetCemeteryInfoResponseModel.fromJson(body);
       completion(model);
     } else {

@@ -6,6 +6,7 @@ import 'package:memorial_book/screens/main_flow/filter_people_screen.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
+import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
 import '../../helpers/enums.dart';
 import '../../provider/account_provider.dart';
@@ -61,8 +62,13 @@ class PlacesScreen extends StatelessWidget {
                   }
                   else {
                     final dataList = catalogProvider.places![index];
-                    return MapsPlacesCardWidget(
-                      model: dataList,
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 3.2.w,
+                      ),
+                      child: MapsPlacesCardWidget(
+                        model: dataList,
+                      ),
                     );
                   }
                 },

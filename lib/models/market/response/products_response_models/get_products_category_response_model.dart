@@ -25,14 +25,14 @@ class GetProductsCategoryResponseModel {
         productsData = List.of(json['products']['data']).map(
           ((index) => ProductDataResponseModel.fromJson(index)),
         ).toList();
-        lastPage = json['products']['meta']['last_page'];
-      } else if(json['services']['data'] != null) {
+        lastPage = json['products']['meta']['to'];
+      }
+      if(json['services'] != null) {
         productsData = List.of(json['services']['data']).map(
           ((index) => ProductDataResponseModel.fromJson(index)),
         ).toList();
-        lastPage = json['services']['meta']['last_page'];
+        lastPage = json['services']['meta']['to'];
       }
-    } else {
     }
   }
 }

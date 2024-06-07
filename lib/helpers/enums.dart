@@ -19,7 +19,14 @@ enum LoadingState {
   error,
 }
 
-enum MarketplaceState {
+enum MarketplaceProductType {
   services,
-  products
+  products,
+  none,
+}
+
+enum ProfileType {
+  human,
+  pet,
+  none,
 }

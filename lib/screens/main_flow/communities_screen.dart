@@ -12,12 +12,12 @@ import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/cards/horizontal_mini_card_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../../helpers/enums.dart';
 import '../../provider/account_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/catalog_provider.dart';
 import '../../widgets/home_frame_skeleton_widget.dart';
 import '../../widgets/home_frame_widget.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/skeleton_loader_widget.dart';
 import '../../widgets/text_field_search_widget.dart';
 import '../profile_creation_flow/creation_flow.dart';
@@ -45,8 +45,6 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
     }
     super.initState();
   }
-
-  int i = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +221,7 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
               activeFlow: Stack(
                 children: [
                   ListView(
-                    physics: const BouncingScrollPhysics(),
+                    physics: platformScrollPhysics(),
                     children: [
                       authProvider.userRules == 'authorized' ?
                       Column(
@@ -242,7 +240,7 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                               autofocus: false,
                               focusNode: searchFocusNode,
                               controller: catalogProvider.communityController,
-                              hintText: 'Find and join a community',
+                              hintText: 'Найдите сообщество и присоединяйтесь к нему',
                               onChanged: catalogProvider.activateMainCommunitiesFilter,
                               prefixIcon: catalogProvider.isCommunitySearch ?
                               Container(
@@ -300,7 +298,7 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Communities you follow',
+                                  'Ваши сообщества',
                                   style: TextStyle(
                                     fontSize: 13.sp,
                                     fontFamily: ConstantsFonts.latoBold,
@@ -441,22 +439,20 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                               5 :
                               catalogProvider.communitiesList.length,
                               itemBuilder: (context, index) {
-                                final dataList = catalogProvider.searchedCommunitiesList.isNotEmpty ?
-                                catalogProvider.searchedCommunitiesList[index] :
-                                catalogProvider.communitiesList[index];
+                                // final dataList = catalogProvider.searchedCommunitiesList.isNotEmpty ?
+                                // catalogProvider.searchedCommunitiesList[index] :
+                                // catalogProvider.communitiesList[index];
+                                final dataList = catalogProvider.communitiesList[index];
                                 return HorizontalMiniCardWidget(
-                                  onTap: () {
-                                    catalogProvider.gettingCommunityProfile(context, dataList.id ?? 0, (model) {
-                                      if(model!.status == true) {
-                                        Navigator.push(
-                                          context,
-                                          CupertinoPageRoute(
-                                            builder: (context) => const SelectedCommunityScreen(),
-                                          ),
-                                        );
-                                      }
-                                    });
-                                  },
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => SelectedCommunityScreen(
+                                        id: dataList.id ?? 0,
+                                        avatar: dataList.avatar ?? '',
+                                      ),
+                                    ),
+                                  ),
                                   avatar: dataList.avatar ?? '',
                                   title: dataList.title ?? '',
                                   subtitle: dataList.subtitle ?? '',
@@ -477,8 +473,9 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                           SizedBox(
                             height: 1.2.h,
                           ),
+                          if(catalogProvider.searchedFeaturedCommunitiesList.isNotEmpty)
                           HomeFrameWidget(
-                            title: 'Featured Communities',
+                            title: 'Избранные сообщества',
                             controller: featuredCommunitiesController,
                             widget: SizedBox(
                               height: 19.h,
@@ -486,12 +483,11 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                                 shrinkWrap: true,
                                 controller: featuredCommunitiesController,
                                 scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
+                                physics: platformScrollPhysics(),
                                 children: [
                                   SizedBox(
                                     width: 3.2.w,
                                   ),
-                                  catalogProvider.searchedFeaturedCommunitiesList.isNotEmpty ?
                                   ListView.separated(
                                     shrinkWrap: true,
                                     itemCount: catalogProvider.searchedFeaturedCommunitiesList.isNotEmpty ?
@@ -500,22 +496,20 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                                     scrollDirection: Axis.horizontal,
                                     physics: const NeverScrollableScrollPhysics(),
                                     itemBuilder: (context, index) {
-                                      final dataList = catalogProvider.searchedFeaturedCommunitiesList.isNotEmpty ?
-                                      catalogProvider.searchedFeaturedCommunitiesList[index] :
-                                      catalogProvider.featuredCommunitiesList[index];
+                                      // final dataList = catalogProvider.searchedFeaturedCommunitiesList.isNotEmpty ?
+                                      // catalogProvider.searchedFeaturedCommunitiesList[index] :
+                                      // catalogProvider.featuredCommunitiesList[index];
+                                      final dataList = catalogProvider.featuredCommunitiesList[index];
                                       return VerticalMiniCardWidget(
-                                        onTap: () {
-                                          catalogProvider.gettingCommunityProfile(context, dataList.id ?? 0, (model) {
-                                            if(model!.status == true) {
-                                              Navigator.push(
-                                                context,
-                                                CupertinoPageRoute(
-                                                  builder: (context) => const SelectedCommunityScreen(),
-                                                ),
-                                              );
-                                            }
-                                          });
-                                        },
+                                        onTap: () => Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) => SelectedCommunityScreen(
+                                              id: dataList.id ?? 0,
+                                              avatar: dataList.avatar ?? '',
+                                            ),
+                                          ),
+                                        ),
                                         title: dataList.title,
                                         subtitle: dataList.subtitle,
                                         avatar: dataList.avatar,
@@ -527,16 +521,6 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                                         width: 1.4.h,
                                       );
                                     },
-                                  ) :
-                                  Center(
-                                    child: Text(
-                                      'Nothing is found',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12.sp,
-                                        fontFamily: ConstantsFonts.latoRegular,
-                                      ),
-                                    ),
                                   ),
                                   SizedBox(
                                     width: 3.2.w,
@@ -556,14 +540,14 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                             height: 1.2.h,
                           ),
                           HomeFrameWidget(
-                            title: 'Featured Communities',
+                            title: 'Избранные сообщества',
                             controller: featuredCommunitiesController,
                             widget: LimitedBox(
                               maxHeight: 21.h,
                               child: ListView(
                                 controller: featuredCommunitiesController,
                                 scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
+                                physics: platformScrollPhysics(),
                                 children: [
                                   SizedBox(
                                     width: 3.2.w,
@@ -576,25 +560,15 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                                     itemBuilder: (context, index) {
                                       final dataList = catalogProvider.featuredCommunitiesList[index];
                                       return GestureDetector(
-                                        onTap: () {
-                                          catalogProvider.gettingCommunityProfile(context, dataList.id ?? 0, (model) {
-                                            if(model!.status == true) {
-                                              Navigator.push(
-                                                context,
-                                                CupertinoPageRoute(
-                                                  builder: (context) => const SelectedCommunityScreen(
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          });
-                                          // Navigator.push(
-                                          //   context,
-                                          //   CupertinoPageRoute(
-                                          //     builder: (context) => const SelectedCommunityScreen(),
-                                          //   ),
-                                          // );
-                                        },
+                                        onTap: () => Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) => SelectedCommunityScreen(
+                                              id: dataList.id ?? 0,
+                                              avatar: dataList.avatar ?? '',
+                                            ),
+                                          ),
+                                        ),
                                         child: Stack(
                                           children: [
                                             Positioned(
@@ -793,18 +767,15 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                                 return Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () {
-                                      catalogProvider.gettingCommunityProfile(context, dataList.id ?? 0, (model) {
-                                        if(model!.status == true) {
-                                          Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) => const SelectedCommunityScreen(),
-                                            ),
-                                          );
-                                        }
-                                      });
-                                    },
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (context) => SelectedCommunityScreen(
+                                          id: dataList.id ?? 0,
+                                          avatar: dataList.avatar ?? '',
+                                        ),
+                                      ),
+                                    ),
                                     borderRadius: BorderRadius.circular(50),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,

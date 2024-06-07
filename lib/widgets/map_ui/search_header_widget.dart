@@ -52,7 +52,7 @@ class SearchHeaderWidget extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 2.8.w,
+            width: 2.w,
           ),
           GestureDetector(
             behavior: HitTestBehavior.translucent,
@@ -65,19 +65,19 @@ class SearchHeaderWidget extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Filters',
+                  'Фильтр',
                   style: TextStyle(
                     color: mainColor ?? const Color.fromRGBO(23, 94, 217, 1),
                     fontFamily: ConstantsFonts.latoBold,
-                    fontSize: 13.sp,
+                    fontSize: 11.5.sp,
                   ),
                 ),
                 SizedBox(
                   width: 1.4.w,
                 ),
                 Container(
-                  height: 2.4.h,
-                  width: 2.4.h,
+                  height: 2.5.h,
+                  width: 2.5.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
                     color: mainColor ?? const Color.fromRGBO(23, 94, 217, 1),
@@ -88,7 +88,7 @@ class SearchHeaderWidget extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: ConstantsFonts.latoRegular,
-                        fontSize: 8.5.sp,
+                        fontSize: 9.5.sp,
                       ),
                     ),
                   ),

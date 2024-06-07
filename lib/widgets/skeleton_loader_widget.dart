@@ -17,6 +17,7 @@ class SkeletonLoaderWidget extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: const Color.fromRGBO(241, 241, 241, 1),
       highlightColor: const Color.fromRGBO(255, 255, 255, 1),
+      // highlightColor: Colors.black,
       child: Container(
         height: height,
         width: width,

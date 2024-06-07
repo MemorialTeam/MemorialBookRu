@@ -12,6 +12,7 @@ import '../../provider/catalog_provider.dart';
 import '../../provider/profile_creation_provider.dart';
 import '../../provider/tab_bar_provider.dart';
 import '../../widgets/memorial_app_bar.dart';
+import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/skeleton_loader_widget.dart';
 import '../../widgets/text_field_profile_widget.dart';
 
@@ -131,7 +132,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
             horizontal: 3.2.w,
           ),
           child: ListView(
-            physics: const BouncingScrollPhysics(),
+            physics: platformScrollPhysics(),
             children: [
               SizedBox(
                 height: 4.8.h,

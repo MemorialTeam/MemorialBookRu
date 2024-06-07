@@ -1,9 +1,9 @@
+import '../../common/image_response_model.dart';
 import '../../people/response/get_map_of_people_response_model.dart';
 
 class GetCemeteryInfoResponseModel {
   bool? status;
   CemeteryResponseModel? cemetery;
-  List<CemeteryResponseModel>? cemeteryList;
 
   GetCemeteryInfoResponseModel({
     required this.status,
@@ -15,34 +15,28 @@ class GetCemeteryInfoResponseModel {
     if(json['cemetery'] != null) {
       cemetery = CemeteryResponseModel.fromJson(json['cemetery']);
     }
-    else {
-      json['cemeteries'] != null ?
-      cemeteryList = List.of(json['cemeteries']).map(
-        ((index) => CemeteryResponseModel.fromJson(index)),
-      ).toList() :
-      null;
-    }
   }
 }
 
 class CemeteryResponseModel {
   dynamic id;
   bool? isSubscribe;
-  String? title;
-  String? subtitle;
+  String? name;
   String? description;
+  String? address;
+  CoordsResponseModel? addressCoords;
   String? avatar;
   String? banner;
-  CoordsResponseModel? addressCoords;
-  List? gallery;
+  List<ImageResponseModel>? gallery;
   List<FamousPersonalitiesResponseModel>? memorials;
   List<FamousPersonalitiesResponseModel>? famousPersonalities;
 
   CemeteryResponseModel({
    this.id,
-   this.title,
-   this.subtitle,
+   this.isSubscribe,
+   this.name,
    this.description,
+   this.address,
    this.avatar,
    this.banner,
    this.addressCoords,
@@ -55,15 +49,19 @@ class CemeteryResponseModel {
     try {
       id = json['id'];
       isSubscribe = json['is_subscribe'];
-      title = json['title'];
-      subtitle = json['subtitle'];
-      description = json['description'];
+      name = json['name'];
+      if(json['description'] != null) {
+        description = json['description'];
+      }
+      address = json['address'];
       avatar = json['avatar'];
       banner = json['banner'];
       json['address_coords'] != null ?
       addressCoords = CoordsResponseModel.fromJson(json['address_coords']) :
       null;
-      gallery = json['gallery'];
+      gallery = List.of(json['gallery']).map(
+        ((index) => ImageResponseModel.fromJson(index)),
+      ).toList();
       memorials = List.of(json['memorials']).map(
             (index) => FamousPersonalitiesResponseModel.fromJson(index),
       ).toList();
@@ -78,32 +76,42 @@ class CemeteryResponseModel {
 
 class FamousPersonalitiesResponseModel {
   int? id;
-  String? fullName;
+  bool? isCelebrity;
+  String? firstName;
+  String? lastName;
+  String? middleName;
+  dynamic yearBirth;
+  dynamic yearDeath;
   dynamic dateBirth;
   dynamic dateDeath;
-  CoordsResponseModel? burialCord;
-  bool? isCelebrity;
   String? avatar;
+  String? createdAt;
 
   FamousPersonalitiesResponseModel({
     required this.id,
-    required this.fullName,
+    required this.isCelebrity,
+    required this.firstName,
+    required this.lastName,
+    required this.middleName,
+    required this.yearBirth,
+    required this.yearDeath,
     required this.dateBirth,
     required this.dateDeath,
-    required this.burialCord,
-    required this.isCelebrity,
     required this.avatar,
+    required this.createdAt,
   });
 
   FamousPersonalitiesResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    fullName = json['full_name'];
+    isCelebrity = json['is_celebrity'];
+    firstName = json['first_name'];
+    lastName = json['last_name'];
+    middleName = json['middle_name'];
+    yearBirth = json['year_birth'];
+    yearDeath = json['year_death'];
     dateBirth = json['date_birth'];
     dateDeath = json['date_death'];
-    json['burial_cord'] != null ?
-    burialCord = CoordsResponseModel.fromJson(json['burial_cord']) :
-    null;
-    isCelebrity = json['is_celebrity'];
     avatar = json['avatar'];
+    createdAt = json['created_at'];
   }
 }

@@ -1,3 +1,5 @@
+import 'package:memorial_book/models/common/image_response_model.dart';
+
 class GetPeopleInfoResponseModel {
   bool? status;
   PeopleInfoResponseModel? human;
@@ -39,7 +41,7 @@ class PeopleInfoResponseModel {
   String? religion;
   String? access;
   String? status;
-  List? gallery;
+  List<ImageResponseModel>? gallery;
   String? createdAt;
 
   PeopleInfoResponseModel({
@@ -84,7 +86,11 @@ class PeopleInfoResponseModel {
     religion = json['religion'];
     access = json['access'];
     status = json['status'];
-    gallery = json['gallery'];
+    if(json['gallery'] != null) {
+      gallery = List.of(json['gallery']).map(
+        ((index) => ImageResponseModel.fromJson(index)),
+      ).toList();
+    }
     createdAt = json['created_at'];
   }
 

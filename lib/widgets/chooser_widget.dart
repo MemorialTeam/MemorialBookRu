@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memorial_book/models/create_profile/response/get_religions_response_model.dart';
 import 'package:memorial_book/provider/profile_creation_provider.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:provider/provider.dart';
 import '../helpers/constants.dart';
 import 'package:sizer/sizer.dart';
@@ -261,7 +262,7 @@ class _ChooserWidgetState extends State<ChooserWidget> with TickerProviderStateM
                 },
                 itemCount: length,
                 physics: length > 5?
-                const BouncingScrollPhysics() :
+                platformScrollPhysics() :
                 const NeverScrollableScrollPhysics(),
               ),
             ),

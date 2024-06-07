@@ -9,6 +9,7 @@ import 'package:memorial_book/provider/tab_bar_provider.dart';
 import 'package:memorial_book/screens/main_flow/add_post_screen.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/animation/vertical_soft_navigation.dart';
+import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/share_widget.dart';
 import 'package:memorial_book/widgets/skeleton_loader_widget.dart';
 import 'package:provider/provider.dart';
@@ -89,7 +90,6 @@ class _PostCardState extends State<PostCard> {
                     },
                     controller: widget.model.pageController,
                     scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, index) {
                       return OpenImage(
                         initialIndex: index,
@@ -248,7 +248,7 @@ class _PostCardState extends State<PostCard> {
                     },
                     controller: widget.model.pageController,
                     scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
+                    physics: platformScrollPhysics(),
                     itemBuilder: (context, index) {
                       return OpenImage(
                         initialIndex: index,
@@ -534,11 +534,11 @@ class _PostCardState extends State<PostCard> {
                                   width: 1.w,
                                 ),
                                 Text(
-                                  'Pinned post',
+                                  'Пост закреплён',
                                   style: TextStyle(
-                                      fontSize: 7.5.sp,
-                                      fontFamily: ConstantsFonts.latoRegular,
-                                      color: const Color.fromRGBO(130, 130, 130, 1)
+                                    fontSize: 7.5.sp,
+                                    fontFamily: ConstantsFonts.latoRegular,
+                                    color: const Color.fromRGBO(130, 130, 130, 1),
                                   ),
                                 ),
                               ],
@@ -584,7 +584,7 @@ class _PostCardState extends State<PostCard> {
                               width: 1.w,
                             ),
                             Text(
-                              'Pinned post',
+                              'Пост закреплён',
                               style: TextStyle(
                                   fontSize: 7.5.sp,
                                   fontFamily: ConstantsFonts.latoRegular,
@@ -605,6 +605,7 @@ class _PostCardState extends State<PostCard> {
                   constraints: BoxConstraints(
                     maxWidth: 42.w,
                   ),
+                  surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
                   color: const Color.fromRGBO(255, 255, 255, 1),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
@@ -615,7 +616,7 @@ class _PostCardState extends State<PostCard> {
                   ),
                   itemBuilder: ((context) => [
                     BoardTypePopupMenuItem(
-                      title: 'Edit post',
+                      title: 'Редактировать',
                       image: Image.asset(
                         ConstantsAssets.editPostImage,
                         height: 1.8.h,
@@ -644,7 +645,7 @@ class _PostCardState extends State<PostCard> {
                       },
                     ),
                     BoardTypePopupMenuItem(
-                      title: 'Pin post',
+                      title: 'Закрепить',
                       image: Image.asset(
                         ConstantsAssets.pinPostImage,
                         height: 1.65.h,
@@ -654,21 +655,21 @@ class _PostCardState extends State<PostCard> {
                         Navigator.pop(context);
                         await messageDialogsProvider.theSelectionWindow(
                           context: context,
-                          title: 'Are you sure you want to pin the post?',
-                          yesButton: 'YES',
-                          noButton: 'I CHANGED MY MIND',
+                          title: 'Вы уверены, что хотите закрепить пост?',
+                          yesButton: 'ДА',
+                          noButton: 'Я ПЕРЕДУМАЛ',
                           yesOnTap: () async => await profileCreationProvider.pinPost(
                             widget.model.id ?? 0,
                             ((model) async {
                               if(model?.status == true) {
-                                await catalogProvider.gettingPostsOfCommunity(catalogProvider.selectedCommunity.id ?? 0);
+                                await catalogProvider.gettingPostsOfCommunity(catalogProvider.communityProfileModel?.id ?? 0);
                               }
                               await Navigator.maybePop(tabBarProvider.mainContext).whenComplete(() {
                                 if(model?.status == false) {
                                   messageDialogsProvider.informationWindow(
                                     context: tabBarProvider.mainContext,
-                                    title: model?.message ?? 'Something went wrong',
-                                    textButton: 'Close',
+                                    title: model?.message ?? 'Что-то пошло не так',
+                                    textButton: 'Закрыть',
                                   );
                                 }
                               });
@@ -679,7 +680,7 @@ class _PostCardState extends State<PostCard> {
                       },
                     ),
                     BoardTypePopupMenuItem(
-                      title: 'Delete post',
+                      title: 'Удалить',
                       image: Image.asset(
                         ConstantsAssets.deletePostImage,
                         height: 2.h,
@@ -689,22 +690,22 @@ class _PostCardState extends State<PostCard> {
                         Navigator.pop(context);
                         await messageDialogsProvider.theSelectionWindow(
                           context: context,
-                          title: 'Are you sure you want to proceed?',
-                          subtitle: 'After deleting the record, it will no longer\nbe accessible.',
-                          yesButton: 'DELETE RECORD',
-                          noButton: 'I CHANGED MY MIND',
+                          title: 'Вы уверены, что хотите продолжить?',
+                          subtitle: 'После удаления записи она больше не будет доступна.',
+                          yesButton: 'УДАЛИТЬ ЗАПИСЬ',
+                          noButton: 'Я ПЕРЕДУМАЛ',
                           yesOnTap: () async => await profileCreationProvider.deletePost(
                             widget.model.id ?? 0,
                             ((model) async {
                               if(model?.status == true) {
-                                await catalogProvider.gettingPostsOfCommunity(catalogProvider.selectedCommunity.id ?? 0);
+                                await catalogProvider.gettingPostsOfCommunity(catalogProvider.communityProfileModel?.id ?? 0);
                               }
                               await Navigator.maybePop(tabBarProvider.mainContext).whenComplete(() => messageDialogsProvider.informationWindow(
                                 context: tabBarProvider.mainContext,
                                 title: model?.status == true ?
-                                'The post was successfully deleted' :
-                                model?.message ?? 'Something went wrong',
-                                textButton: 'Close',
+                                'Пост успешно удален' :
+                                model?.message ?? 'Что-то пошло не так',
+                                textButton: 'Закрыть',
                               ));
                             }),
                           ),
@@ -729,22 +730,22 @@ class _PostCardState extends State<PostCard> {
                   child: GestureDetector(
                     onTap: () async => await messageDialogsProvider.theSelectionWindow(
                         context: context,
-                        title: 'Are you sure you want to proceed?',
-                        subtitle: 'After deleting the record, it will no longer\nbe accessible.',
-                        yesButton: 'DELETE RECORD',
-                        noButton: 'I CHANGED MY MIND',
+                        title: 'Вы уверены, что хотите продолжить?',
+                        subtitle: 'После удаления записи она больше не будет доступна.',
+                        yesButton: 'УДАЛИТЬ ЗАПИСЬ',
+                        noButton: 'Я ПЕРЕДУМАЛ',
                         yesOnTap: () async => await profileCreationProvider.deletePost(
                           widget.model.id ?? 0,
                           ((model) async {
                             if(model?.status == true) {
-                              await catalogProvider.gettingPostsOfCommunity(catalogProvider.selectedCommunity.id ?? 0);
+                              await catalogProvider.gettingPostsOfCommunity(catalogProvider.communityProfileModel?.id ?? 0);
                             }
                             await Navigator.maybePop(tabBarProvider.mainContext).whenComplete(() => messageDialogsProvider.informationWindow(
                               context: tabBarProvider.mainContext,
                               title: model?.status == true ?
-                              'The post was successfully deleted' :
-                              model?.message ?? 'Something went wrong',
-                              textButton: 'Close',
+                              'Пост успешно удален' :
+                              model?.message ?? 'Что-то пошло не так',
+                              textButton: 'Закрыть',
                             ));
                           }),
                         ),
@@ -809,6 +810,7 @@ class BoardTypePopupMenuItem extends PopupMenuEntry {
     required this.title,
     required this.image,
     required this.weight,
+    this.style,
   });
 
   final void Function()? onTap;
@@ -818,6 +820,8 @@ class BoardTypePopupMenuItem extends PopupMenuEntry {
   final Widget image;
 
   final double weight;
+
+  final TextStyle? style;
 
   @override
   double get height => 5.6.h;
@@ -838,29 +842,32 @@ class _BoardTypePopupMenuItemState
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: SizedBox(
-        height: widget.height,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 3.8.w,
-            ),
-            widget.image,
-            SizedBox(
-              width: widget.weight,
-            ),
-            Text(
-              widget.title,
-              style: TextStyle(
-                color: const Color.fromRGBO(51, 51, 51, 1),
-                fontFamily: ConstantsFonts.latoBold,
-                fontSize: 10.5.sp,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: widget.onTap,
+        child: SizedBox(
+          height: widget.height,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 3.8.w,
               ),
-            ),
-          ],
+              widget.image,
+              SizedBox(
+                width: widget.weight,
+              ),
+              Text(
+                widget.title,
+                style: widget.style ?? TextStyle(
+                  color: const Color.fromRGBO(51, 51, 51, 1),
+                  fontFamily: ConstantsFonts.latoBold,
+                  fontSize: 10.5.sp,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
