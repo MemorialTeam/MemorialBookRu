@@ -1,14 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/screens/main_flow/some_selected_screens/selected_community_screen.dart';
 import 'package:memorial_book/widgets/boot_engine.dart';
-import 'package:memorial_book/widgets/open_image_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../models/pet/response/get_pet_info_response_model.dart';
 import '../../../provider/account_provider.dart';
+import '../../../widgets/grid_gallery_widget.dart';
 import '../../../widgets/memorial_app_bar.dart';
 import '../../../widgets/platform_scroll_physics.dart';
 import '../../../widgets/skeleton_loader_widget.dart';
@@ -143,52 +142,10 @@ class _SelectedPetScreenState extends State<SelectedPetScreen> {
                         SizedBox(
                           height: 1.6.h,
                         ),
-                        modelData?.pet?.gallery != null && modelData!.pet!.gallery!.isNotEmpty ?
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 0.2.h,
-                            crossAxisSpacing: 0.2.h,
-                          ),
-                          itemCount: modelData.pet?.gallery?.length ?? 0,
-                          itemBuilder: (BuildContext context, int index) {
-                            return OpenImage(
-                              initialIndex: index,
-                              disposeLevel: DisposeLevel.High,
-                              dataImage: modelData.pet?.gallery ?? [],
-                              child: CachedNetworkImage(
-                                imageUrl: modelData.pet?.gallery?[index] ?? '',
-                                progressIndicatorBuilder: (context, url, downloadProgress) => SkeletonLoaderWidget(
-                                  height: 28.h,
-                                  width: double.infinity,
-                                  borderRadius: 0,
-                                ),
-                                errorWidget: (context, url, error) => Center(
-                                  child: Text(
-                                    'ERROR',
-                                    style: TextStyle(
-                                      fontSize: 13.sp,
-                                    ),
-                                  ),
-                                ),
-                                imageBuilder: (context, imageProvider) {
-                                  return Container(
-                                    height: 28.h,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ) :
-                        const SizedBox(),
+                        GridGalleryWidget(
+                          images: modelData?.pet?.gallery ?? [],
+                          title: modelData?.pet?.name ?? '',
+                        ),
                       ],
                     ),
                   ),

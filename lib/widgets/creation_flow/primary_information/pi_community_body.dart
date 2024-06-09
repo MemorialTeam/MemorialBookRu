@@ -4,7 +4,6 @@ import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/widgets/creation_body_widget.dart';
 import 'package:memorial_book/widgets/creation_flow/required_text.dart';
 import 'package:memorial_book/widgets/social_links_adder_widget.dart';
-import 'package:memorial_book/widgets/text_button_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../provider/profile_creation_provider.dart';
@@ -23,61 +22,40 @@ class PICommunityBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const RequiredText(
-                text: 'Name:',
+                text: 'Название:',
               ),
               SizedBox(
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.communitiesNameController,
-                hintText: 'Name',
+                hintText: 'Название',
               ),
-              /// SOON
-              // SizedBox(
-              //   height: 3.6.h,
-              // ),
-              // Text(
-              //   'Name in Latin:',
-              //   style: TextStyle(
-              //     color: Colors.grey.shade500,
-              //     fontWeight: FontWeight.w400,
-              //     fontSize: 9.5.sp,
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 0.5.h,
-              // ),
-              // TextFieldProfileWidget(
-              //   controller: profileCreationProvider.communitiesNameInLatinController,
-              //   hintText: profileCreationProvider.communitiesNameController.text.isEmpty ?
-              //   'Name in Latin' :
-              //   profileCreationProvider.communitiesNameController.text,
-              // ),
               SizedBox(
                 height: 3.6.h,
               ),
               const RequiredText(
-                text: 'Signature:',
+                text: 'Подпись:',
               ),
               SizedBox(
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.communitiesSignatureController,
-                hintText: 'Signature',
+                hintText: 'Подпись',
               ),
               SizedBox(
                 height: 3.6.h,
               ),
               const RequiredText(
-                text: 'Location:',
+                text: 'Местоположение:',
               ),
               SizedBox(
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.communitiesLocationController,
-                hintText: 'Location',
+                hintText: 'Местоположение',
                 minLines: 1,
                 maxLines: 1,
               ),
@@ -107,19 +85,20 @@ class PICommunityBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               const RequiredText(
-                text: 'Phone number:',
+                text: 'Номер телефона:',
               ),
               SizedBox(
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.communitiesPhoneNumberController,
-                hintText: 'Phone number',
+                hintText: 'Номер телефона',
                 minLines: 1,
                 maxLines: 1,
                 inputFormatters: [
                   MaskedInputFormatter(
-                    '+###############',
+                    '+# (###) ###-##-##',
+                    allowedCharMatcher: RegExp(r'[0-9]'),
                   ),
                 ],
                 keyboardType: TextInputType.number,
@@ -128,7 +107,7 @@ class PICommunityBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               Text(
-                'Website:',
+                'Сайт:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(
@@ -136,7 +115,7 @@ class PICommunityBody extends StatelessWidget {
               ),
               TextFieldProfileWidget(
                 controller: profileCreationProvider.websiteController,
-                hintText: 'Website',
+                hintText: 'Сайт',
                 minLines: 1,
                 maxLines: 1,
               ),

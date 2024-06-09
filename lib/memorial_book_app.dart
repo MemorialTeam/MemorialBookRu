@@ -1,4 +1,5 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:memorial_book/provider/account_provider.dart';
 import 'package:memorial_book/provider/auth_provider.dart';
 import 'package:memorial_book/provider/catalog_provider.dart';
@@ -69,6 +70,13 @@ class _MemorialBookAppState extends State<MemorialBookApp> with WidgetsBindingOb
         builder: (context, orientation, deviceType) {
           return MaterialApp(
             localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('ru'),
+              Locale('en'),
             ],
             theme: ThemeData(
               useMaterial3: true,

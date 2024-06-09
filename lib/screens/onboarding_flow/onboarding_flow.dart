@@ -1,9 +1,11 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/test_data.dart';
 import 'package:memorial_book/widgets/animation/animated_fade_out_in.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
+import 'package:memorial_book/widgets/main_button.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../models/common/onboarding_part_model.dart';
@@ -139,29 +141,29 @@ class OnboardingFlow extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(
-                          height: 2.5.h,
+                          height: 2.8.h,
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 6.6.w,
-                          ),
-                          child: AnimatedFadeOutIn<String>(
-                            data: onboardingsDataList.description,
-                            initialData: onboardingsDataList.description,
-                            duration: animationSpeed,
-                            builder: (value) => Text(
-                              value,
-                              style: TextStyle(
-                                fontSize: 12.2.sp,
-                                height: 1.2.sp,
-                                fontFamily: ConstantsFonts.latoRegular,
-                                color: const Color.fromRGBO(32, 30, 31, 0.7),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                            ),
+                            child: AnimatedFadeOutIn<String>(
+                              data: onboardingsDataList.description,
+                              initialData: onboardingsDataList.description,
+                              duration: animationSpeed,
+                              builder: (value) => AutoSizeText(
+                                value,
+                                group: AutoSizeGroup(),
+                                style: TextStyle(
+                                  fontSize: 12.2.sp,
+                                  height: 1.2.sp,
+                                  fontFamily: ConstantsFonts.latoRegular,
+                                  color: const Color.fromRGBO(32, 30, 31, 0.7),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 5.2.h,
                         ),
                       ],
                     ),
@@ -192,7 +194,9 @@ class OnboardingFlow extends StatelessWidget {
                           ),
                           child: Center(
                             child: AnimatedFadeOutIn<String>(
-                              duration: animationSpeed,
+                              duration: const Duration(
+                                milliseconds: 150,
+                              ),
                               data: onboardingsDataList.title,
                               initialData: onboardingsDataList.title,
                               builder: (value) => Text(
@@ -227,46 +231,27 @@ class OnboardingFlow extends StatelessWidget {
                 child: onboardingIndicatorProvider.currentPage == 4 ?
                 Padding(
                   padding: EdgeInsets.only(
-                    bottom: 3.4.h,
+                    bottom: 4.h,
+                    right: 4.w,
+                    left: 4.w,
                   ),
-                  child: PunchingAnimation(
-                    child: Container(
-                      height: 7.h,
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 3.4.w,
-                      ),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(23, 94, 217, 1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        child: InkWell(
-                          onTap: () async {
-                            authProvider.setOldUser();
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => const LoginScreen(),
-                              ),
-                                  (context) => false,
-                            );
-                          },
-                          child: Center(
-                            child: Text(
-                              'Продолжить',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MainButton(
+                        text: 'Продолжить',
+                        onTap: () async {
+                          authProvider.setOldUser();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => const LoginScreen(),
                             ),
-                          ),
-                        ),
+                                (context) => false,
+                          );
+                        },
                       ),
-                    ),
+                    ],
                   ),
                 ) :
                 Padding(

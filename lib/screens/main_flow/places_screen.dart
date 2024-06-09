@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/screens/flow_build.dart';
 import 'package:memorial_book/screens/loading_screens/map_loading_screen.dart';
-import 'package:memorial_book/screens/main_flow/filter_people_screen.dart';
+import 'package:memorial_book/screens/main_flow/filter_place_screen.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
@@ -79,9 +79,7 @@ class PlacesScreen extends StatelessWidget {
                 searchController: catalogProvider.placesController,
                 filterCount: catalogProvider.countEnabledParameters(MapFlowType.places).toString(),
                 context: tabBarProvider.mainContext,
-                filterRoute: const FilterScreen(
-                  filterCheckFlow: MapFlowType.places,
-                ),
+                filterRoute: const FilterPlaceScreen(),
                 total: catalogProvider.mapPlacesTotal,
                 dataList: catalogProvider.places!,
               ),

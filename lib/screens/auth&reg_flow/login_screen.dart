@@ -104,8 +104,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (_formKey.currentState!.validate()) {
                     await authProvider.signIn(
                       context,
-                      emailController.text,
-                      passController.text,
+                      'p4elka872209@gmail.com',
+                      'Vvadik28',
+                      // emailController.text,
+                      // passController.text,
                     );
                     tabBarProvider.tabBarDispose();
                   }

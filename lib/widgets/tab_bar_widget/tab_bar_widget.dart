@@ -1,5 +1,5 @@
-import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:sizer/sizer.dart';
+import '../../helpers/enums.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/tab_bar_provider.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +35,7 @@ class TabBarWidgetState extends State<TabBarWidget> with SingleTickerProviderSta
   @override
   Widget build(BuildContext context) {
     final tabBarProvider = Provider.of<TabBarProvider>(context);
-    final _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     return WillPopScope(
       onWillPop: tabBarProvider.onWillPop,
       child: Scaffold(
@@ -83,9 +83,9 @@ class TabBarWidgetState extends State<TabBarWidget> with SingleTickerProviderSta
                     currentTab: tabBarProvider.currentTab,
                     onSelectTab: (tabItem) {
                       tabBarProvider.selectTab(tabItem);
-                      if(_authProvider.userRules == 'guest') {
+                      if(authProvider.userRules == 'guest') {
                         if(tabItem == TabItem.account) {
-                          _authProvider.logoutGuest(context);
+                          authProvider.logoutGuest(context);
                           // _tabController.animateTo(tabItem);
                         }
                       }

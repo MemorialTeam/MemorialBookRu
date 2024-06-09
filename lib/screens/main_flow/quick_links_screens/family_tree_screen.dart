@@ -14,6 +14,7 @@ import 'package:memorial_book/widgets/search_engine.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import '../../../helpers/enums.dart';
 import '../../../provider/profile_creation_provider.dart';
 import '../some_selected_screens/selected_people_screen.dart';
 import '../some_selected_screens/selected_pet_screen.dart';
@@ -95,23 +96,22 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
                                 final dataList = accountProvider.createdHumanModel!.data![index];
-                                final String? firstName = dataList.firstName == '' || dataList.firstName == null ?
+                                final String firstName = dataList.firstName == '' || dataList.firstName == null ?
                                 '' :
                                 '${dataList.firstName} ';
-                                final String? middleName = dataList.middleName == '' || dataList.middleName == null ?
+                                final String middleName = dataList.middleName == '' || dataList.middleName == null ?
                                 '' :
                                 '${dataList.middleName} ';
-                                final String? lastName = dataList.lastName == '' || dataList.lastName == null ?
+                                final String lastName = dataList.lastName == '' || dataList.lastName == null ?
                                 '' :
-                                '${dataList.lastName}';
+                                '${dataList.lastName} ';
                                 WidgetsBinding.instance.addPostFrameCallback((_){
-                                  if(accountProvider.createdHumanPageNumber != accountProvider.createdHumanLastPageNumber &&
+                                  if(accountProvider.createdHumanPageNumber != null &&
                                       index == accountProvider.createdHumanModel!.data!.length - 1 &&
                                       accountProvider.createdHumanPaginationLoading == false) {
                                     accountProvider.paginationCreatedHumans();
                                   }
                                 });
-
                                 return HorizontalMiniCardWidget(
                                   onTap: () => Navigator.push(
                                     context,
@@ -122,8 +122,10 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                                       ),
                                     ),
                                   ),
+                                  isVerified: dataList.isCelebrity,
+                                  status: dataList.status,
                                   avatar: dataList.avatar,
-                                  title: firstName! + middleName! + lastName!,
+                                  title: lastName+ firstName+ middleName,
                                   subtitle: '${dataList.dateBirth} - ${dataList.dateDeath}',
                                 );
                               },
@@ -137,7 +139,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                               itemCount: accountProvider.createdHumanModel!.data!.length,
                             ) :
                             const MemorialBookIconWidget(
-                              title: 'Oops...\nWe didn\'t find anything',
+                              title: 'У-пс...\nМы ничего не нашли',
                             )
                           ],
                         ),
@@ -195,7 +197,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                               itemBuilder: (context, index) {
                                 final dataList = accountProvider.createdPetsModel!.data![index];
                                 WidgetsBinding.instance.addPostFrameCallback((_){
-                                  if(accountProvider.createdPetPageNumber != accountProvider.createdPetLastPageNumber &&
+                                  if(accountProvider.createdPetPageNumber != null &&
                                       index == accountProvider.createdPetsModel!.data!.length - 1 &&
                                       accountProvider.createdPetPaginationLoading == false) {
                                     accountProvider.paginationCreatedHumans();
@@ -211,6 +213,8 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                                       ),
                                     ),
                                   ),
+                                  isVerified: dataList.isCelebrity,
+                                  status: dataList.status,
                                   avatar: dataList.avatar,
                                   title: dataList.name ?? '',
                                   subtitle: '${dataList.yearBirth} - ${dataList.yearDeath}',
@@ -226,7 +230,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                               itemCount: accountProvider.createdPetsModel!.data!.length,
                             ) :
                             const MemorialBookIconWidget(
-                              title: 'Oops...\nWe didn\'t find anything',
+                              title: 'У-пс...\nМы ничего не нашли',
                             ),
                           ],
                         ),

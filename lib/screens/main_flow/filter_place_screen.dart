@@ -1,4 +1,3 @@
-import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/widgets/main_button.dart';
 import '../../widgets/platform_scroll_physics.dart';
@@ -9,34 +8,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-class FilterPeopleScreen extends StatefulWidget {
-  const FilterPeopleScreen({
+class FilterPlaceScreen extends StatelessWidget {
+  const FilterPlaceScreen({
     Key? key,
   }) : super(key: key);
-
-  @override
-  State<FilterPeopleScreen> createState() => _FilterPeopleScreenState();
-}
-
-class _FilterPeopleScreenState extends State<FilterPeopleScreen> {
-
-  late CatalogProvider provider;
-
-  @override
-  void initState() {
-    provider = Provider.of<CatalogProvider>(
-      context,
-      listen: false,
-    );
-    provider.peopleController.addListener(() => provider.updateState());
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    provider.peopleController.removeListener(() => provider.updateState());
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +50,7 @@ class _FilterPeopleScreenState extends State<FilterPeopleScreen> {
                 height: 3.h,
               ),
               Text(
-                'Полное имя:',
+                'Название:',
                 style: TextStyle(
                   color: const Color.fromRGBO(32, 30, 31, 0.5),
                   fontFamily: ConstantsFonts.latoRegular,
@@ -86,183 +61,14 @@ class _FilterPeopleScreenState extends State<FilterPeopleScreen> {
                 height: 0.5.h,
               ),
               TextFieldProfileWidget(
-                controller: catalogProvider.peopleController,
-              ),
-              SizedBox(
-                height: 2.0.h,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Год рождения:',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(32, 30, 31, 0.5),
-                            fontFamily: ConstantsFonts.latoRegular,
-                            fontSize: 9.5.sp,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 0.5.h,
-                        ),
-                        TextFieldProfileWidget(
-                          hintText: 'XXXX - XXXX г.',
-                          inputFormatters: [
-                            // FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
-                            MaskedInputFormatter('####-####'),
-                          ],
-                          keyboardType: TextInputType.number,
-                          controller: catalogProvider.birthYearController,
-                          onChanged: (String text) {
-                            catalogProvider.errorChecking();
-                          },
-                          // borderColor: catalogProvider.checkBirth == true ?
-                          // const Color.fromRGBO(250, 18, 46, 1) :
-                          // null,
-                        ),
-                        // Column(
-                        //   mainAxisSize: MainAxisSize.min,
-                        //   children: [
-                        //     SizedBox(
-                        //       height: 0.5.h,
-                        //     ),
-                        //     Row(
-                        //       mainAxisSize: MainAxisSize.min,
-                        //       children: [
-                        //         Padding(
-                        //           padding: EdgeInsets.symmetric(
-                        //             horizontal: 1.2.w,
-                        //           ),
-                        //           child: Icon(
-                        //             Icons.circle,
-                        //             size: 5.sp,
-                        //             color: catalogProvider.checkBirth == true ?
-                        //             const Color.fromRGBO(250, 18, 46, 1) :
-                        //             Colors.transparent,
-                        //           ),
-                        //         ),
-                        //         SizedBox(
-                        //           width: 38.w,
-                        //           child: Text(
-                        //             catalogProvider.errorBirthYearsText,
-                        //             style: TextStyle(
-                        //               color: const Color.fromRGBO(250, 18, 46, 1),
-                        //               fontFamily: ConstantsFonts.latoRegular,
-                        //               fontSize: 8.5.sp,
-                        //               height: 0.15.h,
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ],
-                        // ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 5.6.w,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Год смерти:',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(32, 30, 31, 0.5),
-                            fontFamily: ConstantsFonts.latoRegular,
-                            fontSize: 9.5.sp,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 0.5.h,
-                        ),
-                        TextFieldProfileWidget(
-                          hintText: 'XXXX - XXXX г.',
-                          inputFormatters: [
-                            // FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
-                            MaskedInputFormatter('#### ####'),
-                          ],
-                          keyboardType: TextInputType.number,
-                          controller: catalogProvider.deathYearController,
-                          onChanged: (String text) {
-                            catalogProvider.errorChecking();
-                          },
-                          // borderColor: catalogProvider.checkDeath == true ?
-                          // const Color.fromRGBO(250, 18, 46, 1) :
-                          // null,
-                        ),
-                        // Column(
-                        //   mainAxisSize: MainAxisSize.min,
-                        //   children: [
-                        //     SizedBox(
-                        //       height: 0.5.h,
-                        //     ),
-                        //     Row(
-                        //       mainAxisSize: MainAxisSize.min,
-                        //       children: [
-                        //         Padding(
-                        //           padding: EdgeInsets.symmetric(
-                        //             horizontal: 1.2.w,
-                        //           ),
-                        //           child: Icon(
-                        //             Icons.circle,
-                        //             size: 5.sp,
-                        //             color: catalogProvider.checkDeath == true ?
-                        //             const Color.fromRGBO(250, 18, 46, 1) :
-                        //             Colors.transparent,
-                        //           ),
-                        //         ),
-                        //         SizedBox(
-                        //           width: 38.w,
-                        //           child: Text(
-                        //             catalogProvider.errorDeathYearsText,
-                        //             style: TextStyle(
-                        //               color: const Color.fromRGBO(250, 18, 46, 1),
-                        //               fontFamily: ConstantsFonts.latoRegular,
-                        //               fontSize: 8.5.sp,
-                        //               height: 0.15.h,
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ],
-                        // ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 2.0.h,
-              ),
-              Text(
-                'Страна:',
-                style: TextStyle(
-                  color: const Color.fromRGBO(32, 30, 31, 0.5),
-                  fontFamily: ConstantsFonts.latoRegular,
-                  fontSize: 9.5.sp,
-                ),
-              ),
-              SizedBox(
-                height: 0.5.h,
-              ),
-              TextFieldProfileWidget(
-                controller: catalogProvider.countryController,
+                controller: catalogProvider.placesController,
               ),
               SizedBox(
                 height: 3.6.h,
               ),
               MainButton(
                 text: 'ПОКАЗАТЬ',
-                condition: catalogProvider.peopleController.text.isNotEmpty,
-                inactiveColor: const Color.fromRGBO(23, 94, 217, 0.5),
-                activeColor: const Color.fromRGBO(23, 94, 217, 1),
+                activeColor: const Color.fromRGBO(18, 175, 82, 1),
                 onTap: () {
                   catalogProvider.peopleSearch();
                   Navigator.pop(context);
@@ -496,10 +302,10 @@ class _FilterPeopleScreenState extends State<FilterPeopleScreen> {
           height: 6.4.h,
           width: 6.4.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50),
-            border: Border.all(
-              color: const Color.fromRGBO(229, 232, 235, 1),
-            )
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(
+                color: const Color.fromRGBO(229, 232, 235, 1),
+              )
           ),
           child: Material(
             color: Colors.transparent,

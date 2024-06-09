@@ -79,6 +79,10 @@ class CatalogProvider extends ChangeNotifier {
   final TextEditingController cemeteryController = TextEditingController();
   final TextEditingController addPeopleController = TextEditingController();
 
+  void updateState() {
+    notifyListeners();
+  }
+
   final Map<MarkerId, Marker> cemeteryMarkers = {};
   Map<MarkerId, Marker> peopleMarkers = {};
   Map<MarkerId, Marker> markersPlaces = {};
@@ -361,29 +365,46 @@ class CatalogProvider extends ChangeNotifier {
   }
 
   MemorialsDataResponseModel? memorialDataModel;
+  MemorialsDataResponseModel? allMemorialsDataModel;
   bool memorialPaginationLoading = false;
   int memorialPageNumber = 1;
   int memorialLastPageNumber = 1;
 
   Future gettingMemorialsOfCommunity(int id, ValueSetter<GettingMemorialsOfCommunityResponseModel?> completion) async {
-    memorialPageNumber = 1;
-    memorialLastPageNumber = 1;
     memorialDataModel = null;
     notifyListeners();
-    await service.gettingMemorialsOfCommunityRequest(id, memorialPageNumber, (response) {
+    await service.gettingMemorialsOfCommunityRequest(id, 1, (response) {
       mapper.gettingMemorialsOfCommunityResponse(response, (model) {
         print(response?.body);
         if(model != null) {
           if (model.status == true) {
             if (model.posts?.data != null) {
               memorialDataModel = model.posts;
-              memorialLastPageNumber = model.posts?.lastPage ?? 0;
               notifyListeners();
             }
           }
           completion(model);
         } else {
           completion(null);
+        }
+      });
+    });
+  }
+  Future getAllMemorialsOfCommunity(int id) async {
+    memorialPageNumber = 1;
+    memorialLastPageNumber = 1;
+    allMemorialsDataModel = null;
+    await service.gettingMemorialsOfCommunityRequest(id, memorialPageNumber, (response) {
+      mapper.gettingMemorialsOfCommunityResponse(response, (model) {
+        print(response?.body);
+        if(model != null) {
+          if (model.status == true) {
+            if (model.posts?.data != null) {
+              allMemorialsDataModel = model.posts;
+              memorialLastPageNumber = model.posts?.lastPage ?? 0;
+              notifyListeners();
+            }
+          }
         }
       });
     });
@@ -409,7 +430,7 @@ class CatalogProvider extends ChangeNotifier {
   Future paginationMemorialsOfCommunity(int id) async {
     memorialPaginationLoading = true;
     memorialPageNumber++;
-    notifyListeners();
+    // notifyListeners();
     SVProgressHUD.show();
     service.gettingMemorialsOfCommunityRequest(id, memorialPageNumber, (response) {
       SVProgressHUD.dismiss();
@@ -429,57 +450,34 @@ class CatalogProvider extends ChangeNotifier {
   }
 
   Future subscribeToTheCommunity(
-      int id,
-      BuildContext context,
-      ValueSetter<StatusResponseModel?> completion,
-      ) async {
+      int id, BuildContext context, ValueSetter<StatusResponseModel?> completion) async {
     await service.subscribeToTheCommunityRequest(id, (response) {
       mapper.statusResponse(response, (model) async {
         if(model != null) {
           if(model.status == true) {
-            await Future.delayed(
-              const Duration(
-                seconds: 1,
-              ),
-            ).whenComplete(() async {
-              await gettingPostsOfCommunity(id);
-              await gettingGuestCommunities(context, (model) {});
-            });
+            await updateCommunityProfile(id).whenComplete(() async => await gettingGuestCommunities(context, (model) {}));
           }
           completion(model);
         }
         else {
           completion(null);
         }
-        print('subscribe----${model?.status}----');
       });
     });
   }
 
-  Future unsubscribeFromTheCommunity(
-      int id,
-      BuildContext context,
-      ValueSetter<StatusResponseModel?> completion,
-      ) async {
+  Future unsubscribeFromTheCommunity(int id, BuildContext context, ValueSetter<StatusResponseModel?> completion) async {
     await service.unsubscribeFromTheCommunityRequest(id, (response) {
       mapper.statusResponse(response, (model) async {
         if(model != null) {
           if(model.status == true) {
-            await Future.delayed(
-              const Duration(
-                seconds: 1,
-              ),
-            ).whenComplete(() async {
-              await gettingPostsOfCommunity(id);
-              await gettingGuestCommunities(context, (model) {});
-            });
+            await updateCommunityProfile(id).whenComplete(() async => await gettingGuestCommunities(context, (model) {}));
           }
           completion(model);
         }
         else {
           completion(null);
         }
-        print('subscribe----${model?.status}----');
       });
     });
   }
@@ -601,25 +599,17 @@ class CatalogProvider extends ChangeNotifier {
     }
   }
 
-  Future updateCommunityProfile(
-      int id,
-      ) async {
-    try {
-      SVProgressHUD.show();
-      await service.gettingCommunitiesProfileRequest(id, (response) {
-        mapper.gettingCommunitiesProfileResponse(response, (model) async {
-          SVProgressHUD.dismiss();
-          if(model != null) {
-            if(model.status == true) {
-              communityProfileModel = model.communities!;
-              notifyListeners();
-            }
+  Future updateCommunityProfile(int id) async {
+    await service.gettingCommunitiesProfileRequest(id, (response) {
+      mapper.gettingCommunitiesProfileResponse(response, (model) async {
+        if(model != null) {
+          if(model.status == true) {
+            communityProfileModel = model.communities!;
+            notifyListeners();
           }
-        });
+        }
       });
-    } catch (error) {
-      SVProgressHUD.dismiss();
-    }
+    });
   }
 
   Future gettingGuestCommunities(
@@ -629,7 +619,6 @@ class CatalogProvider extends ChangeNotifier {
     service.gettingGuestCommunitiesRequest((response) {
       mapper.gettingGuestCommunitiesResponse(response, (model) async {
         if (model != null) {
-          print('тут${response?.body}');
           searchedCommunitiesList = model.communities ?? [];
           searchedFeaturedCommunitiesList = model.featuredCommunities ?? [];
           featuredCommunitiesList = model.featuredCommunities ?? [];
@@ -1064,7 +1053,7 @@ class CatalogProvider extends ChangeNotifier {
     await service.communityMemorialsSearchRequest(name, communityID, (response) {
       mapper.communityMemorialsSearchResponse(response, (model) {
         isMemorialsCommunitySearch = false;
-        // selectedCommunity.memorials = model?.memorialsList ?? [];
+        // communityProfileModel.memorials = model?.memorialsList ?? [];
 
         notifyListeners();
       });

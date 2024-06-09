@@ -102,7 +102,7 @@ class _ChooserWidgetState extends State<ChooserWidget> with TickerProviderStateM
                   Text(
                     widget.text != '' ?
                     widget.text :
-                    'Choose from the list',
+                    'Выберите из списка',
                     style: TextStyle(
                       color: widget.text == '' ?
                       const Color.fromRGBO(32, 30, 31, 0.5) :

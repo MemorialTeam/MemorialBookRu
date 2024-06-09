@@ -119,7 +119,6 @@ class MarketplaceAppBar extends StatelessWidget {
                               'Доставка: ${marketplaceProvider.shopModel?.shop?.name ?? 'Cemetery'}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              // 'Delivery: ${marketplaceProvider.shopModel?.shop?.name ?? 'Cemetery'}',
                               style: TextStyle(
                                 color: const Color.fromRGBO(32, 30, 31, 1),
                                 fontSize: 11.6.sp,

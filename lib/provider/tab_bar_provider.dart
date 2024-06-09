@@ -1,7 +1,7 @@
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
-import '../widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:flutter/material.dart';
 import '../helpers/constants.dart';
+import '../helpers/enums.dart';
 
 class TabBarProvider extends ChangeNotifier {
   TabItem currentTab = TabItem.home;
@@ -24,8 +24,6 @@ class TabBarProvider extends ChangeNotifier {
         return 3;
       case TabItem.account:
         return 4;
-      case TabItem.marketplace:
-        return 5;
     }
   }
 

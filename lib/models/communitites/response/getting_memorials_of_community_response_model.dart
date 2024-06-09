@@ -36,7 +36,7 @@ class MemorialsDataResponseModel {
     data = List.of(json['data']).map(
       ((index) => MemorialResponseModel.fromJson(index)),
     ).toList();
-    lastPage = json['meta']['last_page'];
+    lastPage = json['meta']['to'];
   }
 }
 

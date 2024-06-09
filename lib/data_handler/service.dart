@@ -201,7 +201,7 @@ class Service {
   }
 
   Future gettingCreatedHumansProfilesRequest(
-      int page,
+      String? link,
       ValueSetter<Response?> completion,
       ) async {
     final storage = await SharedPreferences.getInstance();
@@ -213,7 +213,7 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-    String endpoint = 'user/profiles/humans?page=$page';
+    String endpoint = link ?? '';
 
     await APIManager().getRequest(
       endpoint,
@@ -400,7 +400,7 @@ class Service {
   }
 
   Future gettingCreatedPetsProfilesRequest(
-      int page,
+      String? link,
       ValueSetter<Response?> completion,
       ) async {
     final storage = await SharedPreferences.getInstance();
@@ -412,7 +412,7 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-    String endpoint = 'user/profiles/pets?page=$page';
+    String endpoint = link ?? '';
 
     await APIManager().getRequest(
       endpoint,
@@ -967,7 +967,7 @@ class Service {
     );
   }
 
-  void gettingPetProfileRequest(
+  Future gettingPetProfileRequest(
       int id,
       ValueSetter<Response?> completion,
       ) async {
@@ -980,9 +980,34 @@ class Service {
       'Authorization': 'Bearer $token',
     };
 
-    print(token);
-
     String endpoint = ConstEndpoints.gettingPetProfile + id.toString();
+
+    APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future getUserEventsRequest(
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = ConstEndpoints.getUserEvents;
 
     APIManager().getRequest(
       endpoint,
@@ -1485,7 +1510,7 @@ class Service {
     );
   }
 
-  void creatingProfileRequest(
+  Future creatingProfileRequest(
       File? avatar,
       File? banner,
       File? deathCertificate,
@@ -1514,13 +1539,9 @@ class Service {
      'birth_place': model.birthPlace,
      'description': model.description,
      'access': model.access.toLowerCase(),
-     // 'burial_place': model.burialPlace ?? '',
      'burial_coords[lat]': model.coords.lat.toString(),
      'burial_coords[lng]': model.coords.lng.toString(),
      'as_draft': model.asDraft,
-     'father_id': model.fatherID ?? '',
-     'mother_id': model.motherID ?? '',
-     'spouse_id': model.spouseID ?? '',
     };
 
     if(model.religion != null && model.religion != 0) {
@@ -1535,11 +1556,9 @@ class Service {
       });
     }
 
-   print(body);
-
    String endpoint = ConstEndpoints.creatingProfile;
 
-    APIManager().multiPartRequestForProfile(
+    await APIManager().multiPartRequestForProfile(
       avatar,
       banner,
       deathCertificate,
@@ -1582,8 +1601,6 @@ class Service {
       'date_death': model.dateDeath,
       'death_reason': model.deathReason,
       'birth_place': model.birthPlace,
-      // 'burial_place': model.burialPlace ?? '',
-      'owner_id': model.ownerID ?? '',
       'description': model.description,
       'access': model.access.toLowerCase(),
       'as_draft': model.asDraft,
@@ -1661,7 +1678,7 @@ class Service {
     );
   }
 
-  void creatingCommunityRequest(
+  Future creatingCommunityRequest(
       CreatingCommunityProfileRequestModel model,
       ValueSetter<StreamedResponse?> completion,
       ) async {
@@ -1687,17 +1704,14 @@ class Service {
     int i = 0;
     if(model.socialLinks.isNotEmpty) {
       for (String element in model.socialLinks) {
-        print(i);
         i++;
         body['social_links[internet$i]'] = element;
       }
     }
 
-    print(body);
-
     String endpoint = ConstEndpoints.creatingCommunity;
 
-    APIManager().multiPartRequestForProfile(
+    await APIManager().multiPartRequestForProfile(
       model.avatar,
       model.banner,
       null,

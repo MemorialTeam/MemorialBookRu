@@ -27,7 +27,8 @@ class _CategoryFlowState extends State<CategoryFlow> {
           borderRadius: 10,
         ),
       );
-    } else if(marketplaceProvider.productsMainModel?.productsData != null && marketplaceProvider.productsMainModel!.productsData!.isNotEmpty) {
+    }
+    else if(marketplaceProvider.productsMainModel?.productsData != null && marketplaceProvider.productsMainModel!.productsData!.isNotEmpty) {
       return Expanded(
         child: CategoryCard(
           height: 24.h,

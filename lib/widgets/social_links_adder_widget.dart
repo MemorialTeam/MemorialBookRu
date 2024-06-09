@@ -37,7 +37,7 @@ class _SocialLinksAdderWidgetState extends State<SocialLinksAdderWidget> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Social link',
+                    'Соц. ссылка:',
                     style: TextStyle(
                       fontSize: 10.sp,
                       fontFamily: ConstantsFonts.latoRegular,
@@ -53,7 +53,7 @@ class _SocialLinksAdderWidgetState extends State<SocialLinksAdderWidget> {
                       Expanded(
                         child: TextFieldProfileWidget(
                           controller: widget.dataList[index],
-                          hintText: 'link',
+                          hintText: 'Ссылка',
                           minLines: 1,
                           maxLines: 1,
                         ),
@@ -83,7 +83,7 @@ class _SocialLinksAdderWidgetState extends State<SocialLinksAdderWidget> {
           height: 0.5.h,
         ),
         TextButtonWidget(
-          text: '+  Add social link',
+          text: '+  Добавить соц. ссылку',
           textStyle: TextStyle(
             fontFamily: ConstantsFonts.latoSemiBold,
             fontSize: 11.5.sp,

@@ -1,4 +1,5 @@
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
+import '../../common/links_reponse_model.dart';
 import 'created_pet_profile_response_model.dart';
 
 class GettingCreatedPetsProfilesResponseModel {
@@ -18,11 +19,11 @@ class GettingCreatedPetsProfilesResponseModel {
 
 class CreatedPetsDataResponseModel {
   List<CreatedPetProfileResponseModel>? data;
-  int? lastPage;
+  LinksResponseModel? links;
 
   CreatedPetsDataResponseModel({
     required this.data,
-    required this.lastPage,
+    required this.links,
   });
 
   CreatedPetsDataResponseModel.fromJson(Map<String, dynamic> json) {
@@ -30,7 +31,7 @@ class CreatedPetsDataResponseModel {
       data = List.of(json['data']).map(
         ((index) => CreatedPetProfileResponseModel.fromJson(index)),
       ).toList();
-      lastPage = json['meta']['last_page'];
+      links = LinksResponseModel.fromJson(json['links']);
     } catch(error) {
       print('$error');
       SVProgressHUD.dismiss();

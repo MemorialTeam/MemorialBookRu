@@ -482,7 +482,7 @@ class _SelectedPeopleScreenState extends State<SelectedPeopleScreen> {
                             color: const Color.fromRGBO(32, 30, 31, 0.8),
                             fontSize: 11.5.sp,
                             fontFamily: ConstantsFonts.latoRegular,
-                            height: 1.sp,
+                            height: 1.2.sp,
                           ),
                         ),
                       ),

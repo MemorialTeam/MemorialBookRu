@@ -1,6 +1,8 @@
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
 import 'package:memorial_book/models/people/response/created_human_profile_response_model.dart';
 
+import '../../common/links_reponse_model.dart';
+
 class GettingCreatedHumansProfilesResponseModel {
   bool? status;
   CreatedHumansDataResponseModel? humans;
@@ -23,11 +25,11 @@ class GettingCreatedHumansProfilesResponseModel {
 
 class CreatedHumansDataResponseModel {
   List<CreatedHumanProfileResponseModel>? data;
-  int? lastPage;
+  LinksResponseModel? links;
 
   CreatedHumansDataResponseModel({
     required this.data,
-    required this.lastPage,
+    required this.links,
   });
 
   CreatedHumansDataResponseModel.fromJson(Map<String, dynamic> json) {
@@ -35,7 +37,7 @@ class CreatedHumansDataResponseModel {
       data = List.of(json['data']).map(
         ((index) => CreatedHumanProfileResponseModel.fromJson(index)),
       ).toList();
-      lastPage = json['meta']['last_page'];
+      links = LinksResponseModel.fromJson(json['links']);
     } catch(error) {
       print('$error');
       SVProgressHUD.dismiss();

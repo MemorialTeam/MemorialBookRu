@@ -11,10 +11,10 @@ import 'package:memorial_book/widgets/account_widgets/quick_link_widget.dart';
 import 'package:memorial_book/widgets/element_selection/popupAlertWidget.dart';
 import 'package:memorial_book/widgets/main_button.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
-import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
+import '../../helpers/enums.dart';
 import '../../provider/account_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/tab_bar_provider.dart';
@@ -34,23 +34,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    final _accountProvider = Provider.of<AccountProvider>(
+    final accountProvider = Provider.of<AccountProvider>(
       context,
       listen: false,
     );
-    final _authProvider = Provider.of<AuthProvider>(
+    final authProvider = Provider.of<AuthProvider>(
       context,
       listen: false,
     );
-    if(_authProvider.userRules == 'authorized') {
-      _accountProvider.getUserInfo(context);
-
-      timer = Timer.periodic(
-        const Duration(
-          seconds: 10,
-        ),
-        ((timer) => _accountProvider.getUserInfo(context)),
-      );
+    if(authProvider.userRules == 'authorized') {
+      accountProvider.getUserInfo(context);
     }
     super.initState();
   }
@@ -568,9 +561,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           QuickLinkWidget(
                             isActive: true,
                             title: 'Сообщества',
-                            onTap: () {
-                              tabBarProvider.selectTab(TabItem.communities);
-                            },
+                            onTap: () => tabBarProvider.selectTab(TabItem.communities),
                             image: Image.asset(
                               ConstantsAssets.communitiesLinkImage,
                               width: 8.9.w,

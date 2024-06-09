@@ -7,6 +7,7 @@ import 'package:memorial_book/widgets/main_button.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
+import '../../helpers/enums.dart';
 import '../../provider/profile_creation_provider.dart';
 import '../../widgets/creation_flow/primary_information/pi_community_body.dart';
 import '../../widgets/platform_scroll_physics.dart';
@@ -232,6 +233,11 @@ class _PrimaryInformationScreenState extends State<PrimaryInformationScreen> {
                       horizontal: 15.w,
                     ),
                     text: 'ПРОДОЛЖИТЬ',
+                    textStyle: TextStyle(
+                      fontSize: 9.5.sp,
+                      color: const Color.fromRGBO(255, 255, 255, 1),
+                      fontFamily: ConstantsFonts.latoBold,
+                    ),
                     onTap: (() {
                       profileCreationProvider.pageController.nextPage(
                         duration: const Duration(
@@ -242,48 +248,8 @@ class _PrimaryInformationScreenState extends State<PrimaryInformationScreen> {
                     }),
                     condition: profileCreationProvider.primaryInfoCheck(widget.checkFlow),
                   ),
-                  // Container(
-                  //   height: 6.h,
-                  //   margin: EdgeInsets.symmetric(
-                  //     vertical: 2.2.h,
-                  //     horizontal: 20.w,
-                  //   ),
-                  //   width: double.infinity,
-                  //   decoration: BoxDecoration(
-                  //     borderRadius: BorderRadius.circular(7),
-                  //     color: profileCreationProvider.primaryInfoCheck(widget.checkFlow) != true ?
-                  //     const Color.fromRGBO(23, 94, 217, 0.5) :
-                  //     const Color.fromRGBO(23, 94, 217, 1),
-                  //   ),
-                  //   child: Material(
-                  //     color: Colors.transparent,
-                  //     child: InkWell(
-                  //       borderRadius: BorderRadius.circular(7),
-                  //       onTap: profileCreationProvider.primaryInfoCheck(widget.checkFlow) != true ?
-                  //       null :
-                  //       (() {
-                  //         profileCreationProvider.pageController.nextPage(
-                  //           duration: const Duration(
-                  //             milliseconds: 500,
-                  //           ),
-                  //           curve: Curves.ease,
-                  //         );
-                  //       }),
-                  //       child: Center(
-                  //         child: Text(
-                  //           'CONTINUE',
-                  //           style: TextStyle(
-                  //             color: Colors.white,
-                  //             fontFamily: ConstantsFonts.latoRegular,
-                  //             fontSize: 10.5.sp,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   SizedBox(
-                    height: 1.6.h,
+                    height: 1.2.h,
                   ),
                 ],
               ),

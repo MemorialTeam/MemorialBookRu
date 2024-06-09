@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../widgets/memorial_app_bar.dart';
 import '../../../helpers/constants.dart';
+import '../../../helpers/enums.dart';
 import '../../../provider/catalog_provider.dart';
 import '../../../widgets/cards/vertical_card_widget.dart';
 import '../../../widgets/full_screen_gallery.dart';
@@ -86,7 +87,7 @@ class _SelectedCemeteryScreenState extends State<SelectedCemeteryScreen> {
           style: TextStyle(
             color: Colors.white,
             fontFamily: ConstantsFonts.latoRegular,
-            fontSize: 12.sp,
+            fontSize: 9.5.sp,
           ),
         ) :
         SizedBox(

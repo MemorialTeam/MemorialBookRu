@@ -4,24 +4,21 @@ import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/provider/catalog_provider.dart';
 import 'package:memorial_book/screens/main_flow/adding_profiles_in_memorial_screen.dart';
 import 'package:memorial_book/screens/main_flow/all_profiles_screen.dart';
-import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/link_widget.dart';
 import 'package:memorial_book/widgets/main_button.dart';
+import 'package:memorial_book/widgets/memorial_book_icon_widget.dart';
 import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/search_engine.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../helpers/constants.dart';
+import '../helpers/enums.dart';
 import '../models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import '../screens/main_flow/some_selected_screens/selected_people_screen.dart';
 import 'animation/animated_fade_out_in.dart';
 import 'switch_bar_items/cemetery_contacts.dart';
 import 'cards/horizontal_mini_card_widget.dart';
 
-enum CommunityOrCemeterySwitch {
-  cemetery,
-  community,
-}
 class SwitchBarWidget extends StatefulWidget {
   const SwitchBarWidget({
     Key? key,
@@ -188,6 +185,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
             ),
           ),
         ),
+        if(selectedCommunityModel?.isAdmin == true)
         Visibility(
           visible: value == 1,
           maintainState: true,
@@ -335,41 +333,25 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                     SizedBox(
                       height: 1.h,
                     ),
-                    PunchingAnimation(
-                      child: Container(
-                        height: 6.4.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(7),
-                          color: const Color.fromRGBO(245, 247, 249, 1),
-                          border: Border.all(
-                            color: const Color.fromRGBO(23, 94, 217, 1),
+                    MainButton(
+                      text: 'ПОКАЗАТЬ БОЛЬШЕ',
+                      onTap: () async => await Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => AllProfilesScreen(
+                            communityId: selectedCommunityModel?.id ?? 0,
+                            model: selectedCommunityModel,
                           ),
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () async => await Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => AllProfilesScreen(
-                                  communityId: selectedCommunityModel?.id ?? 0,
-                                ),
-                              ),
-                            ),
-                            borderRadius: BorderRadius.circular(7),
-                            child: Center(
-                              child: Text(
-                                'ПОКАЗАТЬ БОЛЬШЕ',
-                                style: TextStyle(
-                                  color: const Color.fromRGBO(23, 94, 217, 1),
-                                  fontFamily: ConstantsFonts.latoBold,
-                                  fontSize: 10.5.sp,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                      ),
+                      border: Border.all(
+                        color: const Color.fromRGBO(23, 94, 217, 1),
+                      ),
+                      activeColor: const Color.fromRGBO(245, 247, 249, 1),
+                      textStyle: TextStyle(
+                        color: const Color.fromRGBO(23, 94, 217, 1),
+                        fontFamily: ConstantsFonts.latoBold,
+                        fontSize: 9.5.sp,
                       ),
                     ),
                   ],
@@ -415,6 +397,183 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                   ],
                 ),
               ),
+            ),
+          ),
+        )
+        else Visibility(
+          visible: value == 1,
+          maintainState: true,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 3.6.w,
+            ),
+            child: memorialModel != null && memorialModel.data!.isNotEmpty ?
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SearchEngine(
+                  focusNode: communityMemorialsNode,
+                  controller: communityMemorialsController,
+                  isNotEmptyFunc: (text) async => await catalogProvider.communityMemorialsSearch(communityMemorialsController.text, selectedCommunityModel?.id ?? 0),
+                  isEmptyFunc: () async => await catalogProvider.gettingMemorialsOfCommunity(
+                    selectedCommunityModel?.id ?? 0,
+                    ((model) {}),
+                  ),
+                  isSearching: catalogProvider.isMemorialsCommunitySearch,
+                ),
+                SizedBox(
+                  height: 1.8.h,
+                ),
+                if(selectedCommunityModel?.isAdmin == true) GestureDetector(
+                  onTap: () {
+                    catalogProvider.disposeAddPeopleScreen();
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => const AddingProfilesInMemorialScreen(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: 1.8.h,
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 4.w,
+                        ),
+                        Icon(
+                          CupertinoIcons.plus,
+                          size: 14.sp,
+                          color: const Color.fromRGBO(23, 94, 217, 1),
+                        ),
+                        SizedBox(
+                          width: 2.w,
+                        ),
+                        Text(
+                          'Добавить профиль в "Мемориалы"',
+                          style: TextStyle(
+                            fontFamily: ConstantsFonts.latoRegular,
+                            fontSize: 10.5.sp,
+                            color: const Color.fromRGBO(23, 94, 217, 1),
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    final dataList = memorialModel.data![index];
+                    return Stack(
+                      children: [
+                        HorizontalMiniCardWidget(
+                          onTap: () => Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => SelectedPeopleScreen(
+                                avatar: dataList.avatar ?? '',
+                                id: dataList.id ?? 0,
+                              ),
+                            ),
+                          ),
+                          avatar: dataList.avatar,
+                          title: dataList.fullName ?? '',
+                          subtitle: '${dataList.dateBirth.toString()} - ${dataList.dateDeath.toString()}',
+                          isAddingPeople: false,
+                          id: dataList.id ?? 0,
+                        ),
+                        if(selectedCommunityModel?.isAdmin == true)
+                          Positioned(
+                            right: dataList.isLoading == false ?
+                            0 :
+                            12,
+                            top: 1.2.h,
+                            bottom: 1.2.h,
+                            child: dataList.isLoading == false ?
+                            IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  dataList.isLoading = true;
+                                });
+                                await catalogProvider.removeMemorialFromTheCommunity(
+                                  context,
+                                  selectedCommunityModel?.id ?? 0,
+                                  AddMemorialToTheCommunityRequestModel(
+                                    memorialId: dataList.id ?? 0,
+                                    memorialType: 'human',
+                                  ),
+                                  ((model) {
+                                    if(model != null) {
+                                      if(model.status == true) {
+                                        catalogProvider.updateMemorialsOfCommunity(selectedCommunityModel?.id ?? 0).whenComplete(() => setState(() => dataList.isLoading = false));
+                                      }
+                                    }
+                                  }),
+                                );
+                              },
+                              icon: Icon(
+                                Icons.remove_circle,
+                                size: 22.sp,
+                                color: Colors.red,
+                              ),
+                            ) :
+                            SizedBox(
+                              height: 4.h,
+                              width: 4.h,
+                              child: const LoadingIndicator(
+                                indicatorType: Indicator.ballSpinFadeLoader,
+                                colors: [
+                                  Colors.red,
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: memorialModel.data!.length >= 6 ?
+                  6 :
+                  memorialModel.data!.length,
+                ),
+                if(memorialModel.data!.length >= 7) Column(
+                  children: [
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    MainButton(
+                      text: 'ПОКАЗАТЬ БОЛЬШЕ',
+                      onTap: () async => await Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => AllProfilesScreen(
+                            communityId: selectedCommunityModel?.id ?? 0,
+                            model: selectedCommunityModel,
+                          ),
+                        ),
+                      ),
+                      border: Border.all(
+                        color: const Color.fromRGBO(23, 94, 217, 1),
+                      ),
+                      activeColor: const Color.fromRGBO(245, 247, 249, 1),
+                      textStyle: TextStyle(
+                        color: const Color.fromRGBO(23, 94, 217, 1),
+                        fontFamily: ConstantsFonts.latoBold,
+                        fontSize: 9.5.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ) :
+            const MemorialBookIconWidget(
+              title: 'В сообществе нет мемориалов...',
             ),
           ),
         ),
@@ -514,6 +673,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
           SizedBox(
             height: 4.4.h,
             child: TabBar(
+              tabAlignment: TabAlignment.start,
               padding: EdgeInsets.symmetric(
                 horizontal: 4.w,
               ),
@@ -548,6 +708,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                 Tab(
                   text: 'Мемориалы',
                 ),
+
                 Tab(
                   text: 'Социальное',
                 ),
@@ -557,10 +718,6 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
           SizedBox(
             height: 2.h,
           ),
-          // IndexedStack(
-          //   children: widgetSwitch(value),
-          //   index: selectedMenuIndex,
-          // ),
           AnimatedFadeOutIn<int>(
             data: selectedMenuIndex,
             duration: const Duration(

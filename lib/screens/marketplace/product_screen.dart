@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_progress_indicator/widget/gradient_progress_indicator_widget.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/provider/marketplace_provider.dart';
 import 'package:memorial_book/screens/marketplace/product_card_screen.dart';
 import 'package:memorial_book/widgets/boot_engine.dart';

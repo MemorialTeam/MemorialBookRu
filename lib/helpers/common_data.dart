@@ -3,26 +3,26 @@ import '../models/market/product_model.dart';
 class CommonData {
   static final listOfThreeAccesses = [
     {
-      'title': 'Public',
-      'subtitle': 'Profile information is visible to all users',
+      'title': 'Публичный',
+      'subtitle': 'Информация профиля видна всем пользователям',
     },
     {
-      'title': 'Available',
-      'subtitle': 'Some of the profile information is hidden: burial places, kinsfolk',
+      'title': 'Доступный',
+      'subtitle': 'Часть информации в профиле скрыта: места захоронения, родственники',
     },
     {
-      'title': 'Private',
-      'subtitle': 'Profile information can be seen only by me',
+      'title': 'Приватный',
+      'subtitle': 'Информацию профиля могу видеть только я',
     },
   ];
   static final listOfTwoAccesses = [
     {
-      'title': 'Public',
-      'subtitle': 'Profile information is visible to all users',
+      'title': 'Публичный',
+      'subtitle': 'Информация профиля видна всем пользователям',
     },
     {
-      'title': 'Private',
-      'subtitle': 'Profile information can be seen only by me',
+      'title': 'Приватный',
+      'subtitle': 'Информацию профиля могу видеть только я',
     },
   ];
 

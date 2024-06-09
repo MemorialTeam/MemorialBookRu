@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/helpers/constants.dart';
-import 'package:memorial_book/widgets/post_card.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:sizer/sizer.dart';
 import '../models/common/image_response_model.dart';
-import 'open_image_core.dart';
+import 'element_selection/body_type_popup_menu_item.dart';
 
 class FullScreenGallery extends StatefulWidget {
   FullScreenGallery({

@@ -1,3 +1,5 @@
+import 'package:memorial_book/models/common/image_response_model.dart';
+
 class GetPetInfoResponseModel {
   bool? status;
   PetInfoResponseModel? pet;
@@ -27,7 +29,7 @@ class PetInfoResponseModel {
   dynamic yearDeath;
   String? avatar;
   String? banner;
-  List? gallery;
+  List<ImageResponseModel>? gallery;
   String? createdAt;
 
   PetInfoResponseModel({
@@ -62,7 +64,9 @@ class PetInfoResponseModel {
     yearDeath = json['year_death'];
     avatar = json['avatar'];
     banner = json['banner'];
-    gallery = json['gallery'];
+    gallery = List.of(json['gallery']).map(
+      ((index) => ImageResponseModel.fromJson(index)),
+    ).toList();
     createdAt = json['created_at'];
   }
 }

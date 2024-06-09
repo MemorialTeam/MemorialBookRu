@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
+import 'package:memorial_book/provider/account_provider.dart';
 import 'package:memorial_book/screens/main_flow/notification_screen.dart';
+import 'package:provider/provider.dart';
 
 class MemorialAppBar extends StatelessWidget {
   MemorialAppBar({
@@ -19,6 +21,7 @@ class MemorialAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accountProvider = Provider.of<AccountProvider>(context);
     return CupertinoTheme(
       data: CupertinoThemeData(
         barBackgroundColor: const Color.fromRGBO(255, 255, 255, 1),
@@ -64,6 +67,7 @@ class MemorialAppBar extends StatelessWidget {
             GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () {
+                // accountProvider.getUserEvents();
                 Navigator.push(
                   context,
                   CupertinoPageRoute(

@@ -1,4 +1,4 @@
-import '../../../helpers/constants.dart';
+import '../../../helpers/enums.dart';
 
 class EditPostRequestModel {
   final int postId;

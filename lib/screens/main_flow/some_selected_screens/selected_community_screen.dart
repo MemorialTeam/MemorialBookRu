@@ -14,14 +14,15 @@ import 'package:memorial_book/widgets/boot_engine.dart';
 import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/post_card.dart';
 import 'package:memorial_book/widgets/switch_bar_widget.dart';
-import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import '../../../provider/auth_provider.dart';
 import '../../../provider/catalog_provider.dart';
 import '../../../provider/tab_bar_provider.dart';
+import '../../../widgets/element_selection/body_type_popup_menu_item.dart';
 import '../../../widgets/full_screen_gallery.dart';
+import '../../../widgets/main_button.dart';
 import '../../../widgets/memorial_app_bar.dart';
 import '../../../widgets/skeleton_loader_widget.dart';
 import '../../../widgets/unscope_scaffold.dart';
@@ -56,6 +57,58 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
   }
 
   bool loadingSub = false;
+
+  Widget subscribeButton() {
+    final catalogProvider = Provider.of<CatalogProvider>(context);
+    final model = catalogProvider.communityProfileModel;
+
+    return MainButton(
+      activeColor: model?.isSubscribe == true ?
+      const Color.fromRGBO(250, 18, 46, 1) :
+      const Color.fromRGBO(23, 94, 217, 1),
+      onTap: loadingSub == false ?
+      (() async {
+        setState(() => loadingSub = true);
+        if(model?.isSubscribe == true) {
+          await catalogProvider.unsubscribeFromTheCommunity(
+            model?.id ?? 0,
+            context,
+            ((model) => setState(() => loadingSub = false)),
+          );
+        } else {
+          await catalogProvider.subscribeToTheCommunity(
+            model?.id ?? 0,
+            context,
+            ((model) => setState(() => loadingSub = false)),
+          );
+        }
+      }) :
+      (() {}),
+      child: Center(
+        child: loadingSub == false ?
+        Text(
+          model?.isSubscribe == true ?
+          'ОТПИСАТЬСЯ' :
+          'ПОДПИСАТЬСЯ',
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: ConstantsFonts.latoRegular,
+            fontSize: 9.5.sp,
+          ),
+        ) :
+        SizedBox(
+          height: 2.67.h,
+          width: 2.67.h,
+          child: const LoadingIndicator(
+            indicatorType: Indicator.ballSpinFadeLoader,
+            colors: [
+              Colors.white,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,560 +161,444 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
                 ),
                 floating: false,
               ),
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: 5.h,
-                      right: 2.h,
-                      left: 2.h,
-                      bottom: 1.6.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          model?.title ?? '',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 19.sp,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 1.6.h,
-                        ),
-                        Text(
-                          model?.subtitle ?? '',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: 9.5.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            SizedBox(
-                              height: 1.6.h,
-                            ),
-                            if(authProvider.userRules == 'authorized')
-                              Column(
-                                children: [
-                                  model?.isAdmin == true ?
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: Container(
-                                          height: 6.h,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(7),
-                                            color: const Color.fromRGBO(23, 94, 217, 1),
-                                          ),
-                                          child: Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              onTap: () {
-                                                profileCreationProvider.disposeAddPostScreen();
-                                                Navigator.push(
-                                                  tabBarProvider.mainContext,
-                                                  verticalSoftNavigation(
-                                                    AddPostScreen(
-                                                      communityId: model?.id ?? 0,
-                                                      postType: PostType.addPost,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              borderRadius: BorderRadius.circular(7),
-                                              child: Center(
-                                                child: Text(
-                                                  'ДОБАВИТЬ ПОСТ',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 10.5.sp,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 3.w,
-                                      ),
-                                      PunchingAnimation(
-                                        child: PopupMenuButton(
-                                          position: PopupMenuPosition.under,
-                                          constraints: BoxConstraints(
-                                            maxWidth: 45.w,
-                                          ),
-                                          surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
-                                          color: const Color.fromRGBO(255, 255, 255, 1),
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(20),
-                                              bottomRight: Radius.circular(20),
-                                              bottomLeft: Radius.circular(20),
-                                            ),
-                                          ),
-                                          itemBuilder: ((context) => [
-                                            BoardTypePopupMenuItem(
-                                              title: 'Изменить данные',
-                                              image: Image.asset(
-                                                ConstantsAssets.editPostImage,
-                                                height: 1.8.h,
-                                              ),
-                                              weight: 2.8.w,
-                                              onTap: () {
-                                                profileCreationProvider.setEditCommunityState(model!);
-                                                profileCreationProvider.uploadingDataToControllers(
-                                                  CommunityEditModel(
-                                                    avatar: model.avatar,
-                                                    banner: model.banner,
-                                                    title: model.title ?? '',
-                                                    subtitle: model.subtitle ?? '',
-                                                    address: model.address ?? '',
-                                                    email: model.email ?? '',
-                                                    phone: model.phone ?? '',
-                                                    website: model.website ?? '',
-                                                    description: model.description ?? '',
-                                                    id: model.id ?? 0,
-                                                  ),
-                                                );
-                                                Navigator.push(
-                                                  tabBarProvider.mainContext,
-                                                  CupertinoPageRoute(
-                                                    builder: (context) => const CreationFlow(
-                                                      checkFlow: CheckFlow.editCommunity,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                            BoardTypePopupMenuItem(
-                                              title: 'Поделиться',
-                                              image: Image.asset(
-                                                ConstantsAssets.shareCommunityImage,
-                                                height: 1.65.h,
-                                              ),
-                                              weight: 3.8.w,
-                                              onTap: () async {
-                                                Navigator.pop(context);
-                                                await Share.share('Do you love your loved ones? Download the app to keep in touch with your departed loved ones - https://memorialbook.site/api/v1/feed');
-                                              },
-                                            ),
-                                          ]),
-                                          child: Container(
-                                            height: 6.h,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(7),
-                                              color: const Color.fromRGBO(229, 232, 235, 1),
-                                            ),
-                                            padding: EdgeInsets.only(
-                                              right: 4.w,
-                                              left: 4.w,
-                                            ),
-                                            child: Center(
-                                              child: Image.asset(
-                                                ConstantsAssets.threePointsImage,
-                                                width: 5.2.w,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ) :
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: PunchingAnimation(
-                                          child: Container(
-                                            height: 6.h,
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(7),
-                                              color: model?.isSubscribe == true ?
-                                              const Color.fromRGBO(250, 18, 46, 1) :
-                                              const Color.fromRGBO(23, 94, 217, 1),
-                                            ),
-                                            child: GestureDetector(
-                                              behavior: HitTestBehavior.translucent,
-                                              onTap: loadingSub == false ? () {
-                                                loadingSub = true;
-                                                setState(() {});
-                                                if(model?.isSubscribe == true) {
-                                                  catalogProvider.unsubscribeFromTheCommunity(model?.id ?? 0, context, (model) {
-                                                    loadingSub = false;
-                                                    setState(() {});
-                                                  });
-                                                } else {
-                                                  catalogProvider.subscribeToTheCommunity(model?.id ?? 0, context, (model) {
-                                                    loadingSub = false;
-                                                    setState(() {});
-                                                  });
-                                                }
-                                              } :
-                                              null,
-                                              child: Center(
-                                                child: loadingSub == false ?
-                                                Text(
-                                                  model?.isSubscribe == true ?
-                                                  'UNSUBSCRIBE' :
-                                                  'SUBSCRIBE',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 10.5.sp,
-                                                  ),
-                                                ) :
-                                                SizedBox(
-                                                  width: 4.h,
-                                                  height: 4.h,
-                                                  child: const LoadingIndicator(
-                                                    indicatorType: Indicator.ballSpinFadeLoader,
-                                                    colors: [
-                                                      Colors.white,
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      model?.isAdmin == true ?
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 3.w,
-                                          ),
-                                          Container(
-                                            height: 6.h,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(7),
-                                              color: const Color.fromRGBO(229, 232, 235, 1),
-                                            ),
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 2.h,
-                                            ),
-                                            child: Center(
-                                              child: Image.asset(
-                                                ConstantsAssets.settingsOfProfileImage,
-                                                height: 0.5.h,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ) :
-                                      const SizedBox(),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 1.6.h,
-                                  ),
-                                ],
-                              ),
-                            Row(
-                              children: [
-                                Text(
-                                  'Подписчики: ${model?.subscribersCount}',
-                                  style: TextStyle(
-                                    color: const Color.fromRGBO(32, 30, 31, 0.7),
-                                    fontSize: 11.5.sp,
-                                    fontFamily: ConstantsFonts.latoBold,
-                                    height: 0.15.h,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 1.6.h,
-                                ),
-                                if(model?.lastSubscribers != null)
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: List.generate(model!.lastSubscribers!.length < 6 ?
-                                  model.lastSubscribers!.length :
-                                  6, (index) {
-                                    final dataList = model.lastSubscribers![index];
-                                    return dataList.avatar != '' ?
-                                    CachedNetworkImage(
-                                      imageUrl: dataList.avatar ?? '',
-                                      imageBuilder: (context, imageProvider) {
-                                        return SizedBox(
-                                          height: 4.6.h,
-                                          width: 7.5.w,
-                                          child: OverflowBox(
-                                            maxWidth: 12.w,
-                                            child: Container(
-                                              decoration: const BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              height: 5.5.h,
-                                              width: 5.5.h,
-                                              padding: EdgeInsets.all(0.2.h),
-                                              child: Container(
-                                                height: double.infinity,
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      placeholder: (context, indicator) {
-                                        return SizedBox(
-                                          height: 4.6.h,
-                                          width: 7.5.w,
-                                          child: OverflowBox(
-                                            maxWidth: 60,
-                                            child: SkeletonLoaderWidget(
-                                              height: 5.5.h,
-                                              width: 5.5.h,
-                                              borderRadius: 50,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      errorWidget: (context, error, _) {
-                                        return SizedBox(
-                                          height: 4.6.h,
-                                          width: 7.5.w,
-                                          child: OverflowBox(
-                                            maxWidth: 12.w,
-                                            child: SkeletonLoaderWidget(
-                                              height: 5.5.h,
-                                              width: 5.5.h,
-                                              borderRadius: 50,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ) :
-                                    SizedBox(
-                                      height: 4.6.h,
-                                      width: 7.5.w,
-                                      child: OverflowBox(
-                                        maxWidth: 12.w,
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                            color: Color.fromRGBO(229, 232, 235, 1),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          height: 5.5.h,
-                                          width: 5.5.h,
-                                          padding: EdgeInsets.all(0.2.h),
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.camera_alt_rounded,
-                                              size: 15.sp,
-                                              color: const Color.fromRGBO(186, 186, 186, 1),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SwitchBarWidget(
-                    switcher: CommunityOrCemeterySwitch.community,
-                  ),
-                  SizedBox(
-                    height: 1.6.h,
-                  ),
-                  model?.gallery != null && model!.gallery!.isNotEmpty ?
-                  Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 1.6.h,
-                        ),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Color.fromRGBO(229, 232, 235, 1),
-                            ),
-                            top: BorderSide(
-                              color: Color.fromRGBO(229, 232, 235, 1),
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: 5.h,
+                        right: 2.h,
+                        left: 2.h,
+                        bottom: 1.6.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            model?.title ?? '',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 19.sp,
                             ),
                           ),
-                          color: Color.fromRGBO(255, 255, 255, 1),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                left: 2.h,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Картинки',
-                                    style: TextStyle(
-                                      fontFamily: ConstantsFonts.latoBold,
-                                      fontSize: 14.sp,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () {
-                                      Navigator.push(
-                                        tabBarProvider.mainContext,
-                                        verticalSoftNavigation(
-                                          AllPicturesScreen(
-                                            imagesList: model.gallery ?? [],
-                                            galleryTitle: model.title ?? '',
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: SizedBox(
-                                      width: 3.9.h,
-                                      child: Text(
-                                        'Все',
-                                        style: TextStyle(
-                                          fontFamily: ConstantsFonts.latoRegular,
-                                          fontSize: 11.5.sp,
-                                          color: tabBarProvider.currentTab != TabItem.places ? const Color.fromRGBO(23, 94, 217, 1) : const Color.fromRGBO(18, 175, 82, 1),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          SizedBox(
+                            height: 1.6.h,
+                          ),
+                          Text(
+                            model?.subtitle ?? '',
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontSize: 9.5.sp,
+                              fontWeight: FontWeight.w400,
                             ),
-                            SizedBox(
-                              height: 2.h,
-                            ),
-                            SizedBox(
-                              height: 15.h,
-                              child: ListView(
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                physics: platformScrollPhysics(),
-                                children: [
-                                  SizedBox(
-                                    width: 2.h,
-                                  ),
-                                  ListView.separated(
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.horizontal,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemBuilder: (context, indexMenu) {
-                                      return GestureDetector(
-                                        onTap: () => Navigator.push(
-                                          tabBarProvider.mainContext,
-                                          PageRouteBuilder(
-                                            opaque: false,
-                                            barrierColor: Colors.black.withOpacity(0.4),
-                                            pageBuilder: (BuildContext context, _, __) => FullScreenGallery(
-                                              title: model.title ?? '',
-                                              gallery: model.gallery ?? [],
-                                              initialIndex: indexMenu,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Hero(
-                                          tag: indexMenu,
-                                          child: CachedNetworkImage(
-                                            imageUrl: model.gallery![indexMenu],
-                                            imageBuilder: (context, imageProvider) {
-                                              return Container(
-                                                width: 15.h,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(5),
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.fill,
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                height: 1.6.h,
+                              ),
+                              if(authProvider.userRules == 'authorized')
+                                Column(
+                                  children: [
+                                    model?.isAdmin == true ?
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: MainButton(
+                                            onTap: () {
+                                              profileCreationProvider.disposeAddPostScreen();
+                                              Navigator.push(
+                                                tabBarProvider.mainContext,
+                                                verticalSoftNavigation(
+                                                  AddPostScreen(
+                                                    communityId: model?.id ?? 0,
+                                                    postType: PostType.addPost,
                                                   ),
                                                 ),
                                               );
                                             },
-                                            errorWidget: (context, error, _) {
-                                              return Container(
-                                                width: 15.h,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(5),
-                                                  color: const Color.fromRGBO(0, 0, 0, 0.5),
+                                            text: 'ДОБАВИТЬ ПОСТ',
+                                            textStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: ConstantsFonts.latoRegular,
+                                              fontSize: 9.5.sp,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 3.w,
+                                        ),
+                                        PunchingAnimation(
+                                          child: PopupMenuButton(
+                                            position: PopupMenuPosition.under,
+                                            constraints: BoxConstraints(
+                                              maxWidth: 45.w,
+                                            ),
+                                            surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
+                                            color: const Color.fromRGBO(255, 255, 255, 1),
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                bottomRight: Radius.circular(20),
+                                                bottomLeft: Radius.circular(20),
+                                              ),
+                                            ),
+                                            itemBuilder: ((context) => [
+                                              BoardTypePopupMenuItem(
+                                                title: 'Изменить данные',
+                                                image: Image.asset(
+                                                  ConstantsAssets.editPostImage,
+                                                  height: 1.8.h,
                                                 ),
-                                                child: Center(
-                                                  child: Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                      horizontal: 2.5.w,
+                                                weight: 2.8.w,
+                                                onTap: () {
+                                                  profileCreationProvider.setEditCommunityState(model!);
+                                                  profileCreationProvider.uploadingDataToControllers(
+                                                    CommunityEditModel(
+                                                      avatar: model.avatar,
+                                                      banner: model.banner,
+                                                      title: model.title ?? '',
+                                                      subtitle: model.subtitle ?? '',
+                                                      address: model.address ?? '',
+                                                      email: model.email ?? '',
+                                                      phone: model.phone ?? '',
+                                                      website: model.website ?? '',
+                                                      description: model.description ?? '',
+                                                      id: model.id ?? 0,
                                                     ),
-                                                    child: Text(
-                                                      'Got Error - $error',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontFamily: ConstantsFonts.latoBlack,
-                                                        fontSize: 9.5.sp,
+                                                  );
+                                                  Navigator.push(
+                                                    tabBarProvider.mainContext,
+                                                    CupertinoPageRoute(
+                                                      builder: (context) => const CreationFlow(
+                                                        checkFlow: CheckFlow.editCommunity,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                              BoardTypePopupMenuItem(
+                                                title: 'Поделиться',
+                                                image: Image.asset(
+                                                  ConstantsAssets.shareCommunityImage,
+                                                  height: 1.65.h,
+                                                ),
+                                                weight: 3.8.w,
+                                                onTap: () async {
+                                                  Navigator.pop(context);
+                                                  await Share.share('Do you love your loved ones? Download the app to keep in touch with your departed loved ones - https://memorialbook.site/api/v1/feed');
+                                                },
+                                              ),
+                                            ]),
+                                            child: Container(
+                                              height: 5.5.h,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(7),
+                                                color: const Color.fromRGBO(229, 232, 235, 1),
+                                              ),
+                                              padding: EdgeInsets.only(
+                                                right: 4.w,
+                                                left: 4.w,
+                                              ),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  ConstantsAssets.threePointsImage,
+                                                  width: 5.2.w,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ) :
+                                    subscribeButton(),
+                                    SizedBox(
+                                      height: 1.6.h,
+                                    ),
+                                  ],
+                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Подписчики: ${model?.subscribersCount}',
+                                    style: TextStyle(
+                                      color: const Color.fromRGBO(32, 30, 31, 0.7),
+                                      fontSize: 11.5.sp,
+                                      fontFamily: ConstantsFonts.latoBold,
+                                      height: 0.15.h,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 1.6.h,
+                                  ),
+                                  if(model?.lastSubscribers != null)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: List.generate(model!.lastSubscribers!.length < 6 ?
+                                      model.lastSubscribers!.length :
+                                      6, (index) {
+                                        final dataList = model.lastSubscribers![index];
+                                        return GestureDetector(
+                                          onTap: () => Navigator.push,
+                                          child: CachedNetworkImage(
+                                            imageUrl: dataList.avatar ?? '',
+                                            imageBuilder: (context, imageProvider) {
+                                              return SizedBox(
+                                                height: 4.6.h,
+                                                width: 7.5.w,
+                                                child: OverflowBox(
+                                                  maxWidth: 12.w,
+                                                  child: Container(
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    height: 5.5.h,
+                                                    width: 5.5.h,
+                                                    padding: EdgeInsets.all(0.2.h),
+                                                    child: Container(
+                                                      height: double.infinity,
+                                                      width: double.infinity,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                          image: imageProvider,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
                                               );
                                             },
+                                            placeholder: (context, indicator) {
+                                              return SizedBox(
+                                                height: 4.6.h,
+                                                width: 7.5.w,
+                                                child: OverflowBox(
+                                                  maxWidth: 60,
+                                                  child: SkeletonLoaderWidget(
+                                                    height: 5.5.h,
+                                                    width: 5.5.h,
+                                                    borderRadius: 50,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            errorWidget: (context, error, _) {
+                                              return SizedBox(
+                                                height: 4.6.h,
+                                                width: 7.5.w,
+                                                child: OverflowBox(
+                                                  maxWidth: 12.w,
+                                                  child: SkeletonLoaderWidget(
+                                                    height: 5.5.h,
+                                                    width: 5.5.h,
+                                                    borderRadius: 50,
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    separatorBuilder: (context, index) => SizedBox(
-                                      width: 1.2.h,
+                                        );
+                                      },
+                                      ),
                                     ),
-                                    itemCount: model.gallery!.length,
-                                  ),
-                                  SizedBox(
-                                    width: 2.h,
-                                  ),
                                 ],
                               ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SwitchBarWidget(
+                      switcher: CommunityOrCemeterySwitch.community,
+                    ),
+                    SizedBox(
+                      height: 1.6.h,
+                    ),
+                    model?.gallery != null && model!.gallery!.isNotEmpty ?
+                    Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 1.6.h,
+                          ),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Color.fromRGBO(229, 232, 235, 1),
+                              ),
+                              top: BorderSide(
+                                color: Color.fromRGBO(229, 232, 235, 1),
+                              ),
                             ),
-                          ],
+                            color: Color.fromRGBO(255, 255, 255, 1),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  left: 2.h,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Картинки',
+                                      style: TextStyle(
+                                        fontFamily: ConstantsFonts.latoBold,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      onTap: () {
+                                        Navigator.push(
+                                          tabBarProvider.mainContext,
+                                          verticalSoftNavigation(
+                                            AllPicturesScreen(
+                                              imagesList: model.gallery ?? [],
+                                              galleryTitle: model.title ?? '',
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: SizedBox(
+                                        width: 3.9.h,
+                                        child: Text(
+                                          'Все',
+                                          style: TextStyle(
+                                            fontFamily: ConstantsFonts.latoRegular,
+                                            fontSize: 11.5.sp,
+                                            color: tabBarProvider.currentTab != TabItem.places ? const Color.fromRGBO(23, 94, 217, 1) : const Color.fromRGBO(18, 175, 82, 1),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 2.h,
+                              ),
+                              SizedBox(
+                                height: 15.h,
+                                child: ListView(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: platformScrollPhysics(),
+                                  children: [
+                                    SizedBox(
+                                      width: 2.h,
+                                    ),
+                                    ListView.separated(
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, indexMenu) {
+                                        return GestureDetector(
+                                          onTap: () => Navigator.push(
+                                            tabBarProvider.mainContext,
+                                            PageRouteBuilder(
+                                              opaque: false,
+                                              barrierColor: Colors.black.withOpacity(0.4),
+                                              pageBuilder: (BuildContext context, _, __) => FullScreenGallery(
+                                                title: model.title ?? '',
+                                                galleryModels: model.gallery,
+                                                initialIndex: indexMenu,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Hero(
+                                            tag: indexMenu,
+                                            child: CachedNetworkImage(
+                                              imageUrl: model.gallery![indexMenu].url ?? '',
+                                              imageBuilder: (context, imageProvider) {
+                                                return Container(
+                                                  width: 15.h,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                    image: DecorationImage(
+                                                      image: imageProvider,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              errorWidget: (context, error, _) {
+                                                return Container(
+                                                  width: 15.h,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                    color: const Color.fromRGBO(0, 0, 0, 0.5),
+                                                  ),
+                                                  child: Center(
+                                                    child: Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: 2.5.w,
+                                                      ),
+                                                      child: Text(
+                                                        'Got Error - $error',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontFamily: ConstantsFonts.latoBlack,
+                                                          fontSize: 9.5.sp,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) => SizedBox(
+                                        width: 1.w,
+                                      ),
+                                      itemCount: model.gallery!.length,
+                                    ),
+                                    SizedBox(
+                                      width: 2.h,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 1.6.h,
-                      ),
+                        SizedBox(
+                          height: 1.6.h,
+                        ),
 
-                    ],
-                  ) :
-                  const SizedBox(),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      final postModel = catalogProvider.postsDataModel!.data![index];
-                      return PostCard(
-                        model: postModel,
-                        isAdmin: model?.isAdmin ?? false,
-                        communityId: model?.id ?? 0,
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return SizedBox(
-                        height: 1.6.h,
-                      );
-                    },
-                    itemCount: catalogProvider.postsDataModel?.data != null ?
-                    catalogProvider.postsDataModel!.data!.length :
-                    0,
-                  ),
-                ]),
+                      ],
+                    ) :
+                    const SizedBox(),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final postModel = catalogProvider.postsDataModel!.data![index];
+                        return PostCard(
+                          model: postModel,
+                          isAdmin: model?.isAdmin ?? false,
+                          communityId: model?.id ?? 0,
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(
+                          height: 1.6.h,
+                        );
+                      },
+                      itemCount: catalogProvider.postsDataModel?.data != null ?
+                      catalogProvider.postsDataModel!.data!.length :
+                      0,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

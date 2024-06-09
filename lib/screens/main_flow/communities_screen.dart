@@ -12,6 +12,7 @@ import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/cards/horizontal_mini_card_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import '../../helpers/enums.dart';
 import '../../provider/account_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/catalog_provider.dart';
@@ -36,13 +37,11 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
 
   @override
   void initState() {
-    final _catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
-    final _authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if(_authProvider.userRules == 'authorized') {
-      _catalogProvider.gettingGuestCommunities(context, (model) {});
-    } else if(_authProvider.userRules == 'guest') {
-      _catalogProvider.gettingGuestCommunities(context, (model) {});
-    }
+    final catalogProvider = Provider.of<CatalogProvider>(
+      context,
+      listen: false,
+    );
+    catalogProvider.gettingGuestCommunities(context, (model) {});
     super.initState();
   }
 
@@ -345,6 +344,7 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                             padding: EdgeInsets.symmetric(
                               vertical: 3.8.h,
                             ),
+                            color: const Color.fromRGBO(255, 255, 255, 1),
                             child: Column(
                               children: [
                                 Image.asset(
@@ -414,7 +414,6 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                                 ),
                               ],
                             ),
-                            color: const Color.fromRGBO(255, 255, 255, 1),
                           ) :
                           Container(
                             width: double.infinity,
@@ -543,7 +542,7 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                             title: 'Избранные сообщества',
                             controller: featuredCommunitiesController,
                             widget: LimitedBox(
-                              maxHeight: 21.h,
+                              maxHeight: 19.h,
                               child: ListView(
                                 controller: featuredCommunitiesController,
                                 scrollDirection: Axis.horizontal,
@@ -569,132 +568,20 @@ class _CommunitiesScreenState extends State<CommunitiesScreen> {
                                             ),
                                           ),
                                         ),
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              top: 11.h,
-                                              child: Container(
-                                                height: 9.4.h,
-                                                width: 42.w,
-                                                decoration: const BoxDecoration(
-                                                  borderRadius: BorderRadius.only(
-                                                    bottomLeft: Radius.circular(5),
-                                                    bottomRight: Radius.circular(5),
-                                                  ),
-                                                  color: Color.fromRGBO(244, 247, 250, 1),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 1.4.h,
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        dataList.title ?? '',
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 10.sp,
-                                                          fontFamily: ConstantsFonts.latoBold,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 1.h,
-                                                      ),
-                                                      Text(
-                                                        dataList.subtitle ?? '',
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: TextStyle(
-                                                          fontSize: 10.sp,
-                                                          fontFamily: ConstantsFonts.latoBold,
-                                                          color: const Color.fromRGBO(32, 30, 31, 0.6),
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 1.4.h,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
+                                        child: VerticalMiniCardWidget(
+                                          onTap: () => Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                              builder: (context) => SelectedCommunityScreen(
+                                                id: dataList.id ?? 0,
+                                                avatar: dataList.avatar ?? '',
                                               ),
                                             ),
-                                            CachedNetworkImage(
-                                              imageUrl: dataList.subtitle ?? '',
-                                              imageBuilder: (context, imageProvider) {
-                                                return Container(
-                                                  width: 42.w,
-                                                  height: 11.3.h,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(5),
-                                                    image: DecorationImage(
-                                                      image: imageProvider,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              errorWidget: (context, error, widget) {
-                                                return Container(
-                                                  width: 42.w,
-                                                  height: 11.3.h,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(5),
-                                                    image: DecorationImage(
-                                                      image: AssetImage(ConstantsAssets.memorialBookLogoImage,),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              progressIndicatorBuilder: (context, url, downloadProgress) {
-                                                return SkeletonLoaderWidget(
-                                                  width: 42.w,
-                                                  height: 11.3.h,
-                                                  borderRadius: 5,
-                                                );
-                                              },
-                                            ),
-                                            Positioned(
-                                              top: 7.4.h,
-                                              left: 1.4.h,
-                                              child: Container(
-                                                width: 5.4.h,
-                                                height: 5.4.h,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(30),
-                                                  color: Colors.white,
-                                                ),
-                                                child: Center(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.all(3),
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: dataList.avatar ?? '',
-                                                      imageBuilder: (context, imageProvider) {
-                                                        return Container(
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(30),
-                                                            image: DecorationImage(
-                                                              image: imageProvider,
-                                                              fit: BoxFit.cover,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                      progressIndicatorBuilder: (context, url, downloadProgress) {
-                                                        return const SkeletonLoaderWidget(
-                                                          height: double.infinity,
-                                                          width: double.infinity,
-                                                          borderRadius: 30,
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                          ),
+                                          title: dataList.title,
+                                          subtitle: dataList.subtitle,
+                                          avatar: dataList.avatar,
+                                          banner: dataList.banner,
                                         ),
                                       );
                                     },

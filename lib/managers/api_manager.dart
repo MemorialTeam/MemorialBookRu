@@ -471,7 +471,7 @@ class APIManager {
     }
   }
 
-  void multiPartRequestForProfile(
+  Future multiPartRequestForProfile(
       File? avatar,
       File? banner,
       File? deathCertificate,
@@ -488,6 +488,7 @@ class APIManager {
     try {
       final Uri requestURL = Uri.parse(ConstantsUrls.baseUrl + endpoint);
       final MultipartRequest request = MultipartRequest('POST', requestURL);
+
       if(avatar != null) {
         MultipartFile avatarFile = await MultipartFile.fromPath(
           'avatar',
@@ -558,8 +559,6 @@ class APIManager {
       request.fields.addAll(body);
       request.files.addAll(galleryList);
 
-      print(request.fields);
-      print(request.files);
       StreamedResponse response = await request.send();
 
       print(response.statusCode);

@@ -8,6 +8,7 @@ class TextFieldSearchWidget extends StatelessWidget {
     this.focusNode,
     this.onChanged,
     this.prefixIcon,
+    this.suffixIcon,
     required this.autofocus,
     required this.controller,
     this.textStyle,
@@ -23,6 +24,7 @@ class TextFieldSearchWidget extends StatelessWidget {
   final void Function(String)? onChanged;
 
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
 
   final TextEditingController controller;
 
@@ -41,7 +43,6 @@ class TextFieldSearchWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      // cursorColor: cursorColor ?? const Color.fromRGBO(23, 94, 217, 1),
       autofocus: autofocus,
       controller: controller,
       focusNode: focusNode,
@@ -55,7 +56,8 @@ class TextFieldSearchWidget extends StatelessWidget {
           fontFamily: ConstantsFonts.latoRegular,
           fontSize: 11.5.sp,
         ),
-        prefixIcon: prefixIcon ?? const SizedBox(),
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
         isDense: true,
         filled: true,
         fillColor: backgroundColor ?? const Color.fromRGBO(245, 247, 249, 1),

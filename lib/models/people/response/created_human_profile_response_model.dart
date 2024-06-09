@@ -1,4 +1,6 @@
 
+import 'package:memorial_book/helpers/enums.dart';
+
 class CreatedHumanProfileResponseModel {
   int? id;
   String? firstName;
@@ -9,7 +11,7 @@ class CreatedHumanProfileResponseModel {
   String? yearBirth;
   String? yearDeath;
   bool? isCelebrity;
-  String? status;
+  ProfileStatus? status;
   String? avatar;
 
   CreatedHumanProfileResponseModel({
@@ -36,7 +38,22 @@ class CreatedHumanProfileResponseModel {
     yearBirth = json['year_birth'];
     yearDeath = json['year_death'];
     isCelebrity = json['is_celebrity'];
-    status = json['status'];
+    if(json['status'] != null) {
+      switch(json['status']) {
+        case 'active':
+          status = ProfileStatus.active;
+          break;
+        case 'draft':
+          status = ProfileStatus.draft;
+          break;
+        case 'private':
+          status = ProfileStatus.private;
+          break;
+        default:
+          status = ProfileStatus.none;
+          break;
+      }
+    }
     avatar = json['avatar'];
   }
 }

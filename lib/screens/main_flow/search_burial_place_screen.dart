@@ -22,6 +22,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
     return MemorialAppBar(
       automaticallyImplyBackLeading: true,
       child: UnScopeScaffold(
+        backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
         body: ListView(
           physics: platformScrollPhysics(),
           children: [
@@ -34,33 +35,25 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                 horizontal: 3.6.w,
                 vertical: 1.h,
               ),
-              child: Stack(
-                children: [
-                  SearchEngine(
-                    focusNode: profileCreationProvider.searchCemeteryFocusNode,
-                    controller: profileCreationProvider.searchCemeteryController,
-                    isNotEmptyFunc: (name) async => await profileCreationProvider.searchCemeteryForHuman(name),
-                    isEmptyFunc: () => profileCreationProvider.clearSearchedCemeteryData(),
-                  ),
-                  Positioned(
-                    right: 2.w,
-                    top: 0,
-                    bottom: 0,
-                    child: PunchingAnimation(
-                      child: GestureDetector(
-                        onTap: () {
-                          profileCreationProvider.clearSearchedCemeteryData();
-                          FocusScope.of(context).unfocus();
-                        },
-                        child: Icon(
-                          Icons.close,
-                          size: 20.sp,
-                          color: const Color.fromRGBO(23, 94, 217, 1),
-                        ),
-                      ),
+              child: SearchEngine(
+                focusNode: profileCreationProvider.searchCemeteryFocusNode,
+                controller: profileCreationProvider.searchCemeteryController,
+                autofocus: true,
+                isNotEmptyFunc: (name) async => await profileCreationProvider.searchCemeteryForHuman(name),
+                isEmptyFunc: () => profileCreationProvider.clearSearchedCemeteryData(),
+                suffixIcon: PunchingAnimation(
+                  child: GestureDetector(
+                    onTap: () {
+                      profileCreationProvider.clearSearchedCemeteryData();
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: Icon(
+                      Icons.close,
+                      size: 20.sp,
+                      color: const Color.fromRGBO(23, 94, 217, 1),
                     ),
-                  )
-                ],
+                  ),
+                ),
               ),
             ),
             SizedBox(
@@ -78,7 +71,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                       vertical: 1.3.h,
                     ),
                     child: Text(
-                      'Found cemeteries',
+                      'Найденные кладбища',
                       style: TextStyle(
                         fontSize: 13.5.sp,
                         fontFamily: ConstantsFonts.latoSemiBold,
@@ -100,8 +93,10 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                       final CemeteryResponseModel model = profileCreationProvider.searchedCemeteryModel!.cemeteries![index];
                       return PunchingAnimation(
                         child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
                           onTap: () async {
                             FocusScope.of(context).unfocus();
+                            Navigator.pop(context);
                             await profileCreationProvider.setSearchedCemetery(model.name ?? 'Cemetery', model.address ?? 'No address', model.id ?? 0);
                           },
                           child: Padding(
@@ -113,7 +108,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  model.name ?? 'Cemetery',
+                                  model.name ?? 'Кладбище',
                                   style: TextStyle(
                                     fontSize: 11.5.sp,
                                     fontFamily: ConstantsFonts.latoRegular,
@@ -121,7 +116,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  model.address ?? 'No address',
+                                  model.address ?? 'Нет адреса',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 9.5.sp,
@@ -142,7 +137,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                   height: 2.h,
                 ),
                 Text(
-                  '${profileCreationProvider.searchedCemeteryModel!.total ?? 0} cemeteries were found',
+                  'Было найдено ${profileCreationProvider.searchedCemeteryModel!.total ?? 0} кладбищ',
                   style: TextStyle(
                     color: const Color.fromRGBO(0, 0, 0, 0.5),
                     fontSize: 11.5.sp,
@@ -155,13 +150,13 @@ class SearchBurialPlaceScreen extends StatelessWidget {
               ],
             ),
             if(profileCreationProvider.searchedCemeteryModel != null && profileCreationProvider.searchedCemeteryModel!.cemeteries!.isEmpty && profileCreationProvider.searchedCemeteryBool == false) const MemorialBookIconWidget(
-              title: 'Nothing was found...',
+              title: 'Ничего не найдено...',
             ),
             if(profileCreationProvider.searchedCemeteryModel == null && profileCreationProvider.searchCemeteryController.text.isEmpty && profileCreationProvider.searchedCemeteryBool == false) const MemorialBookIconWidget(
-              title: 'Start the search',
+              title: 'Начните поиск',
             ),
             if(profileCreationProvider.searchedCemeteryModel == null && profileCreationProvider.searchCemeteryController.text.isNotEmpty && profileCreationProvider.searchedCemeteryBool == false) const MemorialBookIconWidget(
-              title: 'Error, please try again later...',
+              title: 'Ошибка, пожалуйста, повторите попытку позже...',
             ),
             if(profileCreationProvider.searchedCemeteryBool == true) Center(
               child: Padding(

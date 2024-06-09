@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memorial_book/screens/main_flow/search_burial_place_screen.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/creation_body_widget.dart';
+import 'package:memorial_book/widgets/creation_flow/date_pick_field.dart';
 import 'package:memorial_book/widgets/creation_flow/required_text.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -78,8 +79,8 @@ class PIProfileBody extends StatelessWidget {
               ),
               ChooserWidget(
                 list: const [
-                  'Male',
-                  'Female',
+                  'Мужской',
+                  'Женский',
                 ],
                 tag: 'gender',
                 text: profileCreationProvider.gender,
@@ -100,49 +101,10 @@ class PIProfileBody extends StatelessWidget {
               SizedBox(
                 height: 0.5.h,
               ),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color.fromRGBO(205, 209, 214, 1),
-                  ),
-                  color: const Color.fromRGBO(245, 247, 249, 1),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(7),
-                    onTap: () {
-                      profileCreationProvider.humanBirthDatePicker(context);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(1.2.h),
-                      child: Text(
-                        profileCreationProvider.humanBirthDate == null ?
-                        'дд.мм.гггг' :
-                        '${profileCreationProvider.humanBirthDate!.day.toString().padLeft(2, '0')}.${profileCreationProvider.humanBirthDate!.month.toString().padLeft(2, '0')}.${profileCreationProvider.humanBirthDate!.year}',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: profileCreationProvider.humanBirthDate == null ?
-                          const Color.fromRGBO(32, 30, 31, 0.5) :
-                          const Color.fromRGBO(32, 30, 31, 1),
-                          fontSize: 13.sp,
-                          fontFamily: ConstantsFonts.latoRegular,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              DatePickField(
+                onTap: () => profileCreationProvider.humanBirthDatePicker(context),
+                dateTime: profileCreationProvider.humanBirthDate,
               ),
-              // TextFieldProfileWidget(
-              //   keyboardType: TextInputType.number,
-              //   controller: profileCreationProvider.birthDateNameController,
-              //   hintText: 'dd.mm.yyyy',
-              //   inputFormatters: [
-              //     MaskedInputFormatter('##.##.####'),
-              //   ],
-              // ),
               SizedBox(
                 height: 3.6.h,
               ),
@@ -152,49 +114,10 @@ class PIProfileBody extends StatelessWidget {
               SizedBox(
                 height: 0.5.h,
               ),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color.fromRGBO(205, 209, 214, 1),
-                  ),
-                  color: const Color.fromRGBO(245, 247, 249, 1),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(7),
-                    onTap: () {
-                      profileCreationProvider.humanDeathDatePicker(context);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(1.2.h),
-                      child: Text(
-                        profileCreationProvider.humanDeathDate == null ?
-                        'дд.мм.гггг' :
-                        '${profileCreationProvider.humanDeathDate!.day.toString().padLeft(2, '0')}.${profileCreationProvider.humanDeathDate!.month.toString().padLeft(2, '0')}.${profileCreationProvider.humanDeathDate!.year}',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: profileCreationProvider.humanDeathDate == null ?
-                          const Color.fromRGBO(32, 30, 31, 0.5) :
-                          const Color.fromRGBO(32, 30, 31, 1),
-                          fontSize: 13.sp,
-                          fontFamily: ConstantsFonts.latoRegular,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              DatePickField(
+                onTap: () => profileCreationProvider.humanDeathDatePicker(context),
+                dateTime: profileCreationProvider.humanDeathDate,
               ),
-              // TextFieldProfileWidget(
-              //   keyboardType: TextInputType.number,
-              //   controller: profileCreationProvider.deathDateNameController,
-              //   hintText: 'dd.mm.yyyy',
-              //   inputFormatters: [
-              //     MaskedInputFormatter('##.##.####'),
-              //   ],
-              // ),
               SizedBox(
                 height: 3.6.h,
               ),
@@ -254,45 +177,43 @@ class PIProfileBody extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         tabBarProvider.mainContext,
-                        CupertinoPageRoute(
+                        CupertinoDialogRoute(
                           builder: (context) => const SearchBurialPlaceScreen(),
+                          context: context,
                         ),
                       );
                     },
                     child: Padding(
                       padding: EdgeInsets.all(1.2.h),
-                      child: Stack(
+                      child: Row(
                         children: [
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            physics: platformScrollPhysics(),
-                            child: Text(
-                              profileCreationProvider.selectedCemetery.isEmpty ?
-                              'Место захоронения' :
-                              profileCreationProvider.selectedCemetery,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: profileCreationProvider.selectedCemetery.isEmpty ?
-                                const Color.fromRGBO(32, 30, 31, 0.5) :
-                                const Color.fromRGBO(32, 30, 31, 1),
-                                fontSize: 13.sp,
-                                fontFamily: ConstantsFonts.latoRegular,
+                          Expanded(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              physics: platformScrollPhysics(),
+                              child: Text(
+                                profileCreationProvider.selectedCemetery.isEmpty ?
+                                'Место захоронения' :
+                                profileCreationProvider.selectedCemetery,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: profileCreationProvider.selectedCemetery.isEmpty ?
+                                  const Color.fromRGBO(32, 30, 31, 0.5) :
+                                  const Color.fromRGBO(32, 30, 31, 1),
+                                  fontSize: 13.sp,
+                                  fontFamily: ConstantsFonts.latoRegular,
+                                ),
                               ),
                             ),
                           ),
                           profileCreationProvider.selectedCemetery.isNotEmpty ?
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: PunchingAnimation(
-                              child: GestureDetector(
-                                onTap: () => profileCreationProvider.clearSelectedCemetery(),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 20.sp,
-                                  color: const Color.fromRGBO(23, 94, 217, 1),
-                                ),
+                          PunchingAnimation(
+                            child: GestureDetector(
+                              onTap: () => profileCreationProvider.clearSelectedCemetery(),
+                              child: Icon(
+                                Icons.close,
+                                size: 20.sp,
+                                color: const Color.fromRGBO(23, 94, 217, 1),
                               ),
                             ),
                           ) :
@@ -335,7 +256,7 @@ class PIProfileBody extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.all(1.2.h),
                       child: Text(
-                        '+ Upload a file',
+                        '+ Загрузить файл',
                         style: TextStyle(
                           color: const Color.fromRGBO(23, 94, 217, 1),
                           fontSize: 13.sp,
@@ -413,86 +334,6 @@ class PIProfileBody extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 1.2.h,
-        ),
-        profileCreationProvider.fatherList.isEmpty &&
-            profileCreationProvider.husbandWifeList.isEmpty &&
-            profileCreationProvider.motherList.isEmpty ?
-        const SizedBox() :
-        CreationBodyWidget(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              profileCreationProvider.fatherList.isNotEmpty ?
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Father',
-                    style: ConstantsTextStyles.unRequiredTextStyle,
-                  ),
-                  SizedBox(
-                    height: 0.5.h,
-                  ),
-                  ChooserWidget(
-                    humansList: profileCreationProvider.fatherList,
-                    list: null,
-                    tag: 'father',
-                    text: profileCreationProvider.father,
-                  ),
-                ],
-              ) :
-              const SizedBox(),
-              profileCreationProvider.husbandWifeList.isNotEmpty ?
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 3.6.h,
-                  ),
-                  Text(
-                    'Husband / wife',
-                    style: ConstantsTextStyles.unRequiredTextStyle,
-                  ),
-                  SizedBox(
-                    height: 0.5.h,
-                  ),
-                  ChooserWidget(
-                    list: null,
-                    tag: 'husband',
-                    text: profileCreationProvider.husbandWife,
-                    humansList: profileCreationProvider.husbandWifeList,
-                  ),
-                ],
-              ) :
-              const SizedBox(),
-              profileCreationProvider.motherList.isNotEmpty ?
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 3.6.h,
-                  ),
-                  Text(
-                    'Mother',
-                    style: ConstantsTextStyles.unRequiredTextStyle,
-                  ),
-                  SizedBox(
-                    height: 0.5.h,
-                  ),
-                  ChooserWidget(
-                    list: null,
-                    tag: 'mother',
-                    text: profileCreationProvider.mother,
-                    humansList: profileCreationProvider.motherList,
-                  ),
-                ],
-              ) :
-              const SizedBox(),
             ],
           ),
         ),

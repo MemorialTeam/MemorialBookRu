@@ -4,6 +4,7 @@ import 'package:memorial_book/screens/main_flow/some_selected_screens/selected_p
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
+import '../../models/communitites/response/get_community_info_response_model.dart';
 import '../../provider/catalog_provider.dart';
 import '../../widgets/cards/horizontal_mini_card_widget.dart';
 import '../../widgets/memorial_app_bar.dart';
@@ -12,13 +13,33 @@ import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/search_engine.dart';
 import '../../widgets/unscope_scaffold.dart';
 
-class AllProfilesScreen extends StatelessWidget {
+class AllProfilesScreen extends StatefulWidget {
   const AllProfilesScreen({
     super.key,
     required this.communityId,
+    required this.model,
   });
 
   final int communityId;
+  final CommunitiesInfoResponseModel? model;
+
+  @override
+  State<AllProfilesScreen> createState() => _AllProfilesScreenState();
+}
+
+class _AllProfilesScreenState extends State<AllProfilesScreen> {
+
+  @override
+  void initState() {
+    final catalogProvider = Provider.of<CatalogProvider>(
+      context,
+      listen: false,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      catalogProvider.getAllMemorialsOfCommunity(widget.communityId);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,18 +74,18 @@ class AllProfilesScreen extends StatelessWidget {
             ListView.separated(
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                if(catalogProvider.memorialDataModel?.data != null &&
-                    catalogProvider.memorialDataModel!.data!.isEmpty) {
+                if(catalogProvider.allMemorialsDataModel?.data != null &&
+                    catalogProvider.allMemorialsDataModel!.data!.isEmpty) {
                   return const MemorialBookIconWidget(
                     title: 'There are no memorials',
                   );
                 }
                 else {
-                  final memorialModel = catalogProvider.memorialDataModel!.data![index];
+                  final memorialModel = catalogProvider.allMemorialsDataModel!.data![index];
                   if(catalogProvider.memorialPageNumber != catalogProvider.memorialLastPageNumber &&
-                  index == catalogProvider.memorialDataModel!.data!.length - 1 &&
+                  index == catalogProvider.allMemorialsDataModel!.data!.length - 1 &&
                   catalogProvider.memorialPaginationLoading == false) {
-                    catalogProvider.paginationMemorialsOfCommunity(communityId);
+                    // catalogProvider.paginationMemorialsOfCommunity(widget.communityId);
                   }
                   return Container(
                     color: const Color.fromRGBO(255, 255, 255, 1),
@@ -86,7 +107,7 @@ class AllProfilesScreen extends StatelessWidget {
                           subtitle: '${memorialModel.dateBirth} - ${memorialModel.dateDeath}',
                           id: memorialModel.id ?? 0,
                         ),
-                        Positioned(
+                        if(widget.model?.isAdmin == true) Positioned(
                           top: 0,
                           bottom: 0,
                           right: 4.w,
@@ -94,7 +115,7 @@ class AllProfilesScreen extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () => catalogProvider.removeMemorialFromTheCommunity(
                                 context,
-                                communityId,
+                                widget.communityId,
                                 AddMemorialToTheCommunityRequestModel(
                                   memorialId: memorialModel.id ?? 0,
                                   memorialType: 'human',
@@ -122,8 +143,8 @@ class AllProfilesScreen extends StatelessWidget {
                 );
               },
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: catalogProvider.memorialDataModel!.data!.isNotEmpty ?
-              catalogProvider.memorialDataModel!.data!.length :
+              itemCount: catalogProvider.allMemorialsDataModel!.data!.isNotEmpty ?
+              catalogProvider.allMemorialsDataModel!.data!.length :
               1,
             ),
             SizedBox(

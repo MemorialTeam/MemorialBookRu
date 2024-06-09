@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorial_book/screens/main_flow/some_selected_screens/selected_people_screen.dart';
+import '../../helpers/enums.dart';
 import '../../models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import '../../widgets/cards/horizontal_mini_card_widget.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
@@ -11,7 +12,6 @@ import '../../provider/catalog_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-
 import '../../widgets/platform_scroll_physics.dart';
 
 class AddingProfilesInMemorialScreen extends StatefulWidget {

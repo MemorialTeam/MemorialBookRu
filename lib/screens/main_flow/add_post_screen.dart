@@ -6,11 +6,11 @@ import 'package:memorial_book/helpers/enums.dart';
 import 'package:memorial_book/models/catalog/request/edit_post_request_model.dart';
 import 'package:memorial_book/provider/message_dialogs_provider.dart';
 import 'package:memorial_book/widgets/main_button.dart';
+import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../provider/catalog_provider.dart';
 import '../../provider/profile_creation_provider.dart';
-import '../../provider/tab_bar_provider.dart';
 import '../../widgets/memorial_app_bar.dart';
 import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/skeleton_loader_widget.dart';
@@ -45,8 +45,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
   void initState() {
     switch(widget.postType) {
       case PostType.addPost:
-        titleOfScreen = 'Add post';
-        buttonText = 'ADD POST';
+        titleOfScreen = 'Добавить пост';
+        buttonText = 'ДОБАВИТЬ ПОСТ';
         onTap = () {
           final profileCreationProvider = Provider.of<ProfileCreationProvider>(context, listen: false);
           final catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
@@ -59,14 +59,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 await catalogProvider.gettingPostsOfCommunity(widget.communityId);
                 await Navigator.maybePop(context, true).whenComplete(() => messageDialogsProvider.informationWindow(
                   context: context,
-                  title: 'The post was created successfully',
-                  textButton: 'Close',
+                  title: 'Пост успешно создан',
+                  textButton: 'Закрыть',
                 ));
               } else {
                 await messageDialogsProvider.informationWindow(
                   context: context,
-                  title: model?.message ?? 'Something went wrong',
-                  textButton: 'Close',
+                  title: model?.message ?? 'Что-то пошло не так',
+                  textButton: 'Закрыть',
                 );
               }
             }),
@@ -74,18 +74,18 @@ class _AddPostScreenState extends State<AddPostScreen> {
         };
         break;
       case PostType.editPost:
-        titleOfScreen = 'Edit post';
-        buttonText = 'SAVE CHANGES';
+        titleOfScreen = 'Редактировать пост';
+        buttonText = 'СОХРАНИТЬ ИЗМЕНЕНИЯ';
         onTap = () async {
           final profileCreationProvider = Provider.of<ProfileCreationProvider>(context, listen: false);
           final catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
           final messageDialogsProvider = Provider.of<MessageDialogsProvider>(context, listen: false);
           await messageDialogsProvider.theSelectionWindow(
             context: context,
-            title: 'Are you sure you want to change the post?',
+            title: 'Вы уверены, что хотите изменить пост?',
             yesColorButton: const Color.fromRGBO(23, 94, 217, 1),
-            yesButton: 'SAVE CHANGED',
-            noButton: 'I CHANGED MY MIND',
+            yesButton: 'СОХРАНИТЬ ИЗМЕНЕНИЯ',
+            noButton: 'Я ПЕРЕДУМАЛ',
             yesOnTap: () async => profileCreationProvider.editPost(
               EditPostRequestModel(
                 postId: widget.postId ?? 0,
@@ -102,14 +102,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   await catalogProvider.gettingPostsOfCommunity(widget.communityId);
                   await Navigator.maybePop(context, true).whenComplete(() => messageDialogsProvider.informationWindow(
                     context: context,
-                    title: 'The changes are saved',
-                    textButton: 'Close',
+                    title: 'Изменения сохранены',
+                    textButton: 'Закрыть',
                   ));
                 } else {
                   await messageDialogsProvider.informationWindow(
                     context: context,
-                    title: model?.message ?? 'Something went wrong',
-                    textButton: 'Close',
+                    title: model?.message ?? 'Что-то пошло не так',
+                    textButton: 'Закрыть',
                   );
                 }
               }),
@@ -126,7 +126,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
     final profileCreationProvider = Provider.of<ProfileCreationProvider>(context);
     return MemorialAppBar(
       automaticallyImplyBackLeading: true,
-      child: Scaffold(
+      child: UnScopeScaffold(
+        backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
         body: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 3.2.w,
@@ -166,7 +167,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Title:',
+                          'Заголовок:',
                           style: TextStyle(
                             color: const Color.fromRGBO(32, 30, 31, 0.5),
                             fontFamily: ConstantsFonts.latoRegular,
@@ -178,13 +179,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
                         ),
                         TextFieldProfileWidget(
                           controller: profileCreationProvider.titleOfCreatePostController,
-                          hintText: 'title',
+                          hintText: 'Заголовок',
                         ),
                         SizedBox(
                           height: 2.4.h,
                         ),
                         Text(
-                          'Description:',
+                          'Описание:',
                           style: TextStyle(
                             color: const Color.fromRGBO(32, 30, 31, 0.5),
                             fontFamily: ConstantsFonts.latoRegular,
@@ -196,7 +197,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                         ),
                         TextFieldProfileWidget(
                           controller: profileCreationProvider.descriptionOfCreatePostController,
-                          hintText: 'Description text ...',
+                          hintText: 'Какое-то описание...',
                           maxLines: 20,
                           minLines: 7,
                         ),
@@ -211,7 +212,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Pictures and movies:',
+                          'Медиа:',
                           style: ConstantsTextStyles.unRequiredTextStyle,
                         ),
                         SizedBox(
@@ -418,7 +419,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                           height: 2.4.h,
                         ),
                         Text(
-                          'Post publication time:',
+                          'Задать время публикации:',
                           style: ConstantsTextStyles.unRequiredTextStyle,
                         ),
                         SizedBox(
@@ -434,7 +435,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                 const Color.fromRGBO(250, 18, 46, 1),
                                 keyboardType: TextInputType.number,
                                 controller: profileCreationProvider.dateOfCreatePostController,
-                                hintText: 'dd.mm.yyyy',
+                                hintText: 'дд.мм.гггг',
                                 inputFormatters: [
                                   MaskedInputFormatter('##.##.####'),
                                 ],
@@ -451,7 +452,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                 const Color.fromRGBO(250, 18, 46, 1),
                                 keyboardType: TextInputType.number,
                                 controller: profileCreationProvider.timeOfCreatePostController,
-                                hintText: 'hh:mm',
+                                hintText: 'чч:мм',
                                 inputFormatters: [
                                   MaskedInputFormatter('##:##'),
                                 ],
@@ -497,7 +498,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                               width: 2.w,
                             ),
                             Text(
-                              'Pin post',
+                              'Закрепить пост',
                               style: ConstantsTextStyles.unRequiredTextStyle,
                             ),
                           ],
@@ -514,8 +515,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
               MainButton(
                 text: buttonText,
                 onTap: onTap,
+                textStyle: TextStyle(
+                  fontSize: 9.5.sp,
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  fontFamily: ConstantsFonts.latoBold,
+                ),
                 margin: EdgeInsets.symmetric(
-                  horizontal: 18.w,
+                  horizontal: 15.w,
+                  vertical: 2.2.h,
                 ),
               ),
               SizedBox(

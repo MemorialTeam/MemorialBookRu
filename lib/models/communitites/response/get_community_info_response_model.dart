@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:memorial_book/helpers/constants.dart';
-
+import '../../../helpers/enums.dart';
 import '../../catalog/response/get_authorized_content_response_model.dart';
+import '../../common/image_response_model.dart';
 
 class GetCommunityInfoResponseModel {
   bool? status;
@@ -42,11 +42,11 @@ class CommunitiesInfoResponseModel {
   String? email;
   String? phone;
   String? website;
-  Map<String, dynamic>? socialLinks;
+  Map? socialLinks;
   String? createdAt;
   String? banner;
   String? avatar;
-  List? gallery;
+  List<ImageResponseModel>? gallery;
   List? movies;
   int? subscribersCount;
   List<SubscribersInfoResponseModel>? lastSubscribers;
@@ -98,9 +98,9 @@ class CommunitiesInfoResponseModel {
       createdAt = json['created_at'];
       banner = json['banner'];
       avatar = json['avatar'];
-      json['gallery'] != null ?
-      gallery = json['gallery'] :
-      null;
+      gallery = List.of(json['gallery']).map(
+        ((index) => ImageResponseModel.fromJson(index)),
+      ).toList();
       json['movies'] != null ?
       movies = json['movies'] :
       null;
@@ -131,7 +131,7 @@ class PostsResponseModel {
   SubscribersInfoResponseModel? author;
   int? pageIndex;
   PageController? pageController;
-  List? gallery;
+  List<ImageResponseModel>? gallery;
 
   PostsResponseModel({
     required this.id,
@@ -156,7 +156,9 @@ class PostsResponseModel {
     pageIndex = 0;
     pageController = PageController();
     if(json['gallery'] != null) {
-      gallery = json['gallery'];
+      gallery = List.of(json['gallery']).map(
+        ((index) => ImageResponseModel.fromJson(index)),
+      ).toList();
     } else {
       gallery = [];
     }

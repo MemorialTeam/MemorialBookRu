@@ -1,6 +1,7 @@
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import '../../helpers/enums.dart';
 import '../../provider/tab_bar_provider.dart';
 
 class BuildOffstageNavigator extends StatelessWidget {

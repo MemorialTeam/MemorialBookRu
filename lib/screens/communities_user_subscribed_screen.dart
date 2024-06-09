@@ -6,6 +6,7 @@ import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../helpers/constants.dart';
+import '../helpers/enums.dart';
 import '../models/catalog/response/get_authorized_content_response_model.dart';
 import '../provider/catalog_provider.dart';
 import '../provider/tab_bar_provider.dart';

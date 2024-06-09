@@ -129,12 +129,8 @@ class AccountProvider extends ChangeNotifier {
   bool getPetProfileState = false;
   GetPetInfoResponseModel? petProfileModel;
 
-  void gettingPetProfile(
-      BuildContext context,
-      int id,
-      ) async {
+  Future gettingPetProfile(BuildContext context, int id) async {
     getPetProfileState = true;
-    notifyListeners();
     try {
       service.gettingPetProfileRequest(id, (response) {
         getPetProfileState = false;
@@ -152,6 +148,12 @@ class AccountProvider extends ChangeNotifier {
       SVProgressHUD.dismiss();
       print('the following error occurred (sign up request) ---> $error');
     }
+  }
+
+  Future getUserEvents() async {
+    await service.getUserEventsRequest((response) {
+      print(response?.body);
+    });
   }
 
   String religionIcon(String religionName) {
@@ -192,24 +194,22 @@ class AccountProvider extends ChangeNotifier {
   }
 
   CreatedHumansDataResponseModel? createdHumanModel;
+  String? createdHumanPageNumber = 'user/profiles/humans?page=1';
   bool createdHumanPaginationLoading = false;
-  int createdHumanPageNumber = 1;
-  int createdHumanLastPageNumber = 1;
 
   Future gettingCreatedHumansProfiles(ValueSetter<GettingCreatedHumansProfilesResponseModel?> completion) async {
-    createdHumanPageNumber = 1;
+    createdHumanPageNumber = 'user/profiles/humans?page=1';
     createdHumanModel = null;
     notifyListeners();
     SVProgressHUD.show();
     try {
       await service.gettingCreatedHumansProfilesRequest(createdHumanPageNumber, (response) {
         mapper.gettingCreatedHumansProfilesResponse(response, (model) {
-          print(response?.body);
           SVProgressHUD.dismiss();
           if(model != null) {
             if(model.status == true) {
               createdHumanModel = model.humans;
-              createdHumanLastPageNumber = model.humans?.lastPage ?? 1;
+              createdHumanPageNumber = model.humans?.links?.nextPageUrl;
               notifyListeners();
             }
             completion(model);
@@ -224,9 +224,7 @@ class AccountProvider extends ChangeNotifier {
     }
   }
   Future paginationCreatedHumans() async {
-    createdHumanPageNumber++;
     createdHumanPaginationLoading = true;
-    notifyListeners();
     SVProgressHUD.show();
     service.gettingCreatedHumansProfilesRequest(createdHumanPageNumber, (response) {
       mapper.gettingCreatedHumansProfilesResponse(response, (model) {
@@ -236,6 +234,7 @@ class AccountProvider extends ChangeNotifier {
         if(model != null) {
           if (model.status == true) {
             if (model.humans?.data != null) {
+              createdHumanPageNumber = model.humans?.links?.nextPageUrl;
               createdHumanModel!.data!.addAll(model.humans!.data!);
               notifyListeners();
             }
@@ -247,13 +246,11 @@ class AccountProvider extends ChangeNotifier {
 
   CreatedPetsDataResponseModel? createdPetsModel;
   bool createdPetPaginationLoading = false;
-  int createdPetPageNumber = 1;
-  int createdPetLastPageNumber = 1;
+  String? createdPetPageNumber = 'user/profiles/pets?page=1';
 
   Future gettingCreatedPetsProfiles(ValueSetter<GettingCreatedPetsProfilesResponseModel?> completion) async {
-    createdPetPageNumber = 1;
+    createdPetPageNumber = 'user/profiles/pets?page=1';
     createdPetsModel = null;
-    notifyListeners();
     SVProgressHUD.show();
     try {
     await service.gettingCreatedPetsProfilesRequest(createdPetPageNumber, (response) {
@@ -262,7 +259,7 @@ class AccountProvider extends ChangeNotifier {
         if(model != null) {
           if(model.status == true) {
             createdPetsModel = model.pets;
-            createdPetLastPageNumber = model.pets?.lastPage ?? 1;
+            createdPetPageNumber = model.pets?.links?.nextPageUrl;
             notifyListeners();
           }
           completion(model);
@@ -277,18 +274,15 @@ class AccountProvider extends ChangeNotifier {
     }
   }
   Future paginationCreatedPets() async {
-    createdHumanPageNumber++;
     createdHumanPaginationLoading = true;
-    notifyListeners();
-    SVProgressHUD.show();
     service.gettingCreatedPetsProfilesRequest(createdPetPageNumber, (response) {
       mapper.gettingCreatedPetsProfilesResponse(response, (model) {
-        SVProgressHUD.dismiss();
         createdHumanPaginationLoading = false;
         notifyListeners();
         if(model != null) {
           if (model.status == true) {
             if (model.pets?.data != null) {
+              createdPetPageNumber = model.pets?.links?.nextPageUrl;
               createdPetsModel!.data!.addAll(model.pets!.data!);
               notifyListeners();
             }

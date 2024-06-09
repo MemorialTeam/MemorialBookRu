@@ -57,13 +57,13 @@ class PeopleScreen extends StatelessWidget {
                 }
                 else {
                   final dataList = catalogProvider.peoples![index];
-                  final String? firstName = dataList.firstName == '' || dataList.firstName == null ?
+                  final String firstName = dataList.firstName == '' || dataList.firstName == null ?
                   '' :
                   '${dataList.firstName} ';
-                  final String? middleName = dataList.middleName == '' || dataList.middleName == null ?
+                  final String middleName = dataList.middleName == '' || dataList.middleName == null ?
                   '' :
                   '${dataList.middleName} ';
-                  final String? lastName = dataList.lastName == '' || dataList.lastName == null ?
+                  final String lastName = dataList.lastName == '' || dataList.lastName == null ?
                   '' :
                   '${dataList.lastName}';
                   return HorizontalMiniCardWidget(
@@ -78,7 +78,7 @@ class PeopleScreen extends StatelessWidget {
                       ),
                     ),
                     avatar: dataList.avatar,
-                    title: firstName! + middleName! + lastName!,
+                    title: firstName+ middleName+ lastName,
                     subtitle: '${dataList.dateBirth.toString()} - ${dataList.dateDeath.toString()}',
                     id: dataList.id ?? 0,
                   );
@@ -91,8 +91,7 @@ class PeopleScreen extends StatelessWidget {
               searchController: catalogProvider.peopleController,
               filterCount: catalogProvider.countEnabledParameters(MapFlowType.people).toString(),
               context: tabBarProvider.mainContext,
-              filterRoute: const FilterScreen(
-                filterCheckFlow: MapFlowType.people,
+              filterRoute: const FilterPeopleScreen(
               ),
               dataList: catalogProvider.peoples!,
               total: catalogProvider.mapPeoplesTotal,

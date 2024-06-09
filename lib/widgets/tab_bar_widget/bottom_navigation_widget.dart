@@ -1,4 +1,3 @@
-import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_item/account_tab_bar_item.dart';
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_item/communities_tab_bar_item.dart';
 import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_item/home_tab_bar_item.dart';
@@ -8,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../helpers/constants.dart';
 import 'package:sizer/sizer.dart';
-
+import '../../helpers/enums.dart';
 import '../../provider/tab_bar_provider.dart';
 
 class BottomNavigationWidget extends StatelessWidget {

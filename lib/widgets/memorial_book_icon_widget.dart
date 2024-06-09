@@ -35,6 +35,7 @@ class MemorialBookIconWidget extends StatelessWidget {
               color: color ?? const Color.fromRGBO(23, 94, 217, 0.3),
               fontSize: 21.sp,
               fontFamily: ConstantsFonts.latoBlack,
+              height: 0.8.sp,
             ),
           ),
           SizedBox(

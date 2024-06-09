@@ -5,15 +5,7 @@ import 'package:memorial_book/screens/main_flow/people_screen.dart';
 import 'package:memorial_book/screens/main_flow/places_screen.dart';
 import 'package:memorial_book/screens/main_flow/profile_screen.dart';
 import '../../helpers/constants.dart';
-
-enum TabItem {
-  people,
-  places,
-  home,
-  communities,
-  account,
-  marketplace,
-}
+import '../../helpers/enums.dart';
 
 class TabBarCore extends StatelessWidget {
   TabBarCore({
@@ -43,10 +35,6 @@ class TabBarCore extends StatelessWidget {
           ConstantsNavigatorKeys.root: (context) => const CommunitiesScreen(),
         };
       case TabItem.account:
-        return {
-          ConstantsNavigatorKeys.root: (context) => const ProfileScreen(),
-        };
-      case TabItem.marketplace:
         return {
           ConstantsNavigatorKeys.root: (context) => const ProfileScreen(),
         };

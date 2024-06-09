@@ -15,17 +15,15 @@ import 'package:memorial_book/models/create_profile/response/get_religions_respo
 import 'package:memorial_book/provider/account_provider.dart';
 import 'package:memorial_book/provider/message_dialogs_provider.dart';
 import 'package:memorial_book/test_data.dart';
-import 'package:memorial_book/widgets/element_selection/element_selection_widget.dart';
-import 'package:memorial_book/widgets/element_selection/generate_element.dart';
-import 'package:memorial_book/widgets/element_selection/spinning_cylinder_widget.dart';
 import 'package:provider/provider.dart';
 import '../data_handler/mapper.dart';
 import '../data_handler/service.dart';
-import '../helpers/constants.dart';
+import '../helpers/enums.dart';
 import '../models/catalog/request/edit_post_request_model.dart';
 import '../models/cemetery/request/creating_cemetery_request_model.dart';
 import '../models/cemetery/response/search_cemetery_for_human_response_model.dart';
 import '../models/common/determining_changes_post_data_model.dart';
+import '../models/common/image_response_model.dart';
 import '../models/common/map_response_model.dart';
 import '../models/common/status_response_model.dart';
 import '../models/communitites/response/get_community_info_response_model.dart';
@@ -36,7 +34,6 @@ import '../models/people/response/related_profiles_response_model.dart';
 import '../models/pet/request/creating_pet_request_model.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
-import 'auth_provider.dart';
 import 'catalog_provider.dart';
 
 class ProfileCreationProvider extends ChangeNotifier {
@@ -209,7 +206,7 @@ class ProfileCreationProvider extends ChangeNotifier {
       final Random rng = Random();
       final Directory tempDir = await getTemporaryDirectory();
       final String tempPath = tempDir.path;
-      final File file = File(tempPath + (rng.nextInt(100)).toString() + '.png');
+      final File file = File('$tempPath${rng.nextInt(100)}.png');
       final Response response = await get(Uri.parse(url));
       await file.writeAsBytes(response.bodyBytes);
       return file;
@@ -334,7 +331,7 @@ class ProfileCreationProvider extends ChangeNotifier {
   String titleCard(CheckFlow checkFlow) {
     switch(checkFlow) {
       case CheckFlow.profile:
-        return '${firstNameController.text}${lastNameController.text.isNotEmpty ? ' ${lastNameController.text}' : ''}${middleNameController.text.isNotEmpty ? ' ${middleNameController.text}' : ''}';
+        return '${lastNameController.text}${firstNameController.text.isNotEmpty ? ' ${firstNameController.text}' : ''}${middleNameController.text.isNotEmpty ? ' ${middleNameController.text}' : ''}';
       case CheckFlow.cemetery:
         break;
       case CheckFlow.community:
@@ -454,7 +451,7 @@ class ProfileCreationProvider extends ChangeNotifier {
       case CheckFlow.profile:
         return 'Создание профиля';
       case CheckFlow.pet:
-        return 'Создание профиля домашнего животного';
+        return 'Создание профиля питомца';
       case CheckFlow.cemetery:
         return 'New cemetery';
       case CheckFlow.community:
@@ -761,73 +758,6 @@ class ProfileCreationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future showBirthDate(BuildContext context) async {
-    return await elementSelectionWidget(
-      context: context,
-      title: 'Choose birth date',
-      textButton: 'Close',
-      child: Row(
-        children: [
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Day',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.dayList(),
-                )[item] as Text;
-                dayBirthDate = item;
-                dayBirthDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: dayBirthDate,
-              ),
-              children: data.dayList(),
-            ),
-          ),
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Month',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.monthList(),
-                )[item] as Text;
-                monthBirthDate = item;
-                monthBirthDateText = text.data?.length == 1 ?
-                '0${text.data}' :
-                text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: monthBirthDate,
-              ),
-              children: data.monthList(),
-            ),
-          ),
-          Expanded(
-            child: SpinningCylinderWidget(
-              title: 'Year',
-              onSelectedItemChanged: (item) {
-                Text text = generateElement(
-                  array: data.yearList(),
-                )[item] as Text;
-                yearBirthDate = item;
-                yearBirthDateText = text.data ?? '';
-                notifyListeners();
-              },
-              scrollController: FixedExtentScrollController(
-                initialItem: yearBirthDate,
-              ),
-              children: data.yearList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   bool creatingPostValidate() {
     if(dateOfCreatePostController.text.isEmpty && timeOfCreatePostController.text.isEmpty) {
       return true;
@@ -865,7 +795,7 @@ class ProfileCreationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void generateRequest(BuildContext context, CheckFlow checkFlow, int isDraft) {
+  Future generateRequest(BuildContext context, CheckFlow checkFlow, int isDraft) async {
     switch(checkFlow) {
       case CheckFlow.profile:
         return creatingProfile(context, isDraft);
@@ -875,6 +805,8 @@ class ProfileCreationProvider extends ChangeNotifier {
         return creatingCemetery(context, isDraft);
       case CheckFlow.community:
         return creatingCommunity(context, isDraft);
+      case CheckFlow.editCommunity:
+        break;
     }
   }
 
@@ -887,8 +819,8 @@ class ProfileCreationProvider extends ChangeNotifier {
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      cancelText: 'Close',
-      confirmText: 'Select',
+      cancelText: 'Закрыть',
+      confirmText: 'Выбрать',
       builder: (BuildContext context, Widget? widget) => Theme(
         data: ThemeData(
           colorScheme: const ColorScheme.light(
@@ -907,7 +839,6 @@ class ProfileCreationProvider extends ChangeNotifier {
   }
   Future humanDeathDatePicker(BuildContext context) async {
     humanDeathDate = await showDatePicker(
-      locale: const Locale('ru', 'RU'),
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
@@ -931,14 +862,77 @@ class ProfileCreationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void creatingProfile(BuildContext context, int isDraft) {
+  DateTime? petBirthDate;
+  DateTime? petDeathDate;
+
+  Future petBirthDatePicker(BuildContext context) async {
+    petBirthDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      cancelText: 'Закрыть',
+      confirmText: 'Выбрать',
+      builder: (BuildContext context, Widget? widget) => Theme(
+        data: ThemeData(
+          colorScheme: const ColorScheme.light(
+            primary: Color.fromRGBO(23, 94, 217, 1),
+          ),
+          dialogTheme: DialogTheme(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+          ),
+        ),
+        child: widget!,
+      ),
+    );
+    notifyListeners();
+  }
+  Future petDeathDatePicker(BuildContext context) async {
+    petDeathDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      cancelText: 'Закрыть',
+      confirmText: 'Выбрать',
+      builder: (BuildContext context, Widget? widget) => Theme(
+        data: ThemeData(
+          colorScheme: const ColorScheme.light(
+            primary: Color.fromRGBO(23, 94, 217, 1),
+          ),
+          dialogTheme: DialogTheme(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+          ),
+        ),
+        child: widget!,
+      ),
+    );
+    notifyListeners();
+  }
+
+  String validateGender() {
+    switch(gender) {
+      case 'Мужской':
+        return 'male';
+      case 'Женский':
+        return 'female';
+      default:
+        return '';
+    }
+  }
+
+  Future creatingProfile(BuildContext context, int isDraft) async {
     SVProgressHUD.show();
     try {
       CreatingPersonsProfileRequestModel model = CreatingPersonsProfileRequestModel(
         firstName: firstNameController.text,
         lastName: lastNameController.text,
         middleName: middleNameController.text,
-        gender: gender,
+        gender: validateGender(),
         dateBirth: '${humanBirthDate!.day.toString().padLeft(2, '0')}.${humanBirthDate!.month.toString().padLeft(2, '0')}.${humanBirthDate!.year}',
         dateDeath: '${humanDeathDate!.day.toString().padLeft(2, '0')}.${humanDeathDate!.month.toString().padLeft(2, '0')}.${humanDeathDate!.year}',
         deathReason: profileDeathCauseController.text,
@@ -957,17 +951,23 @@ class ProfileCreationProvider extends ChangeNotifier {
         cemeteryId: selectedCemeteryId,
       );
 
-      service.creatingProfileRequest(profileAvatarImage, profileBackgroundImage, profileCertificate, profileImagesAndMoves, selectedHobbiesList, model, (response) {
+      await service.creatingProfileRequest(profileAvatarImage, profileBackgroundImage, profileCertificate, profileImagesAndMoves, selectedHobbiesList, model, (response) {
         SVProgressHUD.dismiss();
         mapper.statusMultiPartResponse(response, (model) async {
           if(model?.status == true) {
-            final _catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
-            final _accountProvider = Provider.of<AccountProvider>(context, listen: false);
-            await _catalogProvider.gettingAuthorizedMainContent(context, (model) {});
-            await _accountProvider.gettingCreatedHumansProfiles(
+            final catalogProvider = Provider.of<CatalogProvider>(
+              context,
+              listen: false,
+            );
+            final accountProvider = Provider.of<AccountProvider>(
+              context,
+              listen: false,
+            );
+            await catalogProvider.gettingAuthorizedMainContent(context, (model) {});
+            await accountProvider.getUserInfo(context);
+            await accountProvider.gettingCreatedHumansProfiles(
               ((model) { }),
             );
-            await _accountProvider.getUserInfo(context);
             religionID = null;
             Navigator.pop(context);
           } else {
@@ -1010,7 +1010,7 @@ class ProfileCreationProvider extends ChangeNotifier {
       BitmapDescriptor icon,
       ) async {
     try {
-      GoogleMapController _controller = await addressMapController.future;
+      GoogleMapController controller0 = await addressMapController.future;
       FocusScope.of(context).unfocus();
       List<Address> addresses = await Geocoder.local.findAddressesFromQuery(country);
       const String markerIdVal = '1';
@@ -1034,7 +1034,7 @@ class ProfileCreationProvider extends ChangeNotifier {
         ),
       );
       markersAddress[markerId] = marker;
-      _controller.animateCamera(
+      controller0.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(addresses.first.coordinates.latitude ?? 0.0, addresses.first.coordinates.longitude ?? 0.0),
@@ -1081,14 +1081,14 @@ class ProfileCreationProvider extends ChangeNotifier {
     });
   }
 
-  void creatingPet(BuildContext context, int isDraft) async {
+  Future creatingPet(BuildContext context, int isDraft) async {
     try {
       SVProgressHUD.show();
       CreatingPetRequestModel model = CreatingPetRequestModel(
         name: petNameController.text,
         breed: petBreedController.text,
-        dateBirth: petBirthDateController.text,
-        dateDeath: petDeathDateController.text,
+        dateBirth: '${petBirthDate!.day.toString().padLeft(2, '0')}.${petBirthDate!.month.toString().padLeft(2, '0')}.${petBirthDate!.year}',
+        dateDeath: '${petDeathDate!.day.toString().padLeft(2, '0')}.${petDeathDate!.month.toString().padLeft(2, '0')}.${petDeathDate!.year}',
         deathReason: petDeathCauseController.text,
         birthPlace: petBirthPlaceController.text,
         ownerID: ownerID.toString(),
@@ -1103,13 +1103,13 @@ class ProfileCreationProvider extends ChangeNotifier {
           print(model?.message);
           if(model?.status == true) {
             Navigator.pop(context);
-            final _catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
-            final _accountProvider = Provider.of<AccountProvider>(context, listen: false);
-            await _catalogProvider.gettingAuthorizedMainContent(context, (model) {});
-            await _accountProvider.gettingCreatedPetsProfiles(
+            final catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
+            final accountProvider = Provider.of<AccountProvider>(context, listen: false);
+            await catalogProvider.gettingAuthorizedMainContent(context, (model) {});
+            await accountProvider.gettingCreatedPetsProfiles(
               ((model) { }),
             );
-            await _accountProvider.getUserInfo(context);
+            await accountProvider.getUserInfo(context);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -1127,7 +1127,7 @@ class ProfileCreationProvider extends ChangeNotifier {
     }
   }
 
-  void creatingCemetery(BuildContext context, int isDraft) async {
+  Future creatingCemetery(BuildContext context, int isDraft) async {
     try {
       SVProgressHUD.show();
       CreatingCemeteryRequestModel model = CreatingCemeteryRequestModel(
@@ -1196,12 +1196,13 @@ class ProfileCreationProvider extends ChangeNotifier {
   }
 
   void setEditCommunityState(CommunitiesInfoResponseModel model) {
-    print(model.gallery);
     removedIndexUrlsCommunityList.clear();
     editCommunitiesImagesAndMoves.clear();
     if(model.gallery != null && model.gallery!.isNotEmpty) {
-      for(String item in model.gallery!) {
-        editCommunitiesImagesAndMoves.add(item);
+      for(ImageResponseModel item in model.gallery ?? []) {
+        if(item.url != null && item.url!.isNotEmpty) {
+          editCommunitiesImagesAndMoves.add(item.url ?? '');
+        }
         notifyListeners();
       }
     }
@@ -1230,7 +1231,6 @@ class ProfileCreationProvider extends ChangeNotifier {
             notifyListeners();
           }
         }
-        print(createPostImagesAndMoves);
         notifyListeners();
         break;
       case PostContentType.textWithMediaContent:
@@ -1250,27 +1250,17 @@ class ProfileCreationProvider extends ChangeNotifier {
             notifyListeners();
           }
         }
-        print(createPostImagesAndMoves);
         notifyListeners();
         break;
       case null:
+        break;
+      case PostContentType.none:
         break;
     }
   }
 
   void createPost(BuildContext context, int communityId, ValueSetter<StatusResponseModel?> completion) async {
     try {
-      // late final PostContentType switcher;
-      //
-      // if(createPostImagesAndMoves.isNotEmpty && descriptionOfCreatePostController.text.isEmpty && titleOfCreatePostController.text.isEmpty) {
-      //   switcher = PostContentType.mediaContent;
-      // }
-      // else if(descriptionOfCreatePostController.text.isNotEmpty && titleOfCreatePostController.text.isNotEmpty && createPostImagesAndMoves.isEmpty) {
-      //   switcher = PostContentType.textContent;
-      // } else if(descriptionOfCreatePostController.text.isNotEmpty && titleOfCreatePostController.text.isNotEmpty && createPostImagesAndMoves.isNotEmpty) {
-      //   switcher = PostContentType.textWithMediaContent;
-      // }
-
       String publishedAt = '';
 
       if(birthDateNameController.text.isNotEmpty && timeOfCreatePostController.text.isNotEmpty) {
@@ -1310,7 +1300,6 @@ class ProfileCreationProvider extends ChangeNotifier {
         mapper.statusMultiPartResponse(response, (model) {
           SVProgressHUD.dismiss();
           if(model != null) {
-            print(model.status);
             completion(model);
           } else {
             completion(null);
@@ -1360,7 +1349,7 @@ class ProfileCreationProvider extends ChangeNotifier {
     }
   }
 
-  void creatingCommunity(BuildContext context, int isDraft) async {
+  Future creatingCommunity(BuildContext context, int isDraft) async {
     try {
       SVProgressHUD.show();
 
@@ -1375,7 +1364,7 @@ class ProfileCreationProvider extends ChangeNotifier {
         subtitle: communitiesSignatureController.text,
         description: communitiesDescriptionController.text,
         email: communitiesEmailController.text,
-        phone: communitiesPhoneNumberController.text,
+        phone: communitiesPhoneNumberController.text.replaceAll(RegExp(r'[^+0-9]'),''),
         website: websiteController.text,
         socialLinks: links,
         address: communitiesLocationController.text,
@@ -1384,25 +1373,27 @@ class ProfileCreationProvider extends ChangeNotifier {
         gallery: communitiesImagesAndMoves,
       );
 
-      service.creatingCommunityRequest(model, (response) {
-        mapper.statusMultiPartResponse(response, (model) {
-          SVProgressHUD.dismiss();
+      await service.creatingCommunityRequest(model, (response) {
+        SVProgressHUD.dismiss();
+        mapper.statusMultiPartResponse(response, (model) async {
           if(model?.status == true) {
-            final authProvider = Provider.of<AuthProvider>(context, listen: false);
-            final catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
-            if(authProvider.userRules == 'authorized') {
-              catalogProvider.gettingAuthorizedMainContent(context, (model) {});
-            } else if(authProvider.userRules == 'guest') {
-              catalogProvider.gettingGuestMainContent(context, (model) {});
-            }
-            catalogProvider.gettingGuestCommunities(
+            final catalogProvider = Provider.of<CatalogProvider>(
               context,
-              ((model) {}),
+              listen: false,
             );
             Navigator.pop(context);
+            await catalogProvider.gettingAuthorizedMainContent(
+              context,
+              ((model) {}),
+            ).whenComplete(
+              (() => catalogProvider.gettingGuestCommunities(
+                context,
+                ((model) {}),
+              )),
+            );
           } else {
             final messageDialogsProvider = Provider.of<MessageDialogsProvider>(context, listen: false);
-            messageDialogsProvider.informationWindow(
+            await messageDialogsProvider.informationWindow(
               context: context,
               title: model?.message ?? 'Error',
               textButton: 'Retry',

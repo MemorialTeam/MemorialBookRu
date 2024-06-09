@@ -3,9 +3,11 @@ import 'package:memorial_book/helpers/common_data.dart';
 import 'package:memorial_book/provider/catalog_provider.dart';
 import 'package:memorial_book/provider/message_dialogs_provider.dart';
 import 'package:memorial_book/widgets/creation_body_widget.dart';
+import 'package:memorial_book/widgets/main_button.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
+import '../../helpers/enums.dart';
 import '../../provider/profile_creation_provider.dart';
 import '../../widgets/platform_scroll_physics.dart';
 
@@ -43,7 +45,6 @@ class _PostingScreenState extends State<PostingScreen> {
     final profileCreationProvider = Provider.of<ProfileCreationProvider>(context);
     final catalogProvider = Provider.of<CatalogProvider>(context);
     final messageDialogsProvider = Provider.of<MessageDialogsProvider>(context);
-    print(profileCreationProvider.titleCard(widget.checkFlow).length);
     return SingleChildScrollView(
       padding: EdgeInsets.zero,
       physics: platformScrollPhysics(),
@@ -107,17 +108,20 @@ class _PostingScreenState extends State<PostingScreen> {
                         null,
                       ),
                       Positioned(
-                        top: 8.h,
+                        top: 8.2.h,
                         child: Container(
-                          height: 12.5.h,
-                          width: 12.5.h,
+                          height: 12.7.h,
+                          width: 12.7.h,
                           margin: EdgeInsets.only(
-                            left: 6.w,
+                            left: 5.w,
                           ),
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color.fromRGBO(245, 247, 249, 1),
+                            color: const Color.fromRGBO(245, 247, 249, 1),
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 0.8.w,
+                            )
                           ),
                           child: profileCreationProvider.generateAvatarImage(widget.checkFlow) != null ?
                           Container(
@@ -152,15 +156,16 @@ class _PostingScreenState extends State<PostingScreen> {
                       Padding(
                         padding: EdgeInsets.only(
                           top: 22.h,
-                          right: 1.8.h,
-                          left: 1.8.h,
+                          right: 3.4.w,
+                          left: 3.4.w,
                           bottom: 2.2.h,
                         ),
                         child: Text(
                           profileCreationProvider.titleCard(widget.checkFlow),
                           style: TextStyle(
-                            fontSize: 19.5.sp,
+                            fontSize: 21.sp,
                             fontFamily: ConstantsFonts.latoBlack,
+                            height: 0.9.sp,
                             color: const Color.fromRGBO(32, 30, 31, 1),
                           ),
                         ),
@@ -168,8 +173,8 @@ class _PostingScreenState extends State<PostingScreen> {
                       Padding(
                         padding: EdgeInsets.only(
                           top: 10.h,
-                          right: 1.8.h,
-                          left: 1.8.h,
+                          right: 3.4.w,
+                          left: 3.4.w,
                           bottom: 10.h,
                         ),
                       ),
@@ -184,7 +189,7 @@ class _PostingScreenState extends State<PostingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Public access settings',
+                        'Настройки публичного доступа',
                         style: TextStyle(
                           color: const Color.fromRGBO(32, 30, 31, 0.5),
                           fontFamily: ConstantsFonts.latoRegular,
@@ -215,7 +220,7 @@ class _PostingScreenState extends State<PostingScreen> {
                                     color: const Color.fromRGBO(255, 255, 255, 1),
                                     border: Border.all(
                                       color: const Color.fromRGBO(23, 94, 217, 1),
-                                      width: 2,
+                                      width: 0.5.w,
                                     ),
                                   ),
                                   child: profileCreationProvider.selectedItem == index ?
@@ -280,83 +285,53 @@ class _PostingScreenState extends State<PostingScreen> {
                   height: 1.2.h,
                 ),
                 widget.checkFlow != CheckFlow.editCommunity ?
-                Column(
-                  children: [
-                    Container(
-                      height: 6.h,
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                      ),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(7),
-                        color: const Color.fromRGBO(245, 247, 249, 1),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                  ),
+                  child: Column(
+                    children: [
+                      MainButton(
+                        text: 'СОХРАНИТЬ В ЧЕРНОВИК',
+                        textStyle: TextStyle(
+                          fontSize: 9.5.sp,
+                          color: const Color.fromRGBO(23, 94, 217, 1),
+                          fontFamily: ConstantsFonts.latoBold,
+                        ),
+                        activeColor: const Color.fromRGBO(245, 247, 249, 1),
                         border: Border.all(
+                          width: 0.1.h,
                           color: const Color.fromRGBO(23, 94, 217, 1),
                         ),
+                        onTap: () {
+                          profileCreationProvider.generateRequest(
+                            context,
+                            widget.checkFlow,
+                            1,
+                          );
+                        },
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(7),
-                          onTap: () {
-                            profileCreationProvider.generateRequest(
-                              context,
-                              widget.checkFlow,
-                              1,
-                            );
-                          },
-                          child: Center(
-                            child: Text(
-                              'SAVE AS DRAFT',
-                              style: TextStyle(
-                                color: const Color.fromRGBO(23, 94, 217, 1),
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10.5.sp,
-                              ),
-                            ),
-                          ),
+                      SizedBox(
+                        height: 1.2.h,
+                      ),
+                      MainButton(
+                        text: 'ОПУБЛИКОВАТЬ',
+                        textStyle: TextStyle(
+                          fontSize: 9.5.sp,
+                          color: const Color.fromRGBO(255, 255, 255, 1),
+                          fontFamily: ConstantsFonts.latoBold,
                         ),
+                        activeColor: const Color.fromRGBO(23, 94, 217, 1),
+                        onTap: () {
+                          profileCreationProvider.generateRequest(
+                            context,
+                            widget.checkFlow,
+                            0,
+                          );
+                        },
                       ),
-                    ),
-                    SizedBox(
-                      height: 1.2.h,
-                    ),
-                    Container(
-                      height: 6.h,
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                      ),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(7),
-                        color: const Color.fromRGBO(23, 94, 217, 1),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(7),
-                          onTap: () {
-                            profileCreationProvider.generateRequest(
-                              context,
-                              widget.checkFlow,
-                              0,
-                            );
-                          },
-                          child: Center(
-                            child: Text(
-                              'SAVE AND POSTING',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 10.5.sp,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ) :
                 Container(
                   height: 6.h,

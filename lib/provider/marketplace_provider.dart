@@ -245,12 +245,14 @@ class MarketplaceProvider extends ChangeNotifier {
   int productsMainPageNumber = 1;
   int productsMainLastPageNumber = 1;
 
+  int marketPlaceId = 14;
+
   Future getProductsMain() async {
     productsMainPageNumber = 1;
     productsMainModel = null;
     productsMainLoading = true;
     notifyListeners();
-    await service.getProductsCategoryRequest(productsMainPageNumber, 14, null, (response) {
+    await service.getProductsCategoryRequest(productsMainPageNumber, marketPlaceId, null, (response) {
       mapper.getProductsCategoryResponse(response, (model) {
         productsMainLoading = false;
         notifyListeners();
@@ -270,7 +272,7 @@ class MarketplaceProvider extends ChangeNotifier {
     productsMainPaginationLoading = true;
     notifyListeners();
     SVProgressHUD.show();
-    await service.getProductsCategoryRequest(productsMainPageNumber, 1, null, (response) {
+    await service.getProductsCategoryRequest(productsMainPageNumber, marketPlaceId, null, (response) {
       mapper.getProductsCategoryResponse(response, (model) {
         SVProgressHUD.dismiss();
         productsMainPaginationLoading = false;
@@ -297,7 +299,7 @@ class MarketplaceProvider extends ChangeNotifier {
     servicesMainModel = null;
     servicesMainLoading = true;
     notifyListeners();
-    await service.getServicesCategoryRequest(productsMainPageNumber, 1, '', (response) {
+    await service.getServicesCategoryRequest(productsMainPageNumber, marketPlaceId, '', (response) {
       mapper.getServicesCategoryResponse(response, (model) {
         servicesMainLoading = false;
         notifyListeners();
@@ -318,7 +320,7 @@ class MarketplaceProvider extends ChangeNotifier {
     servicesMainPaginationLoading = true;
     notifyListeners();
     SVProgressHUD.show();
-    await service.getProductsCategoryRequest(servicesMainPageNumber, 1, null, (response) {
+    await service.getProductsCategoryRequest(servicesMainPageNumber, marketPlaceId, null, (response) {
       mapper.getProductsCategoryResponse(response, (model) {
         SVProgressHUD.dismiss();
         servicesMainPaginationLoading = false;

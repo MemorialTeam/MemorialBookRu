@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memorial_book/models/common/image_response_model.dart';
 import 'package:memorial_book/widgets/platform_scroll_physics.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:sizer/sizer.dart';
@@ -15,7 +16,7 @@ class AllPicturesScreen extends StatelessWidget {
     required this.galleryTitle,
   }) : super(key: key);
 
-  final List imagesList;
+  final List<ImageResponseModel> imagesList;
   final String galleryTitle;
 
   @override
@@ -59,16 +60,16 @@ class AllPicturesScreen extends StatelessWidget {
                 barrierColor: Colors.black.withOpacity(0.4),
                 pageBuilder: (BuildContext context, _, __) => FullScreenGallery(
                   title: galleryTitle,
-                  gallery: imagesList,
+                  galleryModels: imagesList,
                   initialIndex: index,
                 ),
                 // context: tabBarProvider.mainContext,
               ),
             ),
             child: Hero(
-              tag: imagesList[index] ?? '',
+              tag: imagesList[index].id ?? '',
               child: CachedNetworkImage(
-                imageUrl: imagesList[index] ?? '',
+                imageUrl: imagesList[index].url ?? '',
                 imageBuilder: (context, imageProvider) {
                   return Image(
                     image: imageProvider,

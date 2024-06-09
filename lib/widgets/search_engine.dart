@@ -20,6 +20,7 @@ class SearchEngine extends StatefulWidget {
     this.title,
     this.isEmptyFunc,
     required this.isNotEmptyFunc,
+    this.suffixIcon,
   });
 
   final FocusNode focusNode;
@@ -39,6 +40,8 @@ class SearchEngine extends StatefulWidget {
   final TextStyle? textStyle;
 
   final String? title;
+
+  final Widget? suffixIcon;
 
   final void Function()? isEmptyFunc;
   final void Function(String) isNotEmptyFunc;
@@ -98,6 +101,7 @@ class _SearchEngineState extends State<SearchEngine> {
         ),
         child: loading(),
       ),
+      suffixIcon: widget.suffixIcon,
     );
   }
 }

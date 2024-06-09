@@ -17,8 +17,9 @@ import 'package:sizer/sizer.dart';
 import '../helpers/enums.dart';
 import '../models/communitites/response/get_community_info_response_model.dart';
 import '../provider/onboarding_indicator_provider.dart';
+import 'element_selection/body_type_popup_menu_item.dart';
+import 'full_screen_gallery.dart';
 import 'memorial_book_icon_widget.dart';
-import 'open_image_core.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({
@@ -40,6 +41,7 @@ class _PostCardState extends State<PostCard> {
 
   Widget typeFlow() {
     final onboardingIndicatorProvider = Provider.of<OnboardingIndicatorProvider>(context);
+    final tabBarProvider = Provider.of<TabBarProvider>(context);
     switch(widget.model.contentType) {
       case PostContentType.textContent:
         return Column(
@@ -91,50 +93,61 @@ class _PostCardState extends State<PostCard> {
                     controller: widget.model.pageController,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
-                      return OpenImage(
-                        initialIndex: index,
-                        disposeLevel: DisposeLevel.High,
-                        dataImage: widget.model.gallery ?? [],
-                        imageUrl: 'url',
-                        child: CachedNetworkImage(
-                          imageUrl: widget.model.gallery?[index]['url'] ?? '',
-                          progressIndicatorBuilder: (context, url, downloadProgress) => SkeletonLoaderWidget(
-                            width: double.infinity,
-                            height: 29.h,
-                            borderRadius: 0,
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                          tabBarProvider.mainContext,
+                          PageRouteBuilder(
+                            opaque: false,
+                            barrierColor: Colors.black.withOpacity(0.4),
+                            pageBuilder: (BuildContext context, _, __) => FullScreenGallery(
+                              title: '',
+                              galleryModels: widget.model.gallery ?? [],
+                              initialIndex: index,
+                            ),
                           ),
-                          errorWidget: (context, url, error) => Container(
-                            color: const Color.fromRGBO(0, 0, 0, 0.5),
-                            width: double.infinity,
-                            height: 29.h,
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 5.w,
-                                ),
-                                child: Text(
-                                  'Got Error - $error',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: ConstantsFonts.latoBlack,
-                                    fontSize: 12.5.sp,
+                        ),
+                        child: Hero(
+                          tag: widget.model.gallery?[index].id ?? index,
+                          child: CachedNetworkImage(
+                            imageUrl: widget.model.gallery?[index].url ?? '',
+                            progressIndicatorBuilder: (context, url, downloadProgress) => SkeletonLoaderWidget(
+                              width: double.infinity,
+                              height: 29.h,
+                              borderRadius: 0,
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: const Color.fromRGBO(0, 0, 0, 0.5),
+                              width: double.infinity,
+                              height: 29.h,
+                              child: Center(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 5.w,
+                                  ),
+                                  child: Text(
+                                    'Got Error - $error',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: ConstantsFonts.latoBlack,
+                                      fontSize: 12.5.sp,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          imageBuilder: (context, imageProvider) {
-                            return Container(
-                              width: double.infinity,
-                              height: 29.h,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
+                            imageBuilder: (context, imageProvider) {
+                              return Container(
+                                width: double.infinity,
+                                height: 29.h,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       );
                     },
@@ -250,50 +263,61 @@ class _PostCardState extends State<PostCard> {
                     scrollDirection: Axis.horizontal,
                     physics: platformScrollPhysics(),
                     itemBuilder: (context, index) {
-                      return OpenImage(
-                        initialIndex: index,
-                        disposeLevel: DisposeLevel.High,
-                        dataImage: widget.model.gallery ?? [],
-                        imageUrl: 'url',
-                        child: CachedNetworkImage(
-                          imageUrl: widget.model.gallery?[index]['url'].toString() ?? '',
-                          progressIndicatorBuilder: (context, url, downloadProgress) => SkeletonLoaderWidget(
-                            width: double.infinity,
-                            height: 29.h,
-                            borderRadius: 0,
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                          tabBarProvider.mainContext,
+                          PageRouteBuilder(
+                            opaque: false,
+                            barrierColor: Colors.black.withOpacity(0.4),
+                            pageBuilder: (BuildContext context, _, __) => FullScreenGallery(
+                              title: '',
+                              galleryModels: widget.model.gallery ?? [],
+                              initialIndex: index,
+                            ),
                           ),
-                          errorWidget: (context, url, error) => Container(
-                            color: const Color.fromRGBO(0, 0, 0, 0.5),
-                            width: double.infinity,
-                            height: 29.h,
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 5.w,
-                                ),
-                                child: Text(
-                                  'Got Error - $error',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: ConstantsFonts.latoBlack,
-                                    fontSize: 12.5.sp,
+                        ),
+                        child: Hero(
+                          tag: widget.model.gallery?[index].id ?? index,
+                          child: CachedNetworkImage(
+                            imageUrl: widget.model.gallery?[index].url ?? '',
+                            progressIndicatorBuilder: (context, url, downloadProgress) => SkeletonLoaderWidget(
+                              width: double.infinity,
+                              height: 29.h,
+                              borderRadius: 0,
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: const Color.fromRGBO(0, 0, 0, 0.5),
+                              width: double.infinity,
+                              height: 29.h,
+                              child: Center(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 5.w,
+                                  ),
+                                  child: Text(
+                                    'Got Error - $error',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: ConstantsFonts.latoBlack,
+                                      fontSize: 12.5.sp,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          imageBuilder: (context, imageProvider) {
-                            return Container(
-                              width: double.infinity,
-                              height: 29.h,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
+                            imageBuilder: (context, imageProvider) {
+                              return Container(
+                                width: double.infinity,
+                                height: 29.h,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       );
                     },
@@ -797,79 +821,3 @@ class _PostCardState extends State<PostCard> {
   }
 }
 
-enum MenuFlow {
-  editPost,
-  pinPost,
-  deletePost,
-}
-
-class BoardTypePopupMenuItem extends PopupMenuEntry {
-  const BoardTypePopupMenuItem({
-    super.key,
-    required this.onTap,
-    required this.title,
-    required this.image,
-    required this.weight,
-    this.style,
-  });
-
-  final void Function()? onTap;
-
-  final String title;
-
-  final Widget image;
-
-  final double weight;
-
-  final TextStyle? style;
-
-  @override
-  double get height => 5.6.h;
-
-  @override
-  State<StatefulWidget> createState() {
-    return _BoardTypePopupMenuItemState();
-  }
-
-  @override
-  bool represents(value) {
-    throw UnimplementedError();
-  }
-}
-
-class _BoardTypePopupMenuItemState
-    extends State<BoardTypePopupMenuItem> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: widget.onTap,
-        child: SizedBox(
-          height: widget.height,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 3.8.w,
-              ),
-              widget.image,
-              SizedBox(
-                width: widget.weight,
-              ),
-              Text(
-                widget.title,
-                style: widget.style ?? TextStyle(
-                  color: const Color.fromRGBO(51, 51, 51, 1),
-                  fontFamily: ConstantsFonts.latoBold,
-                  fontSize: 10.5.sp,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

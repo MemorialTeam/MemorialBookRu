@@ -58,8 +58,9 @@ class SearchHeaderWidget extends StatelessWidget {
             behavior: HitTestBehavior.translucent,
             onTap: () => Navigator.push(
               context,
-              CupertinoPageRoute(
+              CupertinoDialogRoute(
                 builder: (context) => filterRoute,
+                context: context,
               ),
             ),
             child: Row(

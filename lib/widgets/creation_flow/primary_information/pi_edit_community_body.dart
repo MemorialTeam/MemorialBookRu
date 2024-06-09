@@ -20,7 +20,7 @@ class PIEditCommunityBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Name:',
+                'Название:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(
@@ -55,7 +55,7 @@ class PIEditCommunityBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               Text(
-                'Signature:',
+                'Подпись:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(
@@ -69,7 +69,7 @@ class PIEditCommunityBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               Text(
-                'Location:',
+                'Местоположение:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(
@@ -108,7 +108,7 @@ class PIEditCommunityBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               Text(
-                'Phone number:',
+                'Номер телефона:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(
@@ -121,7 +121,8 @@ class PIEditCommunityBody extends StatelessWidget {
                 maxLines: 1,
                 inputFormatters: [
                   MaskedInputFormatter(
-                    '+###############',
+                    '+# (###) ###-##-##',
+                    allowedCharMatcher: RegExp(r'[0-9]'),
                   ),
                 ],
                 keyboardType: TextInputType.number,
@@ -130,7 +131,7 @@ class PIEditCommunityBody extends StatelessWidget {
                 height: 3.6.h,
               ),
               Text(
-                'Website:',
+                'Сайт:',
                 style: ConstantsTextStyles.unRequiredTextStyle,
               ),
               SizedBox(
@@ -140,7 +141,7 @@ class PIEditCommunityBody extends StatelessWidget {
                 controller: profileCreationProvider.editWebsiteCommunityController,
                 hintText: profileCreationProvider.communityEditModel.website != '' ?
                 profileCreationProvider.communityEditModel.website :
-                'Website',
+                'Сайт',
                 minLines: 1,
                 maxLines: 1,
               ),

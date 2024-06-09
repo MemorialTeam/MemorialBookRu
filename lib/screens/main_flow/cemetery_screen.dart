@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memorial_book/helpers/constants.dart';
@@ -8,9 +7,9 @@ import 'package:memorial_book/screens/flow_build.dart';
 import 'package:memorial_book/screens/main_flow/some_selected_screens/selected_cemetery_screen.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/search_engine.dart';
-import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import '../../helpers/enums.dart';
 import '../../provider/account_provider.dart';
 import '../../provider/catalog_provider.dart';
 import '../../widgets/cards/horizontal_mini_card_widget.dart';
@@ -34,8 +33,8 @@ class _CemeteryScreenState extends State<CemeteryScreen> {
 
   @override
   void initState() {
-    final _catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
-    _catalogProvider.gettingCemeteries(context, (model) {});
+    final catalogProvider = Provider.of<CatalogProvider>(context, listen: false);
+    catalogProvider.gettingCemeteries(context, (model) {});
     super.initState();
   }
 
@@ -303,6 +302,7 @@ class _CemeteryScreenState extends State<CemeteryScreen> {
                   padding: EdgeInsets.symmetric(
                     vertical: 3.8.h,
                   ),
+                  color: const Color.fromRGBO(255, 255, 255, 1),
                   child: Column(
                     children: [
                       Image.asset(
@@ -364,7 +364,6 @@ class _CemeteryScreenState extends State<CemeteryScreen> {
                       ),
                     ],
                   ),
-                  color: const Color.fromRGBO(255, 255, 255, 1),
                 ) :
                 Container(
                   width: double.infinity,

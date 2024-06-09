@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:memorial_book/widgets/creation_body_widget.dart';
 import 'package:memorial_book/widgets/creation_flow/required_text.dart';
+import 'package:memorial_book/widgets/main_button.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
+import '../../helpers/enums.dart';
 import '../../provider/profile_creation_provider.dart';
 import '../../widgets/chooser_widget.dart';
 import '../../widgets/platform_scroll_physics.dart';
@@ -62,7 +65,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pictures and movies:',
+                        'Фотографии:',
                         style: ConstantsTextStyles.unRequiredTextStyle,
                       ),
                       SizedBox(
@@ -369,11 +372,11 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       ),
                       widget.checkFlow == CheckFlow.editCommunity ?
                       Text(
-                        'Description:',
+                        'Описание:',
                         style: ConstantsTextStyles.unRequiredTextStyle,
                       ) :
                       const RequiredText(
-                        text: 'Description:',
+                        text: 'Описание:',
                       ),
                       SizedBox(
                         height: 1.2.h,
@@ -384,6 +387,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                         autocorrect: false,
                         maxLines: 14,
                         minLines: 7,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(1000),
+                        ],
                         decoration: InputDecoration(
                           hintStyle: TextStyle(
                             color: const Color.fromRGBO(32, 30, 31, 0.5),
@@ -392,7 +398,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           ),
                           isDense: true,
                           filled: true,
-                          hintText: 'Description text ...',
+                          hintText: 'Какое-то описание...',
                           fillColor: const Color.fromRGBO(245, 247, 249, 1),
                           border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(
@@ -430,7 +436,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                             height: 2.4.h,
                           ),
                           Text(
-                            'Hobbies:',
+                            'Хобби:',
                             style: ConstantsTextStyles.unRequiredTextStyle,
                           ),
                           SizedBox(
@@ -447,7 +453,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           profileCreationProvider.selectedHobbiesList.isNotEmpty ?
                           Wrap(
                             children: profileCreationProvider.selectedHobbiesList.map(
-                                  (String index) => Row(
+                              ((String index) => Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
@@ -472,9 +478,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                                     ),
                                   ),
                                 ],
-                              ),
+                              )),
                             ).map(
-                                  (widget) => Container(
+                              ((widget) => Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 1.6.w,
                                   vertical: 6,
@@ -490,7 +496,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                                   ),
                                 ),
                                 child: widget,
-                              ),
+                              )),
                             ).toList(),
                           ) :
                           const SizedBox(),
@@ -502,7 +508,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                                 height: 2.4.h,
                               ),
                               Text(
-                                'Religion views:',
+                                'Религиозные взгляды:',
                                 style: ConstantsTextStyles.unRequiredTextStyle,
                               ),
                               SizedBox(
@@ -525,48 +531,29 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                 SizedBox(
                   height: 1.2.h,
                 ),
-                Container(
-                  height: 6.h,
+                MainButton(
                   margin: EdgeInsets.symmetric(
                     vertical: 2.2.h,
-                    horizontal: 20.w,
+                    horizontal: 15.w,
                   ),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7),
-                    color: profileCreationProvider.descriptionCheck(widget.checkFlow) != true ?
-                    const Color.fromRGBO(23, 94, 217, 0.5) :
-                    const Color.fromRGBO(23, 94, 217, 1),
+                  text: 'ПРОДОЛЖИТЬ',
+                  textStyle: TextStyle(
+                    fontSize: 9.5.sp,
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    fontFamily: ConstantsFonts.latoBold,
                   ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(7),
-                      onTap: profileCreationProvider.descriptionCheck(widget.checkFlow) != true ?
-                      null :
-                          () {
-                        profileCreationProvider.pageController.nextPage(
-                          duration: const Duration(
-                            milliseconds: 500,
-                          ),
-                          curve: Curves.ease,
-                        );
-                      },
-                      child: Center(
-                        child: Text(
-                          'Продолжить',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10.5.sp,
-                          ),
-                        ),
+                  onTap: (() {
+                    profileCreationProvider.pageController.nextPage(
+                      duration: const Duration(
+                        milliseconds: 500,
                       ),
-                    ),
-                  ),
+                      curve: Curves.ease,
+                    );
+                  }),
+                  condition: profileCreationProvider.descriptionCheck(widget.checkFlow),
                 ),
                 SizedBox(
-                  height: 1.6.h,
+                  height: 1.2.h,
                 ),
               ],
             ),

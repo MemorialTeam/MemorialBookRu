@@ -1,4 +1,4 @@
-import '../../../widgets/cards/horizontal_mini_card_widget.dart';
+import '../../../helpers/enums.dart';
 import '../../people/response/get_map_of_people_response_model.dart';
 
 class GetAuthorizedContentResponseModel {
@@ -39,9 +39,9 @@ class DataAuthorizedContentResponseModel {
     humans = List.of(json['humans']).map(
       ((index) => HumanDataResponseModel.fromJson(index)),
     ).toList();
-    // cemeteries = List.of(json['cemeteries']).map(
-    //   ((index) => CemeteryDataResponseModel.fromJson(index)),
-    // ).toList();
+    cemeteries = List.of(json['cemeteries']).map(
+      ((index) => CemeteryDataResponseModel.fromJson(index)),
+    ).toList();
     pets = List.of(json['pets']).map(
       ((index) => CelebrityPetDataResponseModel.fromJson(index)),
     ).toList();
@@ -121,23 +121,26 @@ class HumanDataResponseModel {
 
 class CemeteryDataResponseModel {
   int? id;
-  String? title;
-  String? subtitle;
+  String? name;
+  String? address;
+  CoordsResponseModel? coords;
   String? avatar;
   String? banner;
 
   CemeteryDataResponseModel({
     required this.id,
-    required this.title,
-    required this.subtitle,
+    required this.name,
+    required this.address,
+    required this.coords,
     required this.avatar,
     required this.banner,
   });
 
   CemeteryDataResponseModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    title = json['title'];
-    subtitle = json['subtitle'];
+    name = json['name'];
+    address = json['address'];
+    coords = CoordsResponseModel.fromJson(json['address_coords']);
     avatar = json['avatar'];
     banner = json['banner'];
   }

@@ -8,6 +8,7 @@ import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import '../../helpers/constants.dart';
+import '../../helpers/enums.dart';
 import '../../widgets/animation/sprite_painter.dart';
 import '../../widgets/memorial_app_bar.dart';
 
@@ -49,34 +50,12 @@ class _CreationFlowState extends State<CreationFlow> with SingleTickerProviderSt
 
   @override
   void initState() {
-    final profileCreationProvider = Provider.of<ProfileCreationProvider>(context, listen: false);
-    switch(widget.checkFlow) {
-      case CheckFlow.profile:
-        profileCreationProvider.gettingReligions().whenComplete(() => profileCreationProvider.gettingRelatedProfiles(
-          context: context,
-          gender: 'male',
-        ).whenComplete(
-          (() async => await profileCreationProvider.gettingRelatedProfiles(
-            context: context,
-            gender: 'female',
-          ).whenComplete(
-            (() async => await profileCreationProvider.gettingRelatedProfiles(
-              context: context,
-            )),
-          )),
-        )).whenComplete(() => profileCreationProvider.gettingHobbies());
-        break;
-      case CheckFlow.pet:
-        profileCreationProvider.gettingRelatedProfiles(
-          context: context,
-        );
-        break;
-      case CheckFlow.cemetery:
-        break;
-      case CheckFlow.community:
-        break;
-      case CheckFlow.editCommunity:
-        break;
+    final profileCreationProvider = Provider.of<ProfileCreationProvider>(
+      context,
+      listen: false,
+    );
+    if(widget.checkFlow == CheckFlow.profile) {
+      profileCreationProvider.gettingReligions().whenComplete(() => profileCreationProvider.gettingHobbies());
     }
     profileCreationProvider.animationDispose();
     _initialization();
