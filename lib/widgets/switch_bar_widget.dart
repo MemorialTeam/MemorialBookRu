@@ -66,23 +66,29 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
       return [
         Visibility(
           visible: selectedMenuIndex == 0,
-          child: Padding(
+          child: model?.description != null && model!.description!.isNotEmpty ?
+          Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 5.w,
             ),
             child: Text(
-              model?.description ?? '',
+              model.description ?? '',
               style: TextStyle(
                 fontSize: 10.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey.shade700,
+                fontFamily: ConstantsFonts.latoRegular,
+                color: const Color.fromRGBO(32, 30, 31, 0.7),
               ),
             ),
+          ) :
+          const MemorialBookIconWidget(
+            title: 'Описание\nотсутствует',
+            color: Color.fromRGBO(18, 175, 82, 0.6),
           ),
         ),
         Visibility(
           visible: selectedMenuIndex == 1,
-          child: Padding(
+          child: model?.memorials != null && model!.memorials!.isNotEmpty ?
+          Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 3.6.w,
             ),
@@ -93,8 +99,8 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                 SearchEngine(
                   focusNode: communityMemorialsNode,
                   controller: communityMemorialsController,
-                  isNotEmptyFunc: (text) => catalogProvider.communityMemorialsSearch(text, model?.id ?? 0),
-                  isEmptyFunc: () => catalogProvider.gettingCommunityProfile(context, model?.id ?? 0),
+                  isNotEmptyFunc: (text) => catalogProvider.communityMemorialsSearch(text, model.id ?? 0),
+                  isEmptyFunc: () => catalogProvider.gettingCommunityProfile(context, model.id ?? 0),
                   isSearching: catalogProvider.isMemorialsCommunitySearch,
                 ),
                 SizedBox(
@@ -103,7 +109,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                 ListView.builder(
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    final dataList = model?.memorials?[index];
+                    final dataList = model.memorials?[index];
                     final String firstName = dataList?.firstName == '' || dataList?.firstName == null ?
                     '' :
                     '${dataList?.firstName} ';
@@ -128,11 +134,11 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                     );
                   },
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: model?.memorials?.length != null && model!.memorials!.length > 5 ?
+                  itemCount: model.memorials?.length != null && model.memorials!.length > 5 ?
                   5 :
-                  model?.memorials?.length ?? 0,
+                  model.memorials?.length ?? 0,
                 ),
-                if(model?.memorials?.length != null && model!.memorials!.length > 5)
+                if(model.memorials?.length != null && model.memorials!.length > 5)
                   Padding(
                     padding: EdgeInsets.only(
                       top: 2.2.h,
@@ -156,6 +162,10 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                   ),
               ],
             ),
+          ) :
+          const MemorialBookIconWidget(
+            title: 'Мемориалы\nотсутствуют',
+            color: Color.fromRGBO(18, 175, 82, 0.6),
           ),
         ),
         Visibility(
@@ -580,7 +590,11 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
         Visibility(
           visible: value == 2,
           maintainState: true,
-          child: Padding(
+          child: selectedCommunityModel?.website == null || selectedCommunityModel!.website!.isEmpty && selectedCommunityModel.socialLinks != null && selectedCommunityModel.socialLinks!.isNotEmpty ?
+          MemorialBookIconWidget(
+            title: 'Соц. ссылки\nотстутствуют',
+          ) :
+          Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 3.4.w,
             ),
@@ -589,7 +603,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                selectedCommunityModel?.website != null ?
+                selectedCommunityModel.website != null ?
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -605,7 +619,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                       height: 2.4.h,
                     ),
                     LinkWidget(
-                      link: selectedCommunityModel?.website ?? '',
+                      link: selectedCommunityModel.website ?? '',
                     ),
                     SizedBox(
                       height: 2.4.h,
@@ -613,7 +627,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                   ],
                 ) :
                 const SizedBox(),
-                selectedCommunityModel?.socialLinks != null ?
+                selectedCommunityModel.socialLinks != null && selectedCommunityModel.socialLinks!.isNotEmpty ?
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -632,8 +646,8 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-                        String key = selectedCommunityModel?.socialLinks?.keys.elementAt(index) ?? '';
-                        final data = selectedCommunityModel?.socialLinks?[key];
+                        String key = selectedCommunityModel.socialLinks?.keys.elementAt(index) ?? '';
+                        final data = selectedCommunityModel.socialLinks?[key];
                         return LinkWidget(
                           link: data ?? '',
                         );
@@ -643,7 +657,7 @@ class _SwitchBarWidgetState extends State<SwitchBarWidget> with SingleTickerProv
                           height: 2.h,
                         );
                       },
-                      itemCount: selectedCommunityModel?.socialLinks?.length ?? 0,
+                      itemCount: selectedCommunityModel.socialLinks?.length ?? 0,
                     ),
                   ],
                 ) :

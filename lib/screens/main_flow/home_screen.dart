@@ -12,7 +12,6 @@ import 'package:memorial_book/widgets/cards/vertical_card_widget.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/home_frame_skeleton_widget.dart';
 import 'package:memorial_book/widgets/home_frame_widget.dart';
-import 'package:memorial_book/widgets/tab_bar_widget/tab_bar_core.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -49,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     catalogProvider.setCustomMarker();
     if(authProvider.userRules == 'authorized') {
       catalogProvider.gettingAuthorizedMainContent(context, (model) {});
+      catalogProvider.getNotificationCount((model) {});
     } else if(authProvider.userRules == 'guest') {
       catalogProvider.gettingGuestMainContent(context, (model) {});
     }
@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           physics: platformScrollPhysics(),
                           children: [
                             SizedBox(
-                              width: 2.2.w,
+                              width: 3.2.w,
                             ),
                             ListView.separated(
                               shrinkWrap: true,
@@ -251,62 +251,68 @@ class _HomeScreenState extends State<HomeScreen> {
                               2.2.w :
                               0,
                             ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                PunchingAnimation(
-                                  child: SizedBox(
-                                    width: 28.w,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        profileCreationProvider.disposeHumanCreate();
-                                        Navigator.push(
-                                          tabBarProvider.mainContext,
-                                          CupertinoPageRoute(
-                                            builder: (context) => const CreationFlow(
-                                              checkFlow: CheckFlow.profile,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            width: double.infinity,
-                                            height: 18.h,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(5),
-                                              color: const Color.fromRGBO(241, 241, 241, 1),
-                                            ),
-                                            child: Center(
-                                              child: Icon(
-                                                CupertinoIcons.plus,
-                                                color: const Color.fromRGBO(130, 130, 130, 1),
-                                                size: 20.sp,
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: 0.5.h,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  PunchingAnimation(
+                                    child: SizedBox(
+                                      width: 28.w,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          profileCreationProvider.disposeHumanCreate();
+                                          Navigator.push(
+                                            tabBarProvider.mainContext,
+                                            CupertinoPageRoute(
+                                              builder: (context) => const CreationFlow(
+                                                checkFlow: CheckFlow.profile,
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 1.2.h,
-                                          ),
-                                          Text(
-                                            'Создать профиль',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 9.5.sp,
-                                              fontFamily: ConstantsFonts.latoBold,
+                                          );
+                                        },
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: double.infinity,
+                                              height: 18.h,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(5),
+                                                color: const Color.fromRGBO(241, 241, 241, 1),
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  CupertinoIcons.plus,
+                                                  color: const Color.fromRGBO(130, 130, 130, 1),
+                                                  size: 20.sp,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(
+                                              height: 1.2.h,
+                                            ),
+                                            Text(
+                                              'Создать профиль',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 9.5.sp,
+                                                height: 0.9.sp,
+                                                fontFamily: ConstantsFonts.latoBold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
+                                  ) ,
+                                  SizedBox(
+                                    width: 3.2.w,
                                   ),
-                                ) ,
-                                SizedBox(
-                                  width: 3.2.w,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -483,7 +489,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           physics: platformScrollPhysics(),
                           children: [
                             SizedBox(
-                              width: 2.2.w,
+                              width: 3.2.w,
                             ),
                             ListView.separated(
                               shrinkWrap: true,
@@ -530,57 +536,65 @@ class _HomeScreenState extends State<HomeScreen> {
                               2.2.w :
                               0,
                             ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    profileCreationProvider.disposePetCreate();
-                                    Navigator.push(
-                                      tabBarProvider.mainContext,
-                                      CupertinoPageRoute(
-                                        builder: (context) => const CreationFlow(
-                                          checkFlow: CheckFlow.pet,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: 28.w,
-                                        height: 18.3.h,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5),
-                                          color: const Color.fromRGBO(241, 241, 241, 1),
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            CupertinoIcons.plus,
-                                            color: const Color.fromRGBO(130, 130, 130, 1),
-                                            size: 20.sp,
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: 0.5.h,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      profileCreationProvider.disposePetCreate();
+                                      Navigator.push(
+                                        tabBarProvider.mainContext,
+                                        CupertinoPageRoute(
+                                          builder: (context) => const CreationFlow(
+                                            checkFlow: CheckFlow.pet,
                                           ),
                                         ),
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: 28.w,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            height: 18.h,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(5),
+                                              color: const Color.fromRGBO(241, 241, 241, 1),
+                                            ),
+                                            child: Center(
+                                              child: Icon(
+                                                CupertinoIcons.plus,
+                                                color: const Color.fromRGBO(130, 130, 130, 1),
+                                                size: 20.sp,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 1.2.h,
+                                          ),
+                                          Text(
+                                            'Создать профиль\nпитомца',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 9.5.sp,
+                                              height: 0.9.sp,
+                                              fontFamily: ConstantsFonts.latoBold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(
-                                        height: 1.h,
-                                      ),
-                                      Text(
-                                        'Создайте профиль\nпитомца',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 10.sp,
-                                          fontFamily: ConstantsFonts.latoBold,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  width: 3.2.w,
-                                ),
-                              ],
+                                  SizedBox(
+                                    width: 3.2.w,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -618,6 +632,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       builder: (context) => SelectedCommunityScreen(
                                         id: dataList.id ?? 0,
                                         avatar: dataList.avatar ?? '',
+                                        banner: dataList.banner,
                                       ),
                                     ),
                                   ),
@@ -757,7 +772,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           physics: platformScrollPhysics(),
                           children: [
                             SizedBox(
-                              width: 2.2.w,
+                              width: 3.2.w,
                             ),
                             ListView.separated(
                               shrinkWrap: true,
@@ -796,7 +811,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(
                               width: catalogProvider.humans.isNotEmpty ?
-                              2.2.w :
+                              3.2.w :
                               0,
                             ),
                           ],
@@ -876,7 +891,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           physics: platformScrollPhysics(),
                           children: [
                             SizedBox(
-                              width: 2.2.w,
+                              width: 3.2.w,
                             ),
                             ListView.separated(
                               shrinkWrap: true,
@@ -920,7 +935,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(
                               width: catalogProvider.pets.isNotEmpty ?
-                              2.2.w :
+                              3.2.w :
                               0,
                             ),
                           ],
@@ -959,6 +974,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       builder: (context) => SelectedCommunityScreen(
                                         id: dataList.id ?? 0,
                                         avatar: dataList.avatar ?? '',
+                                        banner: dataList.banner,
                                       ),
                                     ),
                                   ),

@@ -107,7 +107,6 @@ class APIManager {
       headers: headers,
     );
     print(requestURL);
-    print(response.body);
 
     switch (response.statusCode) {
       case 200:

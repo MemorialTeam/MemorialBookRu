@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memorial_book/widgets/main_button.dart';
 import 'package:sizer/sizer.dart';
 import '../helpers/constants.dart';
 
@@ -43,29 +44,14 @@ class MessageDialogsProvider extends ChangeNotifier {
                   SizedBox(
                     height: 1.2.h,
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 6.6.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(7),
-                      color: buttonColor ?? const Color.fromRGBO(23, 94, 217, 1),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(7),
-                        onTap: () => Navigator.pop(context),
-                        child: Center(
-                          child: Text(
-                            textButton,
-                            style: TextStyle(
-                              fontSize: 9.5.sp,
-                              fontFamily: ConstantsFonts.latoBold,
-                              color: buttonTextColor ?? const Color.fromRGBO(255, 255, 255, 1),
-                            ),
-                          ),
-                        ),
-                      ),
+                  MainButton(
+                    text: textButton,
+                    onTap: () => Navigator.pop(context),
+                    activeColor: buttonColor ?? const Color.fromRGBO(23, 94, 217, 1),
+                    textStyle: TextStyle(
+                      fontSize: 9.5.sp,
+                      fontFamily: ConstantsFonts.latoBold,
+                      color: buttonTextColor ?? const Color.fromRGBO(255, 255, 255, 1),
                     ),
                   ),
                 ],
@@ -128,7 +114,7 @@ class MessageDialogsProvider extends ChangeNotifier {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: ConstantsFonts.latoRegular,
-                          fontSize: 10.sp,
+                          fontSize: 9.5.sp,
                           color: const Color.fromRGBO(32, 30, 31, 0.8),
                           height: 0.2.h,
                         ),
@@ -141,56 +127,27 @@ class MessageDialogsProvider extends ChangeNotifier {
                     1.2.h :
                     2.6.h,
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 6.6.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(7),
-                      color: yesColorButton ?? const Color.fromRGBO(250, 18, 46, 1),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(7),
-                        onTap: yesOnTap,
-                        child: Center(
-                          child: Text(
-                            yesButton,
-                            style: TextStyle(
-                              fontSize: 9.5.sp,
-                              fontFamily: ConstantsFonts.latoBold,
-                              color: const Color.fromRGBO(255, 255, 255, 1),
-                            ),
-                          ),
-                        ),
-                      ),
+                  MainButton(
+                    text: yesButton,
+                    onTap: yesOnTap,
+                    activeColor: yesColorButton ?? const Color.fromRGBO(250, 18, 46, 1),
+                    textStyle: TextStyle(
+                      fontSize: 9.5.sp,
+                      fontFamily: ConstantsFonts.latoBold,
+                      color: const Color.fromRGBO(255, 255, 255, 1),
                     ),
                   ),
                   SizedBox(
                     height: 1.h,
                   ),
-                  Container(
-                    width: double.infinity,
-                    height: 6.6.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: noOnTap ?? () => Navigator.pop(context),
-                        borderRadius: BorderRadius.circular(7),
-                        child: Center(
-                          child: Text(
-                            noButton,
-                            style: TextStyle(
-                              fontSize: 8.5.sp,
-                              fontFamily: ConstantsFonts.latoBold,
-                              color: const Color.fromRGBO(32, 30, 31, 1),
-                            ),
-                          ),
-                        ),
-                      ),
+                  MainButton(
+                    text: noButton,
+                    onTap: noOnTap ?? () => Navigator.pop(context),
+                    activeColor: Colors.transparent,
+                    textStyle: TextStyle(
+                      fontSize: 9.5.sp,
+                      fontFamily: ConstantsFonts.latoBold,
+                      color: const Color.fromRGBO(32, 30, 31, 1),
                     ),
                   ),
                 ],

@@ -58,12 +58,21 @@ class ConstantsAssets {
   static String editPostImage = 'assets/images/editPostImage.png';
   static String pinPostImage = 'assets/images/pinPostImage.png';
   static String deletePostImage = 'assets/images/deletePostImage.png';
+  /// logo's
   static String websiteInternetImage = 'assets/images/websiteInternetImage.png';
   static String instagramImage = 'assets/images/instagramImage.png';
   static String facebookImage = 'assets/images/facebookImage.png';
   static String twitterImage = 'assets/images/twitterImage.png';
   static String redditImage = 'assets/images/redditImage.png';
   static String snapchatImage = 'assets/images/snapchatImage.png';
+  static String pinterestImage = 'assets/images/pinterestImage.png';
+  static String tikTokImage = 'assets/images/tikTokImage.png';
+  static String okImage = 'assets/images/okImage.png';
+  static String linkedInImage = 'assets/images/linkedInImage.png';
+  static String youtubeImage = 'assets/images/youtubeImage.png';
+  static String vkImage = 'assets/images/vkImage.png';
+  static String threadsImage = 'assets/images/threadsImage.png';
+  /// logo's
   static String threePointsImage = 'assets/images/threePointsImage.png';
   static String shareCommunityImage = 'assets/images/shareCommunityImage.png';
   static String sortImage = 'assets/images/sortImage.png';
@@ -102,6 +111,8 @@ class ConstantsAssets {
   static String freemasonryImage = 'assets/images/freemasonryImage.png';
   static String eyeClosedImage = 'assets/images/eyeClosedImage.png';
   static String eyeOpenedImage = 'assets/images/eyeOpenedImage.png';
+  static String notificationIsEmpty = 'assets/images/notificationIsEmpty.png';
+  static String notificationIsNotEmpty = 'assets/images/notificationIsNotEmpty.png';
 }
 
 class ConstantsFonts {
@@ -149,6 +160,8 @@ class ConstEndpoints {
   static const String getPetsProfiles = 'profiles/pets';
   static const String logoutEndPoint = 'auth/logout';
   static const String authorizedMainPage = 'user/feed';
+  static const String getNotificationCount = 'user/notifications/new/count';
+  static const String getUserNotifications = 'user/notifications';
   static const String gettingRelatedProfiles = 'profile/humans';
   static const String gettingReligions = 'attributes/religions';
   static const String gettingHobbies = 'attributes/hobbies';
@@ -163,6 +176,7 @@ class ConstEndpoints {
   static const String creatingCemetery = 'profile/cemeteries';
   static const String creatingCommunity = 'communities';
   static const String userInfoEndPoint = 'cabinet/user/';
+  static const String getDistrictsCemetery = 'profiles/cemeteries/districts';
   static const String getUserInfo = 'cabinet/user';
   static const String createPost = 'communities/posts/';
   static const String sendCodeForPasswordRecovery = 'auth/password/email';
@@ -182,4 +196,25 @@ class ConstantsTextStyles {
     fontFamily: ConstantsFonts.latoRegular,
     fontSize: 9.5.sp,
   );
+}
+
+class ConstantsValidationTypes {
+  String? searchProfileValidate(String? value) {
+    if(value != null && value.isNotEmpty) {
+      if(value.length < 3) {
+        return 'Введите 3 символа, чтобы начать поиск';
+      }
+    }
+    return null;
+  }
+  String? dateFilterValidation(String? value) {
+    if(value != null && value.isNotEmpty) {
+      if(value.isNotEmpty && value.length != 11) {
+        return 'Заполните дату полностью';
+      } else if(int.parse(value[0] + value[1] + value[2] + value[3]) > int.parse(value[7] + value[8] + value[9] + value[10])) {
+        return 'Не правильная вилка даты';
+      }
+    }
+    return null;
+  }
 }

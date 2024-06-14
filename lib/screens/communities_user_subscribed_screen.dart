@@ -254,6 +254,7 @@ class CommunitiesUserSubscribedScreen extends StatelessWidget {
                               builder: (context) => SelectedCommunityScreen(
                                 id: dataList.id ?? 0,
                                 avatar: dataList.avatar ?? '',
+                                banner: dataList.banner,
                               ),
                             ),
                           ),

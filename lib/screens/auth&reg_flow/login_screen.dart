@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:memorial_book/provider/tab_bar_provider.dart';
 import 'package:memorial_book/screens/auth&reg_flow/forgot_password_flow/auth&reg_frame.dart';
 import 'package:memorial_book/screens/auth&reg_flow/forgot_password_flow/confirm_email_screen.dart';
@@ -13,8 +15,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-
 import '../../widgets/obscure_widget.dart';
+import '../../widgets/skeleton_loader_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -27,11 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    final _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     FirebaseMessagingManager.init();
     FirebaseMessagingManager.getFCMToken();
-    _authProvider.initHUDConfig();
-    _authProvider.requestDeviceInfo();
+    authProvider.initHUDConfig();
+    authProvider.requestDeviceInfo();
     super.initState();
   }
 
@@ -42,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool passwordState = true;
 
+  ScrollController scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -49,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return UnScopeScaffold(
       backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
       body: AuthRegFrame(
+        controller: scrollController,
         title: 'Вход',
         body: Form(
           key: _formKey,
@@ -101,13 +106,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 text: 'Продолжить',
                 condition: emailController.text.isNotEmpty && passController.text.isNotEmpty,
                 onTap: () async {
-                  if (_formKey.currentState!.validate()) {
+                  FocusScope.of(context).unfocus();
+                  if(_formKey.currentState!.validate()) {
                     await authProvider.signIn(
                       context,
-                      'p4elka872209@gmail.com',
-                      'Vvadik28',
-                      // emailController.text,
-                      // passController.text,
+                      emailController.text,
+                      passController.text,
                     );
                     tabBarProvider.tabBarDispose();
                   }
@@ -129,38 +133,122 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 2.h,
               ),
-              MainButton(
-                onTap: () async {
-                  authProvider.signAsGuest(context);
-                  tabBarProvider.tabBarDispose();
-                },
-                activeColor: const Color.fromRGBO(51, 51, 51, 1),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      ConstantsAssets.profileImage,
-                      color: const Color.fromRGBO(255, 255, 255, 1),
-                      height: 3.4.h,
-                      width: 3.4.h,
-                    ),
-                    SizedBox(
-                      width: 2.6.w,
-                    ),
-                    Text(
-                      'Войти как гость',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: ConstantsFonts.latoRegular,
-                        fontSize: 12.sp,
+              Row(
+                children: [
+                  Expanded(
+                    child: MainButton(
+                      onTap: () async {
+                        FocusScope.of(context).unfocus();
+                        Future.delayed(
+                          const Duration(
+                            milliseconds: 500,
+                          ),
+                        ).whenComplete(
+                          (() {
+                            authProvider.signAsGuest(context);
+                            tabBarProvider.tabBarDispose();
+                          }),
+                        );
+                      },
+                      activeColor: const Color.fromRGBO(51, 51, 51, 1),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            ConstantsAssets.profileImage,
+                            color: const Color.fromRGBO(255, 255, 255, 1),
+                            height: 3.4.h,
+                            width: 3.4.h,
+                          ),
+                          SizedBox(
+                            width: 2.6.w,
+                          ),
+                          Text(
+                            'Войти как гость',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: ConstantsFonts.latoRegular,
+                              fontSize: 12.sp,
+                            ),
+                          )
+                        ],
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 2.4.w,
+                  ),
+                  Expanded(
+                    child: MainButton(
+                      onTap: () async {
+                        FocusScope.of(context).unfocus();
+                        await authProvider.signIn(
+                          context,
+                          'p4elka872209@gmail.com',
+                          'Vvadik28',
+                        );
+                        tabBarProvider.tabBarDispose();
+                      },
+                      activeColor: const Color.fromRGBO(87, 167, 109, 1),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl: 'https:\/\/memorialbook.site\/storage\/335\/conversions\/1000000068-thumb.jpg',
+                            imageBuilder: (context, imageProvider) {
+                              return Container(
+                                height: 3.4.h,
+                                width: 3.4.h,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorWidget: (context, error, _) {
+                              return Container(
+                                height: 3.4.h,
+                                width: 3.4.h,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: AssetImage(ConstantsAssets.memorialBookLogoImage),
+                                  ),
+                                ),
+                              );
+                            },
+                            placeholder: (context, indicator) {
+                              return SkeletonLoaderWidget(
+                                height: 3.4.h,
+                                width: 3.4.h,
+                                borderRadius: 50,
+                              );
+                            },
+                          ),
+                          SizedBox(
+                            width: 2.w,
+                          ),
+                          Text(
+                            'Войти как Iryna',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: ConstantsFonts.latoRegular,
+                              fontSize: 12.sp,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(
-                height: 1.8.h,
+                height: 1.6.h,
               ),
               RichText(
                 text: TextSpan(

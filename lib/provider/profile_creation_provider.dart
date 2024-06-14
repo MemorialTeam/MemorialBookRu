@@ -128,7 +128,6 @@ class ProfileCreationProvider extends ChangeNotifier {
         }
       });
     });
-
   }
 
   void disposePetCreate() {
@@ -1272,7 +1271,6 @@ class ProfileCreationProvider extends ChangeNotifier {
         title: titleOfCreatePostController.text,
         description: descriptionOfCreatePostController.text,
         postMedia: createPostImagesAndMoves,
-        isPinned: isPinned,
         publishedAt: publishedAt,
       );
 
@@ -1314,10 +1312,8 @@ class ProfileCreationProvider extends ChangeNotifier {
 
   Future deletePost(int postId, ValueSetter<StatusResponseModel?> completion) async {
     try {
-      SVProgressHUD.show();
       await service.deletePostRequest(postId, (response) {
         mapper.statusResponse(response, (model) {
-          SVProgressHUD.dismiss();
           if(model != null) {
             completion(model);
           } else {
@@ -1332,10 +1328,24 @@ class ProfileCreationProvider extends ChangeNotifier {
   }
   Future pinPost(int postId, ValueSetter<StatusResponseModel?> completion) async {
     try {
-      SVProgressHUD.show();
       await service.pinPostRequest(postId, (response) {
         mapper.statusResponse(response, (model) {
-          SVProgressHUD.dismiss();
+          if(model != null) {
+            completion(model);
+          } else {
+            completion(null);
+          }
+        });
+      });
+    } catch (error) {
+      SVProgressHUD.dismiss();
+      print('the following error occurred (sign up request) ---> $error');
+    }
+  }
+  Future unPinPost(int postId, ValueSetter<StatusResponseModel?> completion) async {
+    try {
+      await service.unPinPostRequest(postId, (response) {
+        mapper.statusResponse(response, (model) {
           if(model != null) {
             completion(model);
           } else {
@@ -1510,10 +1520,8 @@ class ProfileCreationProvider extends ChangeNotifier {
         if(petNameController.text.isNotEmpty &&
             petBreedController.text.isNotEmpty &&
             petBirthPlaceController.text.isNotEmpty &&
-            petDeathCauseController.text.isNotEmpty &&
             petDeathDateController.text.isNotEmpty &&
-            petBirthDateController.text.isNotEmpty &&
-            petOwner.isNotEmpty
+            petBirthDateController.text.isNotEmpty
         ) {
           return true;
         } else {

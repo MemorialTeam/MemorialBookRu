@@ -1,6 +1,8 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/widgets/main_button.dart';
+import '../../widgets/animation/punching_animation.dart';
 import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/text_field_profile_widget.dart';
 import '../../provider/catalog_provider.dart';
@@ -21,6 +23,8 @@ class FilterPeopleScreen extends StatefulWidget {
 class _FilterPeopleScreenState extends State<FilterPeopleScreen> {
 
   late CatalogProvider provider;
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -43,447 +47,374 @@ class _FilterPeopleScreenState extends State<FilterPeopleScreen> {
     final catalogProvider = Provider.of<CatalogProvider>(context);
     return UnScopeScaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-      body: SingleChildScrollView(
-        physics: platformScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 4.w,
-            vertical: 8.h,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Поиск',
-                style: TextStyle(
-                  fontFamily: ConstantsFonts.latoBlack,
-                  fontSize: 32.sp,
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          physics: platformScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 4.w,
+              vertical: 8.h,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Поиск',
+                  style: TextStyle(
+                    fontFamily: ConstantsFonts.latoBlack,
+                    fontSize: 32.sp,
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 1.h,
-              ),
-              Text(
-                'Введите имя, отчество, фамилию профиля, который вы хотите найти. Если вы не уверены в датах, укажите приблизительные.',
-                style: TextStyle(
-                  color: const Color.fromRGBO(32, 30, 31, 0.5),
-                  fontFamily: ConstantsFonts.latoRegular,
-                  fontSize: 10.5.sp,
+                SizedBox(
+                  height: 1.h,
                 ),
-              ),
-              SizedBox(
-                height: 3.h,
-              ),
-              Text(
-                'Полное имя:',
-                style: TextStyle(
-                  color: const Color.fromRGBO(32, 30, 31, 0.5),
-                  fontFamily: ConstantsFonts.latoRegular,
-                  fontSize: 9.5.sp,
+                Text(
+                  'Введите имя, отчество, фамилию профиля, который вы хотите найти. Если вы не уверены в датах, укажите приблизительные.',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 30, 31, 0.5),
+                    fontFamily: ConstantsFonts.latoRegular,
+                    fontSize: 10.5.sp,
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 0.5.h,
-              ),
-              TextFieldProfileWidget(
-                controller: catalogProvider.peopleController,
-              ),
-              SizedBox(
-                height: 2.0.h,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Год рождения:',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(32, 30, 31, 0.5),
-                            fontFamily: ConstantsFonts.latoRegular,
-                            fontSize: 9.5.sp,
+                SizedBox(
+                  height: 3.h,
+                ),
+                Text(
+                  'Полное имя:',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(32, 30, 31, 0.5),
+                    fontFamily: ConstantsFonts.latoRegular,
+                    fontSize: 9.5.sp,
+                  ),
+                ),
+                SizedBox(
+                  height: 0.5.h,
+                ),
+                TextFieldProfileWidget(
+                  controller: catalogProvider.peopleController,
+                  validator: ConstantsValidationTypes().searchProfileValidate,
+                ),
+                SizedBox(
+                  height: 1.6.h,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Год рождения:',
+                            style: TextStyle(
+                              color: const Color.fromRGBO(32, 30, 31, 0.5),
+                              fontFamily: ConstantsFonts.latoRegular,
+                              fontSize: 9.5.sp,
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 0.5.h,
-                        ),
-                        TextFieldProfileWidget(
-                          hintText: 'XXXX - XXXX г.',
-                          inputFormatters: [
-                            // FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
-                            MaskedInputFormatter('####-####'),
-                          ],
-                          keyboardType: TextInputType.number,
-                          controller: catalogProvider.birthYearController,
-                          onChanged: (String text) {
-                            catalogProvider.errorChecking();
-                          },
-                          // borderColor: catalogProvider.checkBirth == true ?
-                          // const Color.fromRGBO(250, 18, 46, 1) :
-                          // null,
-                        ),
-                        // Column(
-                        //   mainAxisSize: MainAxisSize.min,
-                        //   children: [
-                        //     SizedBox(
-                        //       height: 0.5.h,
-                        //     ),
-                        //     Row(
-                        //       mainAxisSize: MainAxisSize.min,
-                        //       children: [
-                        //         Padding(
-                        //           padding: EdgeInsets.symmetric(
-                        //             horizontal: 1.2.w,
-                        //           ),
-                        //           child: Icon(
-                        //             Icons.circle,
-                        //             size: 5.sp,
-                        //             color: catalogProvider.checkBirth == true ?
-                        //             const Color.fromRGBO(250, 18, 46, 1) :
-                        //             Colors.transparent,
-                        //           ),
-                        //         ),
-                        //         SizedBox(
-                        //           width: 38.w,
-                        //           child: Text(
-                        //             catalogProvider.errorBirthYearsText,
-                        //             style: TextStyle(
-                        //               color: const Color.fromRGBO(250, 18, 46, 1),
-                        //               fontFamily: ConstantsFonts.latoRegular,
-                        //               fontSize: 8.5.sp,
-                        //               height: 0.15.h,
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ],
-                        // ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 5.6.w,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Год смерти:',
-                          style: TextStyle(
-                            color: const Color.fromRGBO(32, 30, 31, 0.5),
-                            fontFamily: ConstantsFonts.latoRegular,
-                            fontSize: 9.5.sp,
+                          SizedBox(
+                            height: 0.5.h,
                           ),
-                        ),
-                        SizedBox(
-                          height: 0.5.h,
-                        ),
-                        TextFieldProfileWidget(
-                          hintText: 'XXXX - XXXX г.',
-                          inputFormatters: [
-                            // FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
-                            MaskedInputFormatter('#### ####'),
-                          ],
-                          keyboardType: TextInputType.number,
-                          controller: catalogProvider.deathYearController,
-                          onChanged: (String text) {
-                            catalogProvider.errorChecking();
-                          },
-                          // borderColor: catalogProvider.checkDeath == true ?
-                          // const Color.fromRGBO(250, 18, 46, 1) :
-                          // null,
-                        ),
-                        // Column(
-                        //   mainAxisSize: MainAxisSize.min,
-                        //   children: [
-                        //     SizedBox(
-                        //       height: 0.5.h,
-                        //     ),
-                        //     Row(
-                        //       mainAxisSize: MainAxisSize.min,
-                        //       children: [
-                        //         Padding(
-                        //           padding: EdgeInsets.symmetric(
-                        //             horizontal: 1.2.w,
-                        //           ),
-                        //           child: Icon(
-                        //             Icons.circle,
-                        //             size: 5.sp,
-                        //             color: catalogProvider.checkDeath == true ?
-                        //             const Color.fromRGBO(250, 18, 46, 1) :
-                        //             Colors.transparent,
-                        //           ),
-                        //         ),
-                        //         SizedBox(
-                        //           width: 38.w,
-                        //           child: Text(
-                        //             catalogProvider.errorDeathYearsText,
-                        //             style: TextStyle(
-                        //               color: const Color.fromRGBO(250, 18, 46, 1),
-                        //               fontFamily: ConstantsFonts.latoRegular,
-                        //               fontSize: 8.5.sp,
-                        //               height: 0.15.h,
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ],
-                        // ),
-                      ],
+                          TextFieldProfileWidget(
+                            hintText: 'XXXX - XXXX г.',
+                            inputFormatters: [
+                              MaskedInputFormatter(
+                                '#### - ####',
+                                allowedCharMatcher: RegExp(r'[0-9]'),
+                              ),
+                            ],
+                            keyboardType: TextInputType.number,
+                            controller: catalogProvider.birthYearController,
+                            validator: ConstantsValidationTypes().dateFilterValidation,
+                          ),
+                        ],
+                      ),
                     ),
+                    SizedBox(
+                      width: 5.6.w,
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Год смерти:',
+                            style: TextStyle(
+                              color: const Color.fromRGBO(32, 30, 31, 0.5),
+                              fontFamily: ConstantsFonts.latoRegular,
+                              fontSize: 9.5.sp,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 0.5.h,
+                          ),
+                          TextFieldProfileWidget(
+                            hintText: 'XXXX - XXXX',
+                            inputFormatters: [
+                              MaskedInputFormatter(
+                                '#### - ####',
+                                allowedCharMatcher: RegExp(r'[0-9]'),
+                              ),
+                            ],
+                            validator: ConstantsValidationTypes().dateFilterValidation,
+                            keyboardType: TextInputType.number,
+                            controller: catalogProvider.deathYearController,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                // SizedBox(
+                //   height: 2.0.h,
+                // ),
+                // Text(
+                //   'Страна:',
+                //   style: TextStyle(
+                //     color: const Color.fromRGBO(32, 30, 31, 0.5),
+                //     fontFamily: ConstantsFonts.latoRegular,
+                //     fontSize: 9.5.sp,
+                //   ),
+                // ),
+                // SizedBox(
+                //   height: 0.5.h,
+                // ),
+                // TextFieldProfileWidget(
+                //   controller: catalogProvider.countryController,
+                // ),
+                SizedBox(
+                  height: 3.3.h,
+                ),
+                MainButton(
+                  text: 'ПОКАЗАТЬ',
+                  condition: catalogProvider.peopleController.text.isNotEmpty,
+                  inactiveColor: const Color.fromRGBO(23, 94, 217, 0.5),
+                  activeColor: const Color.fromRGBO(23, 94, 217, 1),
+                  onTap: () {
+                    if(_formKey.currentState!.validate()) {
+                      catalogProvider.peopleSearch();
+                      Navigator.pop(context);
+                    }
+                  },
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontFamily: ConstantsFonts.latoSemiBold,
+                    fontSize: 9.5.sp,
                   ),
-                ],
-              ),
-              SizedBox(
-                height: 2.0.h,
-              ),
-              Text(
-                'Страна:',
-                style: TextStyle(
-                  color: const Color.fromRGBO(32, 30, 31, 0.5),
-                  fontFamily: ConstantsFonts.latoRegular,
-                  fontSize: 9.5.sp,
                 ),
-              ),
-              SizedBox(
-                height: 0.5.h,
-              ),
-              TextFieldProfileWidget(
-                controller: catalogProvider.countryController,
-              ),
-              SizedBox(
-                height: 3.6.h,
-              ),
-              MainButton(
-                text: 'ПОКАЗАТЬ',
-                condition: catalogProvider.peopleController.text.isNotEmpty,
-                inactiveColor: const Color.fromRGBO(23, 94, 217, 0.5),
-                activeColor: const Color.fromRGBO(23, 94, 217, 1),
-                onTap: () {
-                  catalogProvider.peopleSearch();
-                  Navigator.pop(context);
-                },
-                textStyle: TextStyle(
-                  color: Colors.white,
-                  fontFamily: ConstantsFonts.latoSemiBold,
-                  fontSize: 9.5.sp,
-                ),
-              ),
-              // AnimatedCrossFade(
-              //   firstCurve: Curves.easeInBack,
-              //   secondCurve: Curves.easeIn,
-              //   duration: const Duration(
-              //     milliseconds: 500,
-              //   ),
-              //   secondChild: const SizedBox(),
-              //   firstChild: Container(
-              //     decoration: filterProvider.advancedSettings != false ?
-              //     BoxDecoration(
-              //       color: const Color.fromRGBO(245, 247, 249, 1),
-              //       borderRadius: BorderRadius.circular(8),
-              //       border: Border.all(
-              //         color: const Color.fromRGBO(205, 209, 214, 1),
-              //       ),
-              //     ) : null,
-              //     padding: const EdgeInsets.symmetric(
-              //       horizontal: 16,
-              //       vertical: 12,
-              //     ),
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       mainAxisSize: MainAxisSize.min,
-              //       children: [
-              //         filterProvider.advancedSettings != false ?
-              //         GestureDetector(
-              //           behavior: HitTestBehavior.translucent,
-              //           onTap: () {
-              //             filterProvider.switcherOfState();
-              //           },
-              //           child: Row(
-              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //             children: [
-              //               Text(
-              //                 'Advanced settings',
-              //                 style: TextStyle(
-              //                   fontSize: 13.sp,
-              //                   fontWeight: FontWeight.w500,
-              //                 ),
-              //               ),
-              //               const SizedBox(
-              //                 width: 10,
-              //               ),
-              //               Text(
-              //                 '(5 chosen)',
-              //                 style: TextStyle(
-              //                   color: const Color.fromRGBO(23, 94, 217, 1),
-              //                   fontWeight: FontWeight.w400,
-              //                   fontSize: 12.5.sp,
-              //                 ),
-              //               ),
-              //               Image.asset(
-              //                 ConstantsAssets.arrowBottomImage,
-              //                 height: 0.8.h,
-              //                 fit: BoxFit.fill,
-              //               ),
-              //             ],
-              //           ),
-              //         ) :
-              //         GestureDetector(
-              //           behavior: HitTestBehavior.translucent,
-              //           onTap: () {
-              //             filterProvider.switcherOfState();
-              //           },
-              //           child: Row(
-              //             children: [
-              //               Text(
-              //                 'Advanced settings',
-              //                 style: TextStyle(
-              //                   fontSize: 13.sp,
-              //                   fontWeight: FontWeight.w500,
-              //                 ),
-              //               ),
-              //               const SizedBox(
-              //                 width: 4,
-              //               ),
-              //               Image.asset(
-              //                 ConstantsAssets.arrowBottomImage,
-              //                 height: 0.8.h,
-              //                 fit: BoxFit.fill,
-              //               ),
-              //               const SizedBox(
-              //                 width: 10,
-              //               ),
-              //               Text(
-              //                 '(5 chosen)',
-              //                 style: TextStyle(
-              //                   color: const Color.fromRGBO(23, 94, 217, 1),
-              //                   fontWeight: FontWeight.w400,
-              //                   fontSize: 12.5.sp,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //         filterProvider.advancedSettings != false ?
-              //         Column(
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             SizedBox(
-              //               height: 6.h,
-              //             ),
-              //             Text(
-              //               'Country',
-              //               style: TextStyle(
-              //                 color: Colors.grey.shade500,
-              //                 fontSize: 10.sp,
-              //                 fontWeight: FontWeight.w400,
-              //               ),
-              //             ),
-              //             TextFormField(
-              //               style: TextStyle(
-              //                 fontSize: 11.sp,
-              //                 fontWeight: FontWeight.w400,
-              //               ),
-              //               decoration: InputDecoration(
-              //                 isDense: true,
-              //                 filled: true,
-              //                 contentPadding: const EdgeInsets.symmetric(
-              //                   vertical: 5,
-              //                 ),
-              //                 fillColor: const Color.fromRGBO(245, 247, 249, 1),
-              //                 hintStyle: TextStyle(
-              //                   color: const Color.fromRGBO(158, 158, 158, 1),
-              //                   fontSize: 10.sp,
-              //                 ),
-              //               ),
-              //             ),
-              //             SizedBox(
-              //               height: 1.6.h,
-              //             ),
-              //             Text(
-              //               'Cemetery',
-              //               style: TextStyle(
-              //                 color: Colors.grey.shade500,
-              //                 fontSize: 10.sp,
-              //                 fontWeight: FontWeight.w400,
-              //               ),
-              //             ),
-              //             SizedBox(
-              //               height: 1.6.h,
-              //             ),
-              //             Wrap(
-              //               children: listTiles.map(
-              //                     (e) => Row(
-              //                   mainAxisSize: MainAxisSize.min,
-              //                   children: [
-              //                     Text(
-              //                       e['title'],
-              //                       style: TextStyle(
-              //                         fontWeight: FontWeight.w400,
-              //                         fontSize: 13.sp,
-              //                       ),
-              //                     ),
-              //                     SizedBox(
-              //                       width: 4.w,
-              //                     ),
-              //                     Icon(
-              //                       Icons.close,
-              //                       size: 2.2.h,
-              //                       color: Colors.black,
-              //                     ),
-              //                   ],
-              //                 ),
-              //               ).map(
-              //                     (widget) => Container(
-              //                       color: const Color.fromRGBO(255, 255, 255, 1),
-              //                       padding: const EdgeInsets.only(
-              //                         right: 14,
-              //                         bottom: 5,
-              //                         top: 5,
-              //                         left: 14,
-              //                       ),
-              //                       margin: EdgeInsets.only(
-              //                         right: 1.2.h,
-              //                         bottom: 0.6.h,
-              //                       ),
-              //                       child: widget,
-              //                     ),
-              //               ).toList(),
-              //             ),
-              //             SizedBox(
-              //               height: 1.6.h,
-              //             ),
-              //             TextFormField(
-              //               style: TextStyle(
-              //                 fontSize: 11.sp,
-              //                 fontWeight: FontWeight.w400,
-              //               ),
-              //               decoration: InputDecoration(
-              //                 isDense: true,
-              //                 filled: true,
-              //                 contentPadding: const EdgeInsets.symmetric(
-              //                   vertical: 5,
-              //                 ),
-              //                 fillColor: const Color.fromRGBO(245, 247, 249, 1),
-              //                 hintStyle: TextStyle(
-              //                   color: const Color.fromRGBO(158, 158, 158, 1),
-              //                   fontSize: 10.sp,
-              //                 ),
-              //               ),
-              //             ),
-              //           ],
-              //         ) :
-              //         const SizedBox(),
-              //       ],
-              //     ),
-              //   ),
-              //   crossFadeState: CrossFadeState.showFirst,
-              // ),
-            ],
+                // AnimatedCrossFade(
+                //   firstCurve: Curves.easeInBack,
+                //   secondCurve: Curves.easeIn,
+                //   duration: const Duration(
+                //     milliseconds: 500,
+                //   ),
+                //   secondChild: const SizedBox(),
+                //   firstChild: Container(
+                //     decoration: filterProvider.advancedSettings != false ?
+                //     BoxDecoration(
+                //       color: const Color.fromRGBO(245, 247, 249, 1),
+                //       borderRadius: BorderRadius.circular(8),
+                //       border: Border.all(
+                //         color: const Color.fromRGBO(205, 209, 214, 1),
+                //       ),
+                //     ) : null,
+                //     padding: const EdgeInsets.symmetric(
+                //       horizontal: 16,
+                //       vertical: 12,
+                //     ),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       mainAxisSize: MainAxisSize.min,
+                //       children: [
+                //         filterProvider.advancedSettings != false ?
+                //         GestureDetector(
+                //           behavior: HitTestBehavior.translucent,
+                //           onTap: () {
+                //             filterProvider.switcherOfState();
+                //           },
+                //           child: Row(
+                //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //             children: [
+                //               Text(
+                //                 'Advanced settings',
+                //                 style: TextStyle(
+                //                   fontSize: 13.sp,
+                //                   fontWeight: FontWeight.w500,
+                //                 ),
+                //               ),
+                //               const SizedBox(
+                //                 width: 10,
+                //               ),
+                //               Text(
+                //                 '(5 chosen)',
+                //                 style: TextStyle(
+                //                   color: const Color.fromRGBO(23, 94, 217, 1),
+                //                   fontWeight: FontWeight.w400,
+                //                   fontSize: 12.5.sp,
+                //                 ),
+                //               ),
+                //               Image.asset(
+                //                 ConstantsAssets.arrowBottomImage,
+                //                 height: 0.8.h,
+                //                 fit: BoxFit.fill,
+                //               ),
+                //             ],
+                //           ),
+                //         ) :
+                //         GestureDetector(
+                //           behavior: HitTestBehavior.translucent,
+                //           onTap: () {
+                //             filterProvider.switcherOfState();
+                //           },
+                //           child: Row(
+                //             children: [
+                //               Text(
+                //                 'Advanced settings',
+                //                 style: TextStyle(
+                //                   fontSize: 13.sp,
+                //                   fontWeight: FontWeight.w500,
+                //                 ),
+                //               ),
+                //               const SizedBox(
+                //                 width: 4,
+                //               ),
+                //               Image.asset(
+                //                 ConstantsAssets.arrowBottomImage,
+                //                 height: 0.8.h,
+                //                 fit: BoxFit.fill,
+                //               ),
+                //               const SizedBox(
+                //                 width: 10,
+                //               ),
+                //               Text(
+                //                 '(5 chosen)',
+                //                 style: TextStyle(
+                //                   color: const Color.fromRGBO(23, 94, 217, 1),
+                //                   fontWeight: FontWeight.w400,
+                //                   fontSize: 12.5.sp,
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //         filterProvider.advancedSettings != false ?
+                //         Column(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             SizedBox(
+                //               height: 6.h,
+                //             ),
+                //             Text(
+                //               'Country',
+                //               style: TextStyle(
+                //                 color: Colors.grey.shade500,
+                //                 fontSize: 10.sp,
+                //                 fontWeight: FontWeight.w400,
+                //               ),
+                //             ),
+                //             TextFormField(
+                //               style: TextStyle(
+                //                 fontSize: 11.sp,
+                //                 fontWeight: FontWeight.w400,
+                //               ),
+                //               decoration: InputDecoration(
+                //                 isDense: true,
+                //                 filled: true,
+                //                 contentPadding: const EdgeInsets.symmetric(
+                //                   vertical: 5,
+                //                 ),
+                //                 fillColor: const Color.fromRGBO(245, 247, 249, 1),
+                //                 hintStyle: TextStyle(
+                //                   color: const Color.fromRGBO(158, 158, 158, 1),
+                //                   fontSize: 10.sp,
+                //                 ),
+                //               ),
+                //             ),
+                //             SizedBox(
+                //               height: 1.6.h,
+                //             ),
+                //             Text(
+                //               'Cemetery',
+                //               style: TextStyle(
+                //                 color: Colors.grey.shade500,
+                //                 fontSize: 10.sp,
+                //                 fontWeight: FontWeight.w400,
+                //               ),
+                //             ),
+                //             SizedBox(
+                //               height: 1.6.h,
+                //             ),
+                //             Wrap(
+                //               children: listTiles.map(
+                //                     (e) => Row(
+                //                   mainAxisSize: MainAxisSize.min,
+                //                   children: [
+                //                     Text(
+                //                       e['title'],
+                //                       style: TextStyle(
+                //                         fontWeight: FontWeight.w400,
+                //                         fontSize: 13.sp,
+                //                       ),
+                //                     ),
+                //                     SizedBox(
+                //                       width: 4.w,
+                //                     ),
+                //                     Icon(
+                //                       Icons.close,
+                //                       size: 2.2.h,
+                //                       color: Colors.black,
+                //                     ),
+                //                   ],
+                //                 ),
+                //               ).map(
+                //                     (widget) => Container(
+                //                       color: const Color.fromRGBO(255, 255, 255, 1),
+                //                       padding: const EdgeInsets.only(
+                //                         right: 14,
+                //                         bottom: 5,
+                //                         top: 5,
+                //                         left: 14,
+                //                       ),
+                //                       margin: EdgeInsets.only(
+                //                         right: 1.2.h,
+                //                         bottom: 0.6.h,
+                //                       ),
+                //                       child: widget,
+                //                     ),
+                //               ).toList(),
+                //             ),
+                //             SizedBox(
+                //               height: 1.6.h,
+                //             ),
+                //             TextFormField(
+                //               style: TextStyle(
+                //                 fontSize: 11.sp,
+                //                 fontWeight: FontWeight.w400,
+                //               ),
+                //               decoration: InputDecoration(
+                //                 isDense: true,
+                //                 filled: true,
+                //                 contentPadding: const EdgeInsets.symmetric(
+                //                   vertical: 5,
+                //                 ),
+                //                 fillColor: const Color.fromRGBO(245, 247, 249, 1),
+                //                 hintStyle: TextStyle(
+                //                   color: const Color.fromRGBO(158, 158, 158, 1),
+                //                   fontSize: 10.sp,
+                //                 ),
+                //               ),
+                //             ),
+                //           ],
+                //         ) :
+                //         const SizedBox(),
+                //       ],
+                //     ),
+                //   ),
+                //   crossFadeState: CrossFadeState.showFirst,
+                // ),
+              ],
+            ),
           ),
         ),
       ),

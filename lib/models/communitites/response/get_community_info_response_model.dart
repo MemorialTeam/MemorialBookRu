@@ -93,7 +93,12 @@ class CommunitiesInfoResponseModel {
         website = json['website'];
       }
       if (json['social_links'] != null) {
-        socialLinks = json['social_links'];
+        print(json['social_links'].runtimeType );
+        if(json['social_links'].runtimeType.toString() == 'List<dynamic>') {
+          socialLinks = {};
+        } else {
+          socialLinks = json['social_links'];
+        }
       }
       createdAt = json['created_at'];
       banner = json['banner'];
@@ -124,6 +129,7 @@ class CommunitiesInfoResponseModel {
 class PostsResponseModel {
   int? id;
   bool? isPinned;
+  bool isLoading = false;
   String? title;
   String? description;
   late PostContentType contentType;

@@ -11,10 +11,13 @@ class AuthRegFrame extends StatelessWidget {
     required this.title,
     required this.body,
     this.description,
+    this.controller,
   });
 
   final String title;
   final String? description;
+
+  final ScrollController? controller;
 
   final Widget body;
 
@@ -22,6 +25,7 @@ class AuthRegFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       reverse: true,
+      controller: controller,
       physics: platformScrollPhysics(),
       child: Column(
         children: [

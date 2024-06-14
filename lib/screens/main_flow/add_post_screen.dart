@@ -460,49 +460,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: 2.4.h,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 2.8.h,
-                              width: 2.8.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(6),
-                                color: profileCreationProvider.isPinned ?
-                                const Color.fromRGBO(0, 113, 227, 1)  :
-                                const Color.fromRGBO(255, 255, 255, 1),
-                                border: Border.all(
-                                  color: const Color.fromRGBO(0, 113, 227, 1),
-                                ),
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () => profileCreationProvider.switchPinned(),
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: profileCreationProvider.isPinned ?
-                                  Center(
-                                    child: Image.asset(
-                                      ConstantsAssets.checkMarkImage,
-                                      height: 1.3.h,
-                                    ),
-                                  ) :
-                                  null,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 2.w,
-                            ),
-                            Text(
-                              'Закрепить пост',
-                              style: ConstantsTextStyles.unRequiredTextStyle,
-                            ),
-                          ],
-                        ),
                       ],
                     ) :
                     const SizedBox(),

@@ -50,7 +50,7 @@ class PlacesScreen extends StatelessWidget {
                 mapsScrollableSheetBuilder: (BuildContext context, int index) {
                   if(catalogProvider.countEnabledParameters(MapFlowType.places) != 0 && catalogProvider.places!.isEmpty) {
                     return const MemorialBookIconWidget(
-                      title: 'Nothing found',
+                      title: 'Ничего не найдено',
                       color: Color.fromRGBO(18, 175, 82, 0.3),
                     );
                   }

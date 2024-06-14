@@ -15,6 +15,7 @@ class FullScreenGallery extends StatefulWidget {
     this.gallery,
     this.title,
     this.initialIndex = 0,
+    this.heroTag,
   }) : pageController = PageController(
     initialPage: initialIndex,
   );
@@ -24,6 +25,7 @@ class FullScreenGallery extends StatefulWidget {
   final String? title;
   final PageController pageController;
   final int initialIndex;
+  final Object? heroTag;
 
   @override
   State<FullScreenGallery> createState() => _FullScreenGalleryState();
@@ -184,7 +186,7 @@ class _FullScreenGalleryState extends State<FullScreenGallery>
                           widget.galleryModels?[index].url ?? widget.gallery?[index],
                         ),
                         heroAttributes: PhotoViewHeroAttributes(
-                          tag: widget.galleryModels?[index].id.toString() ?? index,
+                          tag: widget.heroTag ?? widget.galleryModels?[index].id.toString() ?? index,
                         ),
                       );
                     },

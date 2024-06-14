@@ -196,20 +196,22 @@ class AccountProvider extends ChangeNotifier {
   CreatedHumansDataResponseModel? createdHumanModel;
   String? createdHumanPageNumber = 'user/profiles/humans?page=1';
   bool createdHumanPaginationLoading = false;
+  bool humanLoading = false;
 
   Future gettingCreatedHumansProfiles(ValueSetter<GettingCreatedHumansProfilesResponseModel?> completion) async {
+    humanLoading = true;
     createdHumanPageNumber = 'user/profiles/humans?page=1';
     createdHumanModel = null;
     notifyListeners();
-    SVProgressHUD.show();
     try {
       await service.gettingCreatedHumansProfilesRequest(createdHumanPageNumber, (response) {
+        humanLoading = false;
+        notifyListeners();
         mapper.gettingCreatedHumansProfilesResponse(response, (model) {
-          SVProgressHUD.dismiss();
           if(model != null) {
             if(model.status == true) {
               createdHumanModel = model.humans;
-              createdHumanPageNumber = model.humans?.links?.nextPageUrl;
+              createdHumanPageNumber = model.humans?.links?.nextPageUrl?.replaceAll('https://memorialbook.site/api/v1/', '');
               notifyListeners();
             }
             completion(model);
@@ -225,16 +227,14 @@ class AccountProvider extends ChangeNotifier {
   }
   Future paginationCreatedHumans() async {
     createdHumanPaginationLoading = true;
-    SVProgressHUD.show();
     service.gettingCreatedHumansProfilesRequest(createdHumanPageNumber, (response) {
+      createdHumanPaginationLoading = false;
+      notifyListeners();
       mapper.gettingCreatedHumansProfilesResponse(response, (model) {
-        SVProgressHUD.dismiss();
-        createdHumanPaginationLoading = false;
-        notifyListeners();
         if(model != null) {
           if (model.status == true) {
             if (model.humans?.data != null) {
-              createdHumanPageNumber = model.humans?.links?.nextPageUrl;
+              createdHumanPageNumber = model.humans?.links?.nextPageUrl?.replaceAll('https://memorialbook.site/api/v1/', '');
               createdHumanModel!.data!.addAll(model.humans!.data!);
               notifyListeners();
             }
@@ -247,15 +247,17 @@ class AccountProvider extends ChangeNotifier {
   CreatedPetsDataResponseModel? createdPetsModel;
   bool createdPetPaginationLoading = false;
   String? createdPetPageNumber = 'user/profiles/pets?page=1';
+  bool petLoading = false;
 
   Future gettingCreatedPetsProfiles(ValueSetter<GettingCreatedPetsProfilesResponseModel?> completion) async {
+    petLoading = true;
     createdPetPageNumber = 'user/profiles/pets?page=1';
     createdPetsModel = null;
-    SVProgressHUD.show();
     try {
     await service.gettingCreatedPetsProfilesRequest(createdPetPageNumber, (response) {
+      petLoading = false;
+      notifyListeners();
       mapper.gettingCreatedPetsProfilesResponse(response, (model) {
-        print(response?.body);
         if(model != null) {
           if(model.status == true) {
             createdPetsModel = model.pets;
@@ -299,52 +301,16 @@ class AccountProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future gettingUserProfiles(BuildContext context, bool? setState) async {
-    bool humanState = false;
-    bool petState = false;
-
-    if(setState != null) {
-      usersProfileButtonState = setState;
-      notifyListeners();
-    }
-    await gettingCreatedHumansProfiles((model) {
-      if(model != null) {
-        if(model.status == true) {
-          humanState = true;
-          notifyListeners();
-        } else {
-          humanState = false;
-          notifyListeners();
-        }
-      } else {
-        humanState = false;
-        notifyListeners();
-      }
-    });
-    await gettingCreatedPetsProfiles((model) {
-      if(model != null) {
-        if(model.status == true) {
-          petState = true;
-          notifyListeners();
-        } else {
-          petState = false;
-          notifyListeners();
-        }
-      } else {
-        petState = false;
-        notifyListeners();
-      }
-    });
-    if(humanState == true || petState == true) {
-      await Navigator.push(
-        context,
-        CupertinoPageRoute(
-          builder: (context) => FamilyTreeScreen(),
-        ),
-      );
-    } else {
-      print('error');
-    }
+  void setProfileButtonState(BuildContext context, bool setState) {
+    usersProfileButtonState = setState;
+    notifyListeners();
+    Navigator.push(
+      context,
+      CupertinoDialogRoute(
+        builder: (context) => const FamilyTreeScreen(),
+        context: context,
+      ),
+    );
   }
 
 

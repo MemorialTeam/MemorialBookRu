@@ -11,8 +11,8 @@ import '../managers/api_manager.dart';
 import '../helpers/constants.dart';
 import 'package:http/http.dart';
 import '../models/catalog/request/edit_post_request_model.dart';
+import '../models/cemetery/request/cemetery_search_request.dart';
 import '../models/cemetery/request/creating_cemetery_request_model.dart';
-import '../models/cemetery/response/get_cemetery_info_response_model.dart';
 import '../models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import '../models/create_profile/request/create_post_request_model.dart';
 import '../models/people/request/creating_persons_profile_request_model.dart';
@@ -107,12 +107,21 @@ class Service {
 
     Map<String, dynamic> body = {
       'full_name': model.fullName,
-      'country': model.country,
     };
-    if(model.birthYearFrom != null && model.birthYearTo != null && model.deathYearFrom != null && model.deathYearTo != null) {
+
+    if(model.country != null && model.country!.isNotEmpty) {
+      body.addAll({
+        'country': model.country,
+      });
+    }
+    if(model.birthYearFrom != null && model.birthYearTo != null) {
       body.addAll({
         'birth_year[from]': model.birthYearFrom,
         'birth_year[to]': model.birthYearTo,
+      });
+    }
+    if(model.deathYearFrom != null && model.deathYearTo != null) {
+      body.addAll({
         'death_year[from]': model.deathYearFrom,
         'death_year[to]': model.deathYearTo,
       });
@@ -578,7 +587,7 @@ class Service {
   }
 
   Future placesSearchRequest(
-      CemeteryResponseModel model,
+      CemeterySearchRequest model,
       ValueSetter<Response?> completion,
       ) async {
 
@@ -590,6 +599,16 @@ class Service {
     Map<String, dynamic> body = {
       'name': model.name,
     };
+    if(model.region.isNotEmpty) {
+      body.addAll({
+        'region': model.region,
+      });
+    }
+    if(model.district.isNotEmpty) {
+      body.addAll({
+        'district': model.district,
+      });
+    }
 
     String endpoint = 'profiles/cemeteries/search';
 
@@ -634,7 +653,7 @@ class Service {
     );
   }
 
-  void gettingAuthorizedMainContentRequest(
+  Future gettingAuthorizedMainContentRequest(
       ValueSetter<Response?> completion,
       ) async {
     final storage = await SharedPreferences.getInstance();
@@ -648,7 +667,61 @@ class Service {
 
     String endpoint = ConstEndpoints.authorizedMainPage;
 
-    APIManager().getRequest(
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future getNotificationCountRequest(
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = ConstEndpoints.getNotificationCount;
+
+    await APIManager().getRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
+  Future getUserNotificationsRequest(
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = ConstEndpoints.getUserNotifications;
+
+    await APIManager().getRequest(
       endpoint,
       headers,
       ((response) {
@@ -1198,20 +1271,8 @@ class Service {
 
     late final Map<String, String> body;
 
-    late final int isPinned;
-
-    switch(model.isPinned) {
-      case true:
-        isPinned = 1;
-        break;
-      case false:
-        isPinned = 0;
-        break;
-    }
-
     body = {
       'community_id': model.communityId.toString(),
-      'is_pinned': isPinned.toString(),
     };
     if(model.title.isNotEmpty) {
       body.addAll({
@@ -1424,6 +1485,35 @@ class Service {
     );
   }
 
+  Future unPinPostRequest(
+      int postId,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'communities/posts/$postId/unpin';
+
+    APIManager().putRequest(
+      endpoint,
+      headers,
+      ((response) {
+        if (response != null) {
+          completion(response);
+        }
+        else {
+          completion(null);
+        }
+      }),
+    );
+  }
+
   Future editPostRequest(
       EditPostRequestModel model,
       ValueSetter<StreamedResponse?> completion,
@@ -1439,7 +1529,6 @@ class Service {
     };
 
     body = {
-      'community_id': model.communityId.toString(),
       'title': model.title ?? '',
       'description': model.description ?? '',
       '_method': model.method,
@@ -1790,6 +1879,67 @@ class Service {
 
     APIManager().getRequest(
       endpoint,
+      headers,
+      (response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      },
+    );
+  }
+
+  Future searchRegionsCemeteryRequest(
+      String region,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    String endpoint = 'profiles/cemeteries/regions?region=$region';
+
+    APIManager().getRequest(
+      endpoint,
+      headers,
+      (response) {
+        if (response != null) {
+          completion(response);
+        } else {
+          completion(null);
+        }
+      },
+    );
+  }
+
+  Future getDistrictsCemeteryRequest(
+      String region,
+      ValueSetter<Response?> completion,
+      ) async {
+    final storage = await SharedPreferences.getInstance();
+    final token = storage.getString(ConstantsKeys.userTOKEN);
+
+    Map<String, String> headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    Map<String, dynamic> body = {
+      'region': region,
+    };
+
+    String endpoint = ConstEndpoints.getDistrictsCemetery;
+
+    APIManager().getRequestEncodedBody(
+      endpoint,
+      body,
       headers,
       (response) {
         if (response != null) {

@@ -88,7 +88,9 @@ class _SearchEngineState extends State<SearchEngine> {
       backgroundColor: widget.backgroundColor,
       onChanged: (text) {
         if(text.isEmpty) {
-          widget.isEmptyFunc!();
+          if(widget.isEmptyFunc != null) {
+            widget.isEmptyFunc!();
+          }
         } else if(text.length % 3 == 0) {
           widget.isNotEmptyFunc(text);
         }

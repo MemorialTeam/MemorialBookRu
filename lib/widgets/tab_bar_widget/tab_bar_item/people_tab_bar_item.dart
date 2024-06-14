@@ -6,7 +6,7 @@ BottomNavigationBarItem peopleTabBarItem(BuildContext context) {
   return BottomNavigationBarItem(
     icon: Padding(
       padding: EdgeInsets.only(
-        bottom: 0.6.h,
+        bottom: 0.5.h,
       ),
       child: Image.asset(
         ConstantsAssets.peopleTabBarImage,

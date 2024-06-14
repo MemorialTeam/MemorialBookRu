@@ -11,12 +11,14 @@ class MapsScrollableSheetWidget extends StatefulWidget {
     required this.color,
     required this.child,
     required this.sheetController,
+    required this.searchedName,
   }) : super(key: key);
 
   final int? total;
   final Color color;
   final Widget child;
   final DraggableScrollableController sheetController;
+  final String searchedName;
 
   @override
   State<MapsScrollableSheetWidget> createState() => _MapsScrollableSheetWidgetState();
@@ -43,24 +45,11 @@ class _MapsScrollableSheetWidgetState extends State<MapsScrollableSheetWidget> {
       },
       child: Stack(
         children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: AnimatedContainer(
-              duration: const Duration(
-                milliseconds: 1000,
-              ),
-              color: isVisible == true ?
-              Colors.transparent :
-              const Color.fromRGBO(245, 247, 249, 1),
-              height: 8.h,
-              width: double.infinity,
-            ),
-          ),
           DraggableScrollableSheet(
             controller: widget.sheetController,
             initialChildSize: initialSizeSheet,
             minChildSize: minChildSizeSheet,
-            maxChildSize: 0.902,
+            maxChildSize: 0.91,
             snap: true,
             snapAnimationDuration: const Duration(
               milliseconds: 200,
@@ -118,7 +107,7 @@ class _MapsScrollableSheetWidgetState extends State<MapsScrollableSheetWidget> {
                             vertical: 2.4.h,
                           ),
                           child: Text(
-                            '${widget.total} people were found',
+                            '${widget.total} ${widget.searchedName} было найдено',
                             style: TextStyle(
                               color: const Color.fromRGBO(0, 0, 0, 0.5),
                               fontSize: 9.5.sp,

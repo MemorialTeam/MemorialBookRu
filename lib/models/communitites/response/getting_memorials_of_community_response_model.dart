@@ -1,3 +1,5 @@
+import 'package:memorial_book/models/common/links_reponse_model.dart';
+
 import '../../../helpers/enums.dart';
 import '../../catalog/response/get_authorized_content_response_model.dart';
 import 'get_community_info_response_model.dart';
@@ -25,10 +27,12 @@ class GettingMemorialsOfCommunityResponseModel {
 
 class MemorialsDataResponseModel {
   List<MemorialResponseModel>? data;
+  LinksResponseModel? links;
   int? lastPage;
 
   MemorialsDataResponseModel({
     required this.data,
+    required this.links,
     required this.lastPage,
   });
 
@@ -36,6 +40,7 @@ class MemorialsDataResponseModel {
     data = List.of(json['data']).map(
       ((index) => MemorialResponseModel.fromJson(index)),
     ).toList();
+    links = LinksResponseModel.fromJson(json['links']);
     lastPage = json['meta']['to'];
   }
 }

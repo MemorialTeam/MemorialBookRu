@@ -51,6 +51,8 @@ class MainButton extends StatelessWidget {
     if(condition != null) {
       if(condition == true) {
         return onTap();
+      } else {
+        return;
       }
     } else {
       return onTap();
@@ -60,6 +62,7 @@ class MainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PunchingAnimation(
+      condition: condition,
       child: Container(
         width: padding == null ?
         double.infinity :

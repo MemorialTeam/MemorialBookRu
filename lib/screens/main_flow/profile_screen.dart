@@ -505,7 +505,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           QuickLinkWidget(
                             isActive: true,
                             title: 'Профили',
-                            onTap: () async => await accountProvider.gettingUserProfiles(context, true),
+                            onTap: () => accountProvider.setProfileButtonState(context, true),
                             image: Image.asset(
                               ConstantsAssets.profilesLinkImage,
                               height: 3.6.h,
@@ -519,7 +519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           QuickLinkWidget(
                             isActive: true,
                             title: 'Питомцы',
-                            onTap: () async => await accountProvider.gettingUserProfiles(context, false),
+                            onTap: () => accountProvider.setProfileButtonState(context, false),
                             image: Image.asset(
                               ConstantsAssets.petTreeLinkImage,
                               width: 7.4.w,
@@ -659,6 +659,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Column(
                           children: [
+                            MainButton(
+                              onTap: () {},
+                              padding: EdgeInsets.symmetric(
+                                vertical: 5.w,
+                              ),
+                              activeColor: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    ConstantsAssets.helpSupportImage,
+                                    height: 2.6.h,
+                                  ),
+                                  SizedBox(
+                                    width: 2.6.w,
+                                  ),
+                                  Text(
+                                    'Help & Support',
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      fontFamily: ConstantsFonts.latoBold,
+                                      color: const Color.fromRGBO(130, 130, 130, 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // border: B,
+                            ),
                             Container(
                               decoration: const BoxDecoration(
                                 border: Border(

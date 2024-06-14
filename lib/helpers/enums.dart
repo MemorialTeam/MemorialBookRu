@@ -76,3 +76,8 @@ enum TabItem {
   communities,
   account,
 }
+
+enum NotificationType {
+  info,
+  none,
+}

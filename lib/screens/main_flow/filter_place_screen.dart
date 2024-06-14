@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:memorial_book/helpers/constants.dart';
+import 'package:memorial_book/provider/tab_bar_provider.dart';
+import 'package:memorial_book/screens/main_flow/search_regions_cemetery_screen.dart';
+import 'package:memorial_book/widgets/chooser_widget.dart';
 import 'package:memorial_book/widgets/main_button.dart';
+import '../../widgets/animation/punching_animation.dart';
 import '../../widgets/platform_scroll_physics.dart';
 import '../../widgets/text_field_profile_widget.dart';
 import '../../provider/catalog_provider.dart';
@@ -8,14 +13,21 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-class FilterPlaceScreen extends StatelessWidget {
+class FilterPlaceScreen extends StatefulWidget {
   const FilterPlaceScreen({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<FilterPlaceScreen> createState() => _FilterPlaceScreenState();
+}
+
+class _FilterPlaceScreenState extends State<FilterPlaceScreen> {
+
+  @override
   Widget build(BuildContext context) {
     final catalogProvider = Provider.of<CatalogProvider>(context);
+    final tabBarProvider = Provider.of<TabBarProvider>(context);
     return UnScopeScaffold(
       backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
       body: SingleChildScrollView(
@@ -36,17 +48,6 @@ class FilterPlaceScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 1.h,
-              ),
-              Text(
-                'Введите имя, отчество, фамилию профиля, который вы хотите найти. Если вы не уверены в датах, укажите приблизительные.',
-                style: TextStyle(
-                  color: const Color.fromRGBO(32, 30, 31, 0.5),
-                  fontFamily: ConstantsFonts.latoRegular,
-                  fontSize: 10.5.sp,
-                ),
-              ),
-              SizedBox(
                 height: 3.h,
               ),
               Text(
@@ -62,15 +63,121 @@ class FilterPlaceScreen extends StatelessWidget {
               ),
               TextFieldProfileWidget(
                 controller: catalogProvider.placesController,
+                onChanged: (text) => catalogProvider.updateState(),
+              ),
+              SizedBox(
+                height: 3.h,
+              ),
+              Text(
+                'Регион:',
+                style: TextStyle(
+                  color: const Color.fromRGBO(32, 30, 31, 0.5),
+                  fontFamily: ConstantsFonts.latoRegular,
+                  fontSize: 9.5.sp,
+                ),
+              ),
+              SizedBox(
+                height: 0.5.h,
+              ),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color.fromRGBO(205, 209, 214, 1),
+                  ),
+                  color: const Color.fromRGBO(245, 247, 249, 1),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () {
+                      Navigator.push(
+                        tabBarProvider.mainContext,
+                        CupertinoDialogRoute(
+                          builder: (context) => const SearchRegionsCemeteryScreen(),
+                          context: context,
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(1.h),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              physics: platformScrollPhysics(),
+                              child: Text(
+                                catalogProvider.selectedRegion.isEmpty ?
+                                'Регион' :
+                                catalogProvider.selectedRegion,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: catalogProvider.selectedRegion.isEmpty ?
+                                  const Color.fromRGBO(32, 30, 31, 0.5) :
+                                  const Color.fromRGBO(32, 30, 31, 1),
+                                  fontSize: 13.sp,
+                                  fontFamily: ConstantsFonts.latoRegular,
+                                ),
+                              ),
+                            ),
+                          ),
+                          catalogProvider.selectedRegion.isNotEmpty ?
+                          PunchingAnimation(
+                            child: GestureDetector(
+                              onTap: () => catalogProvider.clearSearchedCemeteryRegionsData(),
+                              child: Icon(
+                                Icons.close,
+                                size: 18.sp,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ) :
+                          const SizedBox(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if(catalogProvider.selectedRegion.isNotEmpty) Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 3.h,
+                  ),
+                  Text(
+                    'Район:',
+                    style: TextStyle(
+                      color: const Color.fromRGBO(32, 30, 31, 0.5),
+                      fontFamily: ConstantsFonts.latoRegular,
+                      fontSize: 9.5.sp,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 0.5.h,
+                  ),
+                  ChooserWidget(
+                    tag: 'district',
+                    list: catalogProvider.districtList,
+                    text: catalogProvider.district,
+                    condition: catalogProvider.districtCemeteryBool,
+                    loadingColor: const Color.fromRGBO(18, 175, 82, 1),
+                  ),
+                ],
               ),
               SizedBox(
                 height: 3.6.h,
               ),
               MainButton(
+                condition: catalogProvider.placesController.text.length >= 3,
                 text: 'ПОКАЗАТЬ',
+                inactiveColor: const Color.fromRGBO(18, 175, 82, 0.6),
                 activeColor: const Color.fromRGBO(18, 175, 82, 1),
                 onTap: () {
-                  catalogProvider.peopleSearch();
+                  catalogProvider.placeSearch();
                   Navigator.pop(context);
                 },
                 textStyle: TextStyle(

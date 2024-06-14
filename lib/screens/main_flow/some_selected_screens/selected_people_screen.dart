@@ -480,7 +480,7 @@ class _SelectedPeopleScreenState extends State<SelectedPeopleScreen> {
                           modelData?.human?.description ?? '',
                           style: TextStyle(
                             color: const Color.fromRGBO(32, 30, 31, 0.8),
-                            fontSize: 11.5.sp,
+                            fontSize: 9.5.sp,
                             fontFamily: ConstantsFonts.latoRegular,
                             height: 1.2.sp,
                           ),

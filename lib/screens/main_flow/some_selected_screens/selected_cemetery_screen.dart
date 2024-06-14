@@ -57,27 +57,39 @@ class _SelectedCemeteryScreenState extends State<SelectedCemeteryScreen> {
     final catalogProvider = Provider.of<CatalogProvider>(context);
     final model = catalogProvider.cemeteryProfileModel;
     return MainButton(
+      condition: !loadingSub,
+      inactiveColor: model?.isSubscribe == true ?
+      const Color.fromRGBO(250, 18, 46, 0.6) :
+      const Color.fromRGBO(18, 175, 82, 0.6),
       activeColor: model?.isSubscribe == true ?
       const Color.fromRGBO(250, 18, 46, 1) :
       const Color.fromRGBO(18, 175, 82, 1),
-      onTap: loadingSub == false ?
-      (() async {
+      onTap: (() async {
         setState(() => loadingSub = true);
         if(model?.isSubscribe == true) {
           await catalogProvider.unsubscribeFromTheCemetery(
             model?.id ?? 0,
             context,
-            ((model) => setState(() => loadingSub = false)),
+            ((status) async => await catalogProvider.updatingCemetery(
+              context, model?.id ?? 0,
+              ((model) {
+                setState(() => loadingSub = false);
+                catalogProvider.gettingAuthorizedMainContent(context, (model) {});
+              }),
+            )),
           );
         } else {
+          setState(() => loadingSub = true);
           await catalogProvider.subscribeToTheCemetery(
             model?.id ?? 0,
             context,
-            ((model) => setState(() => loadingSub = false)),
+            ((status) async => await catalogProvider.updatingCemetery(context, model?.id ?? 0, (model) {
+              setState(() => loadingSub = false);
+              catalogProvider.gettingAuthorizedMainContent(context, (model) {});
+            })),
           );
         }
-      }) :
-      (() {}),
+      }),
       child: Center(
         child: loadingSub == false ?
         Text(
@@ -91,8 +103,8 @@ class _SelectedCemeteryScreenState extends State<SelectedCemeteryScreen> {
           ),
         ) :
         SizedBox(
-          height: 2.67.h,
-          width: 2.67.h,
+          height: 2.24.h,
+          width: 2.24.h,
           child: const LoadingIndicator(
             indicatorType: Indicator.ballSpinFadeLoader,
             colors: [

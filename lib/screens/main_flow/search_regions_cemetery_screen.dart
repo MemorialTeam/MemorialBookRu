@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/helpers/constants.dart';
-import 'package:memorial_book/models/cemetery/response/search_cemetery_for_human_response_model.dart';
-import 'package:memorial_book/provider/profile_creation_provider.dart';
+import 'package:memorial_book/provider/catalog_provider.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/search_engine.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-
+import '../../models/common/region_response_model.dart';
 import '../../widgets/memorial_book_icon_widget.dart';
 import '../../widgets/platform_scroll_physics.dart';
 
-class SearchBurialPlaceScreen extends StatelessWidget {
-  const SearchBurialPlaceScreen({super.key});
+class SearchRegionsCemeteryScreen extends StatelessWidget {
+  const SearchRegionsCemeteryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final profileCreationProvider = Provider.of<ProfileCreationProvider>(context);
+    final catalogProvider = Provider.of<CatalogProvider>(context);
     return MemorialAppBar(
+      colorIcon: const Color.fromRGBO(18, 175, 82, 1),
       automaticallyImplyBackLeading: true,
       child: UnScopeScaffold(
         backgroundColor: const Color.fromRGBO(245, 247, 249, 1),
@@ -36,15 +36,17 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                 vertical: 1.h,
               ),
               child: SearchEngine(
-                focusNode: profileCreationProvider.searchCemeteryFocusNode,
-                controller: profileCreationProvider.searchCemeteryController,
+                focusNode: catalogProvider.searchedCemeteryRegionsFocusNode,
+                controller: catalogProvider.searchedCemeteryRegionsController,
                 autofocus: true,
-                isNotEmptyFunc: (name) async => await profileCreationProvider.searchCemeteryForHuman(name),
-                isEmptyFunc: () => profileCreationProvider.clearSearchedCemeteryData(),
-                suffixIcon: PunchingAnimation(
+                activeColor: const Color.fromRGBO(18, 175, 82, 1),
+                isNotEmptyFunc: (name) async => await catalogProvider.searchRegionsCemetery(name),
+                isEmptyFunc: () => catalogProvider.clearSearchedCemeteryRegionsData(),
+                suffixIcon: catalogProvider.searchedCemeteryRegionsController.text.isNotEmpty ?
+                PunchingAnimation(
                   child: GestureDetector(
                     onTap: () {
-                      profileCreationProvider.clearSearchedCemeteryData();
+                      catalogProvider.clearSearchedCemeteryRegionsData();
                       FocusScope.of(context).unfocus();
                     },
                     child: Icon(
@@ -53,13 +55,13 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                ),
+                ) : null,
               ),
             ),
             SizedBox(
               height: 1.h,
             ),
-            if(profileCreationProvider.searchedCemeteryModel != null && profileCreationProvider.searchedCemeteryModel!.cemeteries!.isNotEmpty && profileCreationProvider.searchedCemeteryBool == false) Column(
+            if(catalogProvider.searchedCemeteryRegionsModel != null && catalogProvider.searchedCemeteryRegionsModel!.regions!.isNotEmpty && catalogProvider.searchedCemeteryRegionsBool == false) Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
@@ -71,7 +73,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                       vertical: 1.3.h,
                     ),
                     child: Text(
-                      'Найденные кладбища',
+                      'Найденные регионы',
                       style: TextStyle(
                         fontSize: 13.5.sp,
                         fontFamily: ConstantsFonts.latoSemiBold,
@@ -90,54 +92,40 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
-                      final CemeteryResponseModel model = profileCreationProvider.searchedCemeteryModel!.cemeteries![index];
+                      final RegionResponseModel model = catalogProvider.searchedCemeteryRegionsModel!.regions![index];
                       return PunchingAnimation(
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () async {
                             FocusScope.of(context).unfocus();
                             Navigator.pop(context);
-                            await profileCreationProvider.setSearchedCemetery(model.name ?? 'Cemetery', model.address ?? 'No address', model.id ?? 0);
+                            await catalogProvider.setSearchedRegionsCemetery(model.title ?? 'Регион');
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: 4.w,
                               vertical: 1.2.h,
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  model.name ?? 'Кладбище',
-                                  style: TextStyle(
-                                    fontSize: 11.5.sp,
-                                    fontFamily: ConstantsFonts.latoRegular,
-                                    color: const Color.fromRGBO(32, 30, 31, 1),
-                                  ),
-                                ),
-                                Text(
-                                  model.address ?? 'Нет адреса',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 9.5.sp,
-                                    fontFamily: ConstantsFonts.latoRegular,
-                                    color: const Color.fromRGBO(32, 30, 31, 1),
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              model.title ?? 'Регион',
+                              style: TextStyle(
+                                fontSize: 11.5.sp,
+                                fontFamily: ConstantsFonts.latoRegular,
+                                color: const Color.fromRGBO(32, 30, 31, 1),
+                              ),
                             ),
                           ),
                         ),
                       );
                     },
-                    itemCount: profileCreationProvider.searchedCemeteryModel!.cemeteries!.length,
+                    itemCount: catalogProvider.searchedCemeteryRegionsModel?.regions?.length ?? 0,
                   ),
                 ),
                 SizedBox(
                   height: 2.h,
                 ),
                 Text(
-                  'Было найдено ${profileCreationProvider.searchedCemeteryModel!.total ?? 0} кладбищ',
+                  'Было найдено ${catalogProvider.searchedCemeteryRegionsModel?.regions?.length ?? 0} регионов',
                   style: TextStyle(
                     color: const Color.fromRGBO(0, 0, 0, 0.5),
                     fontSize: 11.5.sp,
@@ -149,16 +137,19 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                 ),
               ],
             ),
-            if(profileCreationProvider.searchedCemeteryModel != null && profileCreationProvider.searchedCemeteryModel!.cemeteries!.isEmpty && profileCreationProvider.searchedCemeteryBool == false) const MemorialBookIconWidget(
+            if(catalogProvider.searchedCemeteryRegionsModel != null && catalogProvider.searchedCemeteryRegionsModel!.regions!.isEmpty && catalogProvider.searchedCemeteryRegionsBool == false) const MemorialBookIconWidget(
               title: 'Ничего не найдено...',
+              color: Color.fromRGBO(18, 175, 82, 1),
             ),
-            if(profileCreationProvider.searchedCemeteryModel == null && profileCreationProvider.searchCemeteryController.text.isEmpty && profileCreationProvider.searchedCemeteryBool == false) const MemorialBookIconWidget(
+            if(catalogProvider.searchedCemeteryRegionsModel == null && catalogProvider.searchedCemeteryRegionsController.text.isEmpty && catalogProvider.searchedCemeteryRegionsBool == false) const MemorialBookIconWidget(
               title: 'Начните поиск',
+              color: Color.fromRGBO(18, 175, 82, 1),
             ),
-            if(profileCreationProvider.searchedCemeteryModel == null && profileCreationProvider.searchCemeteryController.text.isNotEmpty && profileCreationProvider.searchedCemeteryBool == false) const MemorialBookIconWidget(
+            if(catalogProvider.searchedCemeteryRegionsModel == null && catalogProvider.searchedCemeteryRegionsController.text.isNotEmpty && catalogProvider.searchedCemeteryRegionsBool == false) const MemorialBookIconWidget(
               title: 'Ошибка, пожалуйста, повторите попытку позже...',
+              color: Color.fromRGBO(18, 175, 82, 1),
             ),
-            if(profileCreationProvider.searchedCemeteryBool == true) Center(
+            if(catalogProvider.searchedCemeteryRegionsBool == true) Center(
               child: Padding(
                 padding: EdgeInsets.only(
                   top: 6.h,
@@ -169,7 +160,7 @@ class SearchBurialPlaceScreen extends StatelessWidget {
                   child: const LoadingIndicator(
                     indicatorType: Indicator.ballRotateChase,
                     colors: [
-                      Color.fromRGBO(23, 94, 217, 1)
+                      Color.fromRGBO(18, 175, 82, 1),
                     ],
                   ),
                 ),

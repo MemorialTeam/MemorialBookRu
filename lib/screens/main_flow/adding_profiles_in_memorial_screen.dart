@@ -59,7 +59,6 @@ class _AddingProfilesInMemorialScreenState extends State<AddingProfilesInMemoria
               itemBuilder: (context, index) {
                 if(catalogProvider.addPeopleFoundPeoples.isEmpty &&
                     catalogProvider.addPeopleController.text.isNotEmpty &&
-                    catalogProvider.addPeopleController.text.length % 3 == 0 &&
                     catalogProvider.addPeopleIsLoading == false) {
                   return const MemorialBookIconWidget(
                     title: 'Ничего не найдено',

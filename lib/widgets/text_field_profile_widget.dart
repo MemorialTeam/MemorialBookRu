@@ -16,6 +16,7 @@ class TextFieldProfileWidget extends StatelessWidget {
     this.inputFormatters,
     this.keyboardType,
     this.suffixIcon,
+    this.validator,
   }) : super(key: key);
 
   final int? maxLines;
@@ -37,6 +38,8 @@ class TextFieldProfileWidget extends StatelessWidget {
 
   final Widget? suffixIcon;
 
+  final String? Function(String?)? validator;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -53,8 +56,33 @@ class TextFieldProfileWidget extends StatelessWidget {
         fontSize: 12.sp,
         fontFamily: ConstantsFonts.latoRegular,
       ),
+      validator: validator,
       decoration: InputDecoration(
-        suffixIcon: suffixIcon,
+        errorMaxLines: 2,
+        errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Color.fromRGBO(250, 18, 46, 1),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(8.0),
+          ),
+        ),
+        focusedErrorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Color.fromRGBO(250, 18, 46, 1),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(8.0),
+          ),
+        ),
+        errorStyle: TextStyle(
+          color: const Color.fromRGBO(250, 18, 46, 1),
+          fontFamily: ConstantsFonts.latoRegular,
+          fontSize: 8.sp,
+        ),
+        suffixIcon: controller.text.isNotEmpty ?
+        suffixIcon :
+        null,
         hintStyle: TextStyle(
           color: const Color.fromRGBO(32, 30, 31, 0.5),
           fontSize: 12.sp,
@@ -66,7 +94,7 @@ class TextFieldProfileWidget extends StatelessWidget {
         fillColor: const Color.fromRGBO(245, 247, 249, 1),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(
-            Radius.circular(7.0),
+            Radius.circular(8.0),
           ),
         ),
         focusedBorder: OutlineInputBorder(

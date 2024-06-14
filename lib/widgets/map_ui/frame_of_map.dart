@@ -108,6 +108,9 @@ class FrameOfMap extends StatelessWidget {
           color: mainColor,
           sheetController: sheetController,
           total: total,
+          searchedName: mapFlowType == MapFlowType.places ?
+          'кладб.' :
+          'чел.',
           child: sheetLoadValue == false ?
           ListView.builder(
             shrinkWrap: true,

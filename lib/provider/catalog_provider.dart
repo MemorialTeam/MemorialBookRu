@@ -1,14 +1,19 @@
+import 'package:flutter/cupertino.dart';
 import 'package:memorial_book/models/catalog/response/get_authorized_content_response_model.dart';
 import 'package:memorial_book/models/communitites/request/add_memorial_to_the_commnunity_request_model.dart';
 import 'package:memorial_book/models/people/request/search_people_request_model.dart';
+import '../models/cemetery/request/cemetery_search_request.dart';
+import '../models/cemetery/response/get_districts_cemetery_response_model.dart';
 import '../models/cemetery/response/getting_the_users_cemeteries_response_model.dart';
+import '../models/cemetery/response/search_regions_cemetery_response_model.dart';
 import '../models/communitites/response/get_community_info_response_model.dart';
 import '../models/cemetery/response/get_cemetery_info_response_model.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/communitites/response/getting_memorials_of_community_response_model.dart';
 import '../models/communitites/response/getting_posts_of_community_response_model.dart';
-import '../widgets/cards/horizontal_mini_card_widget.dart';
+import '../models/user/response/get_notification_count_response.dart';
+import '../models/user/response/get_user_notifications_response_model.dart';
 import '../models/common/status_response_model.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
@@ -210,10 +215,7 @@ class CatalogProvider extends ChangeNotifier {
       BuildContext context,
       ValueSetter<GetAuthorizedContentResponseModel?> completion,
       ) async {
-    SVProgressHUD.show();
-
-    service.gettingAuthorizedMainContentRequest((response) {
-      SVProgressHUD.dismiss();
+    await service.gettingAuthorizedMainContentRequest((response) {
       mapper.gettingAuthorizedMainContentResponse(response, (model) async {
         print('---${response?.body}');
         if (model != null) {
@@ -223,8 +225,50 @@ class CatalogProvider extends ChangeNotifier {
           communities = model.feed?.communities ?? [];
           notifyListeners();
           completion(model);
+        }
+        else {
+          completion(null);
+        }
+      });
+    });
+  }
+
+  Future getNotificationCount(ValueSetter<GetNotificationCountResponse?> completion) async {
+    await service.getNotificationCountRequest((response) {
+      mapper.getNotificationCountResponse(response, (model) async {
+        if(model != null) {
+          if(model.status == true) {
+            if(model.count != 0) {
+              notificationsCount = model.count;
+              notifyListeners();
+            }
+          }
+          completion(model);
         } else {
           completion(null);
+        }
+      });
+    });
+  }
+
+
+  int? notificationsCount;
+
+  GetUserNotificationsResponseModel? userNotifications;
+  bool userNotificationsBool = false;
+
+  Future getUserNotifications() async {
+    userNotifications = null;
+    userNotificationsBool = true;
+    await service.getUserNotificationsRequest((response) {
+      userNotificationsBool = false;
+      notifyListeners();
+      mapper.getUserNotificationsResponse(response, (model) async {
+        if(model != null) {
+          if(model.status == true) {
+            userNotifications = model;
+            notifyListeners();
+          }
         }
       });
     });
@@ -333,6 +377,22 @@ class CatalogProvider extends ChangeNotifier {
     notifyListeners();
     service.gettingPostsOfCommunityRequest(id, postsPageNumber, (response) {
       mapper.gettingPostsOfCommunityResponse(response, (model) {
+        if(model != null) {
+          if (model.status == true) {
+            if (model.posts?.data != null && model.posts!.data!.isNotEmpty) {
+              postsDataModel = model.posts;
+              notifyListeners();
+            }
+          }
+        }
+      });
+    });
+  }
+  Future updatePostsOfCommunity(int id) async {
+    postsPageNumber = 1;
+    notifyListeners();
+    service.gettingPostsOfCommunityRequest(id, postsPageNumber, (response) {
+      mapper.gettingPostsOfCommunityResponse(response, (model) async {
         if(model != null) {
           if (model.status == true) {
             if (model.posts?.data != null && model.posts!.data!.isNotEmpty) {
@@ -515,16 +575,6 @@ class CatalogProvider extends ChangeNotifier {
     await service.subscribeToTheCemeteryRequest(id, (response) {
       mapper.statusResponse(response, (model) async {
         if(model != null) {
-          if(model.status == true) {
-            await Future.delayed(
-              const Duration(
-                seconds: 1,
-              ),
-            ).whenComplete(() async {
-              await updatingCemetery(context, id, (model) {});
-              await gettingCemeteries(context, (model) {});
-            });
-          }
           completion(model);
         }
         else {
@@ -543,16 +593,6 @@ class CatalogProvider extends ChangeNotifier {
     await service.unsubscribeFromTheCemeteryRequest(id, (response) {
       mapper.statusResponse(response, (model) async {
         if(model != null) {
-          if(model.status == true) {
-            await Future.delayed(
-              const Duration(
-                seconds: 1,
-              ),
-            ).whenComplete(() async {
-              await updatingCemetery(context, id, (model) {});
-              await gettingCemeteries(context, (model) {});
-            });
-          }
           completion(model);
         }
         else {
@@ -661,12 +701,11 @@ class CatalogProvider extends ChangeNotifier {
       ConstantsAssets.mapPointImage,
     );
   }
-
-  Future onMapPeopleCreated(GoogleMapController controller) async {
-    peopleMapController = Completer();
-    peopleMapController.complete(controller);
-    notifyListeners();
-  }
+  // Future onMapPeopleCreated(GoogleMapController controller) async {
+  //   peopleMapController = Completer();
+  //   peopleMapController.complete(controller);
+  //   notifyListeners();
+  // }
 
   void onMapPlacesCreated(GoogleMapController controller) {
     placesMapController = Completer();
@@ -743,11 +782,13 @@ class CatalogProvider extends ChangeNotifier {
     String? birthTo;
     String? deathFrom;
     String? deathTo;
-    if(birthYearController.text.isNotEmpty && deathYearController.text.isNotEmpty) {
+    if(birthYearController.text.length == 11) {
       birthFrom = birthYearController.text[0] + birthYearController.text[1] + birthYearController.text[2] + birthYearController.text[3];
-      birthTo = birthYearController.text[5] + birthYearController.text[6] + birthYearController.text[7] + birthYearController.text[8];
+      birthTo = birthYearController.text[7] + birthYearController.text[8] + birthYearController.text[9] + birthYearController.text[10];
+    }
+    if(deathYearController.text.length == 11) {
       deathFrom = deathYearController.text[0] + deathYearController.text[1] + deathYearController.text[2] + deathYearController.text[3];
-      deathTo = deathYearController.text[5] + deathYearController.text[6] + deathYearController.text[7] + deathYearController.text[8];
+      deathTo = deathYearController.text[7] + deathYearController.text[8] + deathYearController.text[9] + deathYearController.text[10];
     }
 
     notifyListeners();
@@ -763,39 +804,39 @@ class CatalogProvider extends ChangeNotifier {
     await service.peopleSearchRequest(model, (response) {
       mapper.peopleSearchResponse(response, (model) async {
         if(model != null) {
-          GoogleMapController gcontroller = await peopleMapController.future;
-          peopleMarkers.clear();
+          // GoogleMapController gcontroller = await peopleMapController.future;
+          // peopleMarkers.clear();
           peopleListLoading = false;
-          if(model.humans != null && model.humans!.isNotEmpty) {
-            for (var element in model.humans!) {
-              if(element.burialCord?.lat != null && element.burialCord?.lng != null) {
-                String markerIdVal = '${element.id}';
-                MarkerId markerId = MarkerId(markerIdVal);
-                final Marker marker = Marker(
-                  markerId: markerId,
-                  icon: mapMarker,
-                  position: LatLng(
-                    double.parse(element.burialCord!.lat!),
-                    double.parse(element.burialCord!.lng!),
-                  ),
-                );
-                peopleMarkers[markerId] = marker;
-                notifyListeners();
-              }
-            }
-            if(model.humans?[0].burialCord?.lat != null && model.humans?[0].burialCord?.lng != null) {
-              double lat = double.parse(model.humans![0].burialCord!.lat);
-              double lng = double.parse(model.humans![0].burialCord!.lng);
-              gcontroller.animateCamera(
-                CameraUpdate.newCameraPosition(
-                  CameraPosition(
-                    target: LatLng(lat, lng),
-                    zoom: 14,
-                  ),
-                ),
-              );
-            }
-          }
+          // if(model.humans != null && model.humans!.isNotEmpty) {
+          //   for (var element in model.humans!) {
+          //     if(element.burialCord?.lat != null && element.burialCord?.lng != null) {
+          //       String markerIdVal = '${element.id}';
+          //       MarkerId markerId = MarkerId(markerIdVal);
+          //       final Marker marker = Marker(
+          //         markerId: markerId,
+          //         icon: mapMarker,
+          //         position: LatLng(
+          //           double.parse(element.burialCord!.lat!),
+          //           double.parse(element.burialCord!.lng!),
+          //         ),
+          //       );
+          //       peopleMarkers[markerId] = marker;
+          //       notifyListeners();
+          //     }
+          //   }
+          //   if(model.humans?[0].burialCord?.lat != null && model.humans?[0].burialCord?.lng != null) {
+          //     double lat = double.parse(model.humans![0].burialCord!.lat);
+          //     double lng = double.parse(model.humans![0].burialCord!.lng);
+          //     gcontroller.animateCamera(
+          //       CameraUpdate.newCameraPosition(
+          //         CameraPosition(
+          //           target: LatLng(lat, lng),
+          //           zoom: 14,
+          //         ),
+          //       ),
+          //     );
+          //   }
+          // }
           mapPeoplesTotal = model.total;
           peoples = model.humans ?? [];
           print(response?.body);
@@ -809,8 +850,10 @@ class CatalogProvider extends ChangeNotifier {
     placeListLoading = true;
     mapPlacesTotal = null;
     notifyListeners();
-    CemeteryResponseModel model = CemeteryResponseModel(
+    CemeterySearchRequest model = CemeterySearchRequest(
       name: placesController.text,
+      region: selectedRegion,
+      district: district,
     );
     await service.placesSearchRequest(model, (response) {
       mapper.placesSearchResponse(response, (model) async {
@@ -866,18 +909,12 @@ class CatalogProvider extends ChangeNotifier {
     );
     notifyListeners();
 
-    Future.delayed(
-      const Duration(
-        milliseconds: 250,
-      ),
-    ).whenComplete(() async {
-      return await service.peopleSearchRequest(model, (response) {
-        print(response?.body);
-        mapper.peopleSearchResponse(response, (model) async {
-          addPeopleIsLoading = false;
-          addPeopleFoundPeoples = model?.humans ?? [];
-          notifyListeners();
-        });
+    await service.peopleSearchRequest(model, (response) {
+      print(response?.body);
+      mapper.peopleSearchResponse(response, (model) async {
+        addPeopleIsLoading = false;
+        addPeopleFoundPeoples = model?.humans ?? [];
+        notifyListeners();
       });
     });
   }
@@ -1082,9 +1119,108 @@ class CatalogProvider extends ChangeNotifier {
         if(placesController.text.isNotEmpty) {
           count++;
         }
+        if(district.isNotEmpty) {
+          count++;
+        }
+        if(selectedRegion.isNotEmpty) {
+          count++;
+        }
         return count;
     }
+  }
 
+  bool searchedCemeteryRegionsBool = false;
+  FocusNode searchedCemeteryRegionsFocusNode = FocusNode();
+  TextEditingController searchedCemeteryRegionsController = TextEditingController();
+  SearchRegionsCemeteryResponseModel? searchedCemeteryRegionsModel;
+  String selectedRegion = '';
+
+  Future searchRegionsCemetery(String name) async {
+    searchedCemeteryRegionsBool = true;
+    notifyListeners();
+    await service.searchRegionsCemeteryRequest(name, (response) {
+      mapper.searchRegionsCemeteryResponse(response, (model) {
+        searchedCemeteryRegionsBool = false;
+        notifyListeners();
+        if(model != null) {
+          if(model.status == true) {
+            searchedCemeteryRegionsModel = model;
+            notifyListeners();
+          }
+        }
+      });
+    });
+  }
+  Future setSearchedRegionsCemetery(String region) async {
+    districtList.clear();
+    selectedRegion = region;
+    searchedCemeteryRegionsController.value = TextEditingValue(
+      text: region,
+    );
+    searchDistrictsCemetery(
+      region,
+      ((model) {
+        if(model != null) {
+          if(model.status == true) {
+            for(DistrictResponseModel dModel in districtsCemeteryModel?.districts ?? []) {
+              if(dModel.region == region) {
+                districtList.add(dModel.title);
+                notifyListeners();
+              }
+            }
+          }
+        }
+      }),
+    );
+    notifyListeners();
+    await searchRegionsCemetery(region);
+  }
+  void clearSearchedCemeteryRegionsData() {
+    selectedRegion = '';
+    district = '';
+    districtList.clear();
+    searchedCemeteryRegionsModel = null;
+    searchedCemeteryRegionsBool = false;
+    searchedCemeteryRegionsController.clear();
+    notifyListeners();
+  }
+
+  LoadingState districtCemeteryBool = LoadingState.loading;
+  GetDistrictsCemeteryResponseModel? districtsCemeteryModel;
+
+  Future searchDistrictsCemetery(String region, ValueSetter<GetDistrictsCemeteryResponseModel?> completion) async {
+    districtCemeteryBool = LoadingState.loading;
+    // notifyListeners();
+    await service.getDistrictsCemeteryRequest(region, (response) {
+      mapper.getDistrictsCemeteryResponse(response, (model) {
+        if(model != null) {
+          if(model.status == true) {
+            districtCemeteryBool = LoadingState.active;
+            districtsCemeteryModel = model;
+            notifyListeners();
+          } else {
+            districtCemeteryBool = LoadingState.error;
+          }
+          completion(model);
+        } else {
+          districtCemeteryBool = LoadingState.error;
+          completion(null);
+        }
+      });
+    });
+  }
+
+  String district = '';
+  List districtList = [];
+
+  void removeDistrict() {
+    district = '';
+    notifyListeners();
+  }
+
+  void addDistrict(String value) {
+    district = value;
+    notifyListeners();
   }
 
   void errorChecking() {

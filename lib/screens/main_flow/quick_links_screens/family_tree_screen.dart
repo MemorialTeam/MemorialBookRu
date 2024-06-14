@@ -1,16 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:memorial_book/helpers/constants.dart';
 import 'package:memorial_book/provider/account_provider.dart';
 import 'package:memorial_book/provider/tab_bar_provider.dart';
 import 'package:memorial_book/screens/profile_creation_flow/creation_flow.dart';
 import 'package:memorial_book/widgets/animation/punching_animation.dart';
 import 'package:memorial_book/widgets/animation/vertical_soft_navigation.dart';
+import 'package:memorial_book/widgets/boot_engine.dart';
 import 'package:memorial_book/widgets/cards/horizontal_mini_card_widget.dart';
 import 'package:memorial_book/widgets/memorial_app_bar.dart';
 import 'package:memorial_book/widgets/memorial_book_icon_widget.dart';
 import 'package:memorial_book/widgets/search_engine.dart';
+import 'package:memorial_book/widgets/skeleton_loader_widget.dart';
 import 'package:memorial_book/widgets/unscope_scaffold.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -20,7 +23,7 @@ import '../some_selected_screens/selected_people_screen.dart';
 import '../some_selected_screens/selected_pet_screen.dart';
 
 class FamilyTreeScreen extends StatefulWidget {
-  FamilyTreeScreen({Key? key}) : super(key: key);
+  const FamilyTreeScreen({Key? key}) : super(key: key);
 
   @override
   State<FamilyTreeScreen> createState() => _FamilyTreeScreenState();
@@ -28,12 +31,23 @@ class FamilyTreeScreen extends StatefulWidget {
 
 class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
   final FocusNode profilesFocusNode = FocusNode();
-
   final FocusNode petsFocusNode = FocusNode();
 
   final TextEditingController profilesController = TextEditingController();
-
   final TextEditingController petsController = TextEditingController();
+
+  @override
+  void initState() {
+    final accountProvider = Provider.of<AccountProvider>(
+      context,
+      listen: false,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      accountProvider.gettingCreatedHumansProfiles((model) {});
+      accountProvider.gettingCreatedPetsProfiles((model) {});
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,46 +69,46 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                 ),
                 height: double.infinity,
                 width: double.infinity,
-                child: RefreshIndicator(
-                  backgroundColor: const Color.fromRGBO(23, 94, 217, 1),
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  displacement: 4.h,
-                  onRefresh: () async => await accountProvider.gettingCreatedHumansProfiles((value) {
-                    SVProgressHUD.dismiss();
-                  }),
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        expandedHeight: 8.3.h,
-                        // elevation: 0,
-                        leading: const SizedBox(),
-                        backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-                        surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
-                        floating: true,
-                        flexibleSpace: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 3.4.w,
-                            vertical: 1.2.h,
-                          ),
-                          child: SearchEngine(
-                            focusNode: profilesFocusNode,
-                            controller: profilesController,
-                            isNotEmptyFunc: (text) {},
+                child: BootEngine(
+                  loadValue: accountProvider.humanLoading,
+                  activeFlow: RefreshIndicator(
+                    backgroundColor: const Color.fromRGBO(23, 94, 217, 1),
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    displacement: 4.h,
+                    onRefresh: () async => await accountProvider.gettingCreatedHumansProfiles((value) {
+                      SVProgressHUD.dismiss();
+                    }),
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverAppBar(
+                          expandedHeight: 8.3.h,
+                          leading: const SizedBox(),
+                          backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
+                          surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
+                          floating: true,
+                          flexibleSpace: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 3.4.w,
+                              vertical: 1.2.h,
+                            ),
+                            child: SearchEngine(
+                              focusNode: profilesFocusNode,
+                              controller: profilesController,
+                              isNotEmptyFunc: (text) {},
+                            ),
                           ),
                         ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 0.4.h,
-                              color: const Color.fromRGBO(245, 247, 249, 1),
-                            ),
-                            accountProvider.createdHumanModel?.data != null && accountProvider.createdHumanModel!.data!.isNotEmpty ?
-                            ListView.separated(
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            ((context, index) {
+                              List modelList = accountProvider.createdHumanModel?.data ?? [];
+                              if(accountProvider.createdHumanPageNumber != null &&
+                                  accountProvider.createdHumanModel?.data != null &&
+                                  index == accountProvider.createdHumanModel!.data!.length - 1 &&
+                                  accountProvider.createdHumanPaginationLoading == false) {
+                                accountProvider.paginationCreatedHumans();
+                              }
+                              if(modelList.isNotEmpty) {
                                 final dataList = accountProvider.createdHumanModel!.data![index];
                                 final String firstName = dataList.firstName == '' || dataList.firstName == null ?
                                 '' :
@@ -105,13 +119,24 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                                 final String lastName = dataList.lastName == '' || dataList.lastName == null ?
                                 '' :
                                 '${dataList.lastName} ';
-                                WidgetsBinding.instance.addPostFrameCallback((_){
-                                  if(accountProvider.createdHumanPageNumber != null &&
-                                      index == accountProvider.createdHumanModel!.data!.length - 1 &&
-                                      accountProvider.createdHumanPaginationLoading == false) {
-                                    accountProvider.paginationCreatedHumans();
-                                  }
-                                });
+                                if(accountProvider.createdHumanPaginationLoading == true) {
+                                  return Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom: 0.5.h,
+                                      ),
+                                      child: SizedBox(
+                                        width: 6.h,
+                                        child: const LoadingIndicator(
+                                          indicatorType: Indicator.ballSpinFadeLoader,
+                                          colors: [
+                                            Color.fromRGBO(23, 94, 217, 1),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
                                 return HorizontalMiniCardWidget(
                                   onTap: () => Navigator.push(
                                     context,
@@ -128,23 +153,111 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                                   title: lastName+ firstName+ middleName,
                                   subtitle: '${dataList.dateBirth} - ${dataList.dateDeath}',
                                 );
-                              },
-                              separatorBuilder: (context, index) {
-                                return Container(
-                                  height: 0.4.h,
-                                  color: const Color.fromRGBO(245, 247, 249, 1),
+                              }
+                              else {
+                                return const MemorialBookIconWidget(
+                                  title: 'У Вас ещё нет\nсозданных профилей',
                                 );
-                              },
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: accountProvider.createdHumanModel!.data!.length,
-                            ) :
-                            const MemorialBookIconWidget(
-                              title: 'У-пс...\nМы ничего не нашли',
-                            )
-                          ],
+                              }
+                            }),
+                            childCount: (accountProvider.createdHumanModel?.data?.length ?? 1) + (accountProvider.createdHumanPaginationLoading == true ? 1 : 0),
+                          ),
                         ),
-                      )
-                    ],
+                      ],
+                    ),
+                  ),
+                  loadingFlow: SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          color: const Color.fromRGBO(255, 255, 255, 1),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 3.4.w,
+                              vertical: 1.2.h,
+                            ),
+                            child: SkeletonLoaderWidget(
+                              height: 5.8.h,
+                              width: double.infinity,
+                              borderRadius: 7,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 0.4.h,
+                          color: const Color.fromRGBO(245, 247, 249, 1),
+                        ),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return PunchingAnimation(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 3.6.w,
+                                  vertical: 1.2.h,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SkeletonLoaderWidget(
+                                      height: 7.h,
+                                      width: 7.h,
+                                      borderRadius: 50,
+                                    ),
+                                    SizedBox(
+                                      width: 3.8.w,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          SkeletonLoaderWidget(
+                                            height: 2.3.h,
+                                            width: index.isEven ?
+                                            15.w :
+                                            20.w,
+                                            borderRadius: 5,
+                                          ),
+                                          SizedBox(
+                                            height: 0.6.h,
+                                          ),
+                                          SkeletonLoaderWidget(
+                                            height: 1.7.h,
+                                            width: index.isEven ?
+                                            34.w :
+                                            40.w,
+                                            borderRadius: 10,
+                                          ),
+                                          SizedBox(
+                                            height: 0.8.h,
+                                          ),
+                                          SkeletonLoaderWidget(
+                                            height: 1.7.h,
+                                            width: 26.w,
+                                            borderRadius: 10,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return Container(
+                              height: 0.4.h,
+                              color: const Color.fromRGBO(245, 247, 249, 1),
+                            );
+                          },
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 6,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ) :
@@ -155,87 +268,183 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
                 ),
                 height: double.infinity,
                 width: double.infinity,
-                child: RefreshIndicator(
-                  backgroundColor: const Color.fromRGBO(23, 94, 217, 1),
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  displacement: 4.h,
-                  onRefresh: () async => await accountProvider.gettingCreatedPetsProfiles((value) {
-                    SVProgressHUD.dismiss();
-                  }),
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        expandedHeight: 8.3.h,
-                        // elevation: 0,
-                        leading: const SizedBox(),
-                        backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-                        surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
-                        floating: true,
-                        flexibleSpace: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 3.4.w,
-                            vertical: 1.2.h,
-                          ),
-                          child: SearchEngine(
-                            focusNode: petsFocusNode,
-                            controller: petsController,
-                            isNotEmptyFunc: (text) {},
+                child: BootEngine(
+                  loadValue: accountProvider.petLoading,
+                  activeFlow: RefreshIndicator(
+                    backgroundColor: const Color.fromRGBO(23, 94, 217, 1),
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    displacement: 4.h,
+                    onRefresh: () async => await accountProvider.gettingCreatedPetsProfiles((value) {
+                      SVProgressHUD.dismiss();
+                    }),
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverAppBar(
+                          expandedHeight: 8.3.h,
+                          // elevation: 0,
+                          leading: const SizedBox(),
+                          backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
+                          surfaceTintColor: const Color.fromRGBO(255, 255, 255, 1),
+                          floating: true,
+                          flexibleSpace: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 3.4.w,
+                              vertical: 1.2.h,
+                            ),
+                            child: SearchEngine(
+                              focusNode: petsFocusNode,
+                              controller: petsController,
+                              isNotEmptyFunc: (text) {},
+                            ),
                           ),
                         ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 0.4.h,
-                              color: const Color.fromRGBO(245, 247, 249, 1),
-                            ),
-                            accountProvider.createdPetsModel?.data != null && accountProvider.createdPetsModel!.data!.isNotEmpty ?
-                            ListView.separated(
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                final dataList = accountProvider.createdPetsModel!.data![index];
-                                WidgetsBinding.instance.addPostFrameCallback((_){
-                                  if(accountProvider.createdPetPageNumber != null &&
-                                      index == accountProvider.createdPetsModel!.data!.length - 1 &&
-                                      accountProvider.createdPetPaginationLoading == false) {
-                                    accountProvider.paginationCreatedHumans();
-                                  }
-                                });
-                                return HorizontalMiniCardWidget(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (context) => SelectedPetScreen(
-                                        id: dataList.id ?? 0,
-                                        avatar: dataList.avatar ?? '',
+                        SliverToBoxAdapter(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 0.4.h,
+                                color: const Color.fromRGBO(245, 247, 249, 1),
+                              ),
+                              accountProvider.createdPetsModel?.data != null && accountProvider.createdPetsModel!.data!.isNotEmpty ?
+                              ListView.separated(
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  final dataList = accountProvider.createdPetsModel!.data![index];
+                                  WidgetsBinding.instance.addPostFrameCallback((_){
+                                    if(accountProvider.createdPetPageNumber != null &&
+                                        index == accountProvider.createdPetsModel!.data!.length - 1 &&
+                                        accountProvider.createdPetPaginationLoading == false) {
+                                      accountProvider.paginationCreatedHumans();
+                                    }
+                                  });
+                                  return HorizontalMiniCardWidget(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (context) => SelectedPetScreen(
+                                          id: dataList.id ?? 0,
+                                          avatar: dataList.avatar ?? '',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  isVerified: dataList.isCelebrity,
-                                  status: dataList.status,
-                                  avatar: dataList.avatar,
-                                  title: dataList.name ?? '',
-                                  subtitle: '${dataList.yearBirth} - ${dataList.yearDeath}',
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return Container(
-                                  height: 0.4.h,
-                                  color: const Color.fromRGBO(245, 247, 249, 1),
-                                );
-                              },
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: accountProvider.createdPetsModel!.data!.length,
-                            ) :
-                            const MemorialBookIconWidget(
-                              title: 'У-пс...\nМы ничего не нашли',
+                                    isVerified: dataList.isCelebrity,
+                                    status: dataList.status,
+                                    avatar: dataList.avatar,
+                                    title: dataList.name ?? '',
+                                    subtitle: '${dataList.yearBirth} - ${dataList.yearDeath}',
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return Container(
+                                    height: 0.4.h,
+                                    color: const Color.fromRGBO(245, 247, 249, 1),
+                                  );
+                                },
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: accountProvider.createdPetsModel!.data!.length,
+                              ) :
+                              const MemorialBookIconWidget(
+                                title: 'У-пс...\nМы ничего не нашли',
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  loadingFlow: SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          color: const Color.fromRGBO(255, 255, 255, 1),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 3.4.w,
+                              vertical: 1.2.h,
                             ),
-                          ],
+                            child: SkeletonLoaderWidget(
+                              height: 5.8.h,
+                              width: double.infinity,
+                              borderRadius: 7,
+                            ),
+                          ),
                         ),
-                      )
-                    ],
+                        Container(
+                          height: 0.4.h,
+                          color: const Color.fromRGBO(245, 247, 249, 1),
+                        ),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return PunchingAnimation(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 3.6.w,
+                                  vertical: 1.2.h,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SkeletonLoaderWidget(
+                                      height: 7.h,
+                                      width: 7.h,
+                                      borderRadius: 50,
+                                    ),
+                                    SizedBox(
+                                      width: 3.8.w,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          SkeletonLoaderWidget(
+                                            height: 2.3.h,
+                                            width: index.isEven ?
+                                            15.w :
+                                            20.w,
+                                            borderRadius: 5,
+                                          ),
+                                          SizedBox(
+                                            height: 0.6.h,
+                                          ),
+                                          SkeletonLoaderWidget(
+                                            height: 1.7.h,
+                                            width: index.isEven ?
+                                            34.w :
+                                            40.w,
+                                            borderRadius: 10,
+                                          ),
+                                          SizedBox(
+                                            height: 0.8.h,
+                                          ),
+                                          SkeletonLoaderWidget(
+                                            height: 1.7.h,
+                                            width: 26.w,
+                                            borderRadius: 10,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return Container(
+                              height: 0.4.h,
+                              color: const Color.fromRGBO(245, 247, 249, 1),
+                            );
+                          },
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 10,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

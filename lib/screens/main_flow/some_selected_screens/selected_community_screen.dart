@@ -33,9 +33,11 @@ class SelectedCommunityScreen extends StatefulWidget {
     Key? key,
     required this.id,
     required this.avatar,
+    this.banner,
   }) : super(key: key);
 
   final String avatar;
+  final String? banner;
   final int id;
 
   @override
@@ -63,11 +65,14 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
     final model = catalogProvider.communityProfileModel;
 
     return MainButton(
+      condition: !loadingSub,
+      inactiveColor: model?.isSubscribe == true ?
+      const Color.fromRGBO(250, 18, 46, 0.6) :
+      const Color.fromRGBO(23, 94, 217, 0.6),
       activeColor: model?.isSubscribe == true ?
       const Color.fromRGBO(250, 18, 46, 1) :
       const Color.fromRGBO(23, 94, 217, 1),
-      onTap: loadingSub == false ?
-      (() async {
+      onTap: (() async {
         setState(() => loadingSub = true);
         if(model?.isSubscribe == true) {
           await catalogProvider.unsubscribeFromTheCommunity(
@@ -82,8 +87,7 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
             ((model) => setState(() => loadingSub = false)),
           );
         }
-      }) :
-      (() {}),
+      }),
       child: Center(
         child: loadingSub == false ?
         Text(
@@ -97,8 +101,8 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
           ),
         ) :
         SizedBox(
-          height: 2.67.h,
-          width: 2.67.h,
+          height: 2.24.h,
+          width: 2.24.h,
           child: const LoadingIndicator(
             indicatorType: Indicator.ballSpinFadeLoader,
             colors: [
@@ -147,7 +151,7 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
             ),
           ),
         ) :
-         null,
+        null,
         body: BootEngine(
           loadValue: catalogProvider.getCommunityProfileState,
           activeFlow: CustomScrollView(
@@ -513,7 +517,7 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
                                             ),
                                           ),
                                           child: Hero(
-                                            tag: indexMenu,
+                                            tag: model.gallery![indexMenu].id.toString(),
                                             child: CachedNetworkImage(
                                               imageUrl: model.gallery![indexMenu].url ?? '',
                                               imageBuilder: (context, imageProvider) {
@@ -612,7 +616,40 @@ class _SelectedCommunityScreenState extends State<SelectedCommunityScreen> {
                   clipBehavior: Clip.none,
                   fit: StackFit.expand,
                   children: [
-                    SkeletonLoaderWidget(
+                    if(widget.banner != null) CachedNetworkImage(
+                      imageUrl: widget.banner!,
+                      imageBuilder: (context, imageProvider) {
+                        return Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      },
+                      errorWidget: (context, error, widget) {
+                        return Container(
+                          height: double.infinity,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(ConstantsAssets.memorialBookLogoImage),
+                            ),
+                          ),
+                        );
+                      },
+                      progressIndicatorBuilder: (context, url, downloadProgress) {
+                        return const SkeletonLoaderWidget(
+                          width: double.infinity,
+                          height: double.infinity,
+                          borderRadius: 0,
+                        );
+                      },
+                    )
+                    else SkeletonLoaderWidget(
                       height: 28.8.h,
                       width: double.infinity,
                     ),
@@ -1001,4 +1038,26 @@ class MySliverAppBar extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
+}
+
+class ChildSizeNotifier extends StatelessWidget {
+  final ValueNotifier<Size> notifier = ValueNotifier(const Size(0, 0));
+  final Widget Function(BuildContext, Size, Widget?) builder;
+  ChildSizeNotifier({
+    Key? key,
+    required this.builder,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback(
+          (_) {
+        notifier.value = (context.findRenderObject() as RenderBox).size;
+      },
+    );
+    return ValueListenableBuilder(
+      valueListenable: notifier,
+      builder: builder,
+    );
+  }
 }

@@ -51,6 +51,8 @@ dependencies:
   animate_do: ^3.3.4
   photo_view: ^0.15.0
   auto_size_text: ^3.0.0
+  flutter_animated_icons: ^1.0.1
+  lottie: ^1.4.3
 
 flutter_native_splash:
   android: true

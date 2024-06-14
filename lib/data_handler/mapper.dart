@@ -10,10 +10,12 @@ import '../models/catalog/response/get_authorized_content_response_model.dart';
 import '../models/catalog/response/get_guest_content_response_model.dart';
 import '../models/catalog/response/main_catalog_response_model.dart';
 import '../models/cemetery/response/get_cemetery_info_response_model.dart';
+import '../models/cemetery/response/get_districts_cemetery_response_model.dart';
 import '../models/cemetery/response/getting_the_users_cemeteries_response_model.dart';
 import '../models/cemetery/response/search_cemetery_for_human_response_model.dart';
 import '../models/cemetery/response/search_cemetery_info_response_model.dart';
 import '../models/cemetery/response/search_memorials_response_model.dart';
+import '../models/cemetery/response/search_regions_cemetery_response_model.dart';
 import '../models/common/map_response_model.dart';
 import '../models/common/status_response_model.dart';
 import '../models/communitites/response/community_response_model.dart';
@@ -31,6 +33,8 @@ import '../models/people/response/get_people_info_response_model.dart';
 import '../models/people/response/getting_created_humans_profiles_response_model.dart';
 import '../models/people/response/related_profiles_response_model.dart';
 import '../models/pet/response/get_pet_info_response_model.dart';
+import '../models/user/response/get_notification_count_response.dart';
+import '../models/user/response/get_user_notifications_response_model.dart';
 
 class Mapper {
   void signUpResponse(
@@ -66,6 +70,32 @@ class Mapper {
     if (response != null) {
       Map<String, dynamic> body = json.decode(response.body);
       GetAuthorizedContentResponseModel model = GetAuthorizedContentResponseModel.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getNotificationCountResponse(
+      Response? response,
+      ValueSetter<GetNotificationCountResponse?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      GetNotificationCountResponse model = GetNotificationCountResponse.fromJson(body);
+      completion(model);
+    } else {
+      completion(null);
+    }
+  }
+
+  void getUserNotificationsResponse(
+      Response? response,
+      ValueSetter<GetUserNotificationsResponseModel?> completion,
+      ) {
+    if (response != null) {
+      Map<String, dynamic> body = json.decode(response.body);
+      GetUserNotificationsResponseModel model = GetUserNotificationsResponseModel.fromJson(body);
       completion(model);
     } else {
       completion(null);
@@ -258,6 +288,40 @@ class Mapper {
       if (response != null) {
         Map<String, dynamic> body = json.decode(response.body);
         SearchCemeteryForHumanResponseModel model = SearchCemeteryForHumanResponseModel.fromJson(body);
+        completion(model);
+      } else {
+        completion(null);
+      }
+    } catch(error) {
+      print('$error');
+    }
+  }
+
+  void searchRegionsCemeteryResponse(
+      Response? response,
+      ValueSetter<SearchRegionsCemeteryResponseModel?> completion,
+      ) async {
+    try {
+      if (response != null) {
+        Map<String, dynamic> body = json.decode(response.body);
+        SearchRegionsCemeteryResponseModel model = SearchRegionsCemeteryResponseModel.fromJson(body);
+        completion(model);
+      } else {
+        completion(null);
+      }
+    } catch(error) {
+      print('$error');
+    }
+  }
+
+  void getDistrictsCemeteryResponse(
+      Response? response,
+      ValueSetter<GetDistrictsCemeteryResponseModel?> completion,
+      ) async {
+    try {
+      if (response != null) {
+        Map<String, dynamic> body = json.decode(response.body);
+        GetDistrictsCemeteryResponseModel model = GetDistrictsCemeteryResponseModel.fromJson(body);
         completion(model);
       } else {
         completion(null);

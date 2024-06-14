@@ -227,7 +227,7 @@ class _HorizontalMiniCardWidgetState extends State<HorizontalMiniCardWidget> {
                             ),
                             if(widget.isVerified == true) Padding(
                               padding: EdgeInsets.only(
-                                bottom: 0.2.h,
+                                left: 0.8.w,
                               ),
                               child: Image.asset(
                                 ConstantsAssets.verifiedImage,
